@@ -1,0 +1,17 @@
+/*
+ * ${className}
+ * Created on : ${date}
+ * Author : ${username}
+ */
+${packageName}
+
+${importStatements}
+
+/**
+ * TODO
+ * 
+ * @author ${username}
+ */
+object ${className} ${extends} ${traits} {
+
+}

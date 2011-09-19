@@ -1,0 +1,18 @@
+<skin>
+    <!-- Sample
+    <element type="comment" background= "" foreground = "" bold="" italics="" pattern="" />
+    -->
+    <background color="0x363636"/>
+    <foreground color="0xffffff"/>
+    <cursor color="0xf2eca4"/>
+    <element type="inlineComment" foreground="0x8080C0" italics="true"/>
+    <element type="multilineComment" foreground="0x8080C0" italics="true"/>
+    <element type="quotes" foreground="0xFF8080"/>
+    <element type="symbols" foreground="0xefa7e2"/>
+    <element type="digits" foreground="0x9ecff8"/>
+    <element type="operation" bold="true"/>
+    <element type="ident"/>
+    <element type="reserved" foreground="0xf89d16" bold="true"/>
+    <element type="typeDefs" foreground="0xaaaaaa" bold="true"/>
+    <element type="leftParen"/>
+</skin>

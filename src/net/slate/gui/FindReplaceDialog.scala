@@ -1,0 +1,142 @@
+package net.slate.gui
+
+import java.awt.{ BorderLayout, Color, FlowLayout }
+import java.awt.event.KeyEvent
+import javax.swing.{ BorderFactory, BoxLayout, JRadioButton, JButton, JTextField, JCheckBox, JDialog, JPanel }
+import javax.swing.text.Document
+import scala.swing._
+import scala.swing.event._
+import net.slate.Launch._
+
+class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
+  title = "Find"
+  val SPACING = 5
+
+  var findForward = true
+
+  var curFinder: Finder = null
+  
+//  com.sun.awt.AWTUtilities.setWindowOpacity(peer, 0.8f)
+
+  val pane = new JPanel(new BorderLayout(SPACING, SPACING));
+  pane.setBorder(BorderFactory.createEmptyBorder(SPACING, SPACING, SPACING, SPACING))
+  peer.getContentPane.add(pane)
+
+  val pnlCenter = new JPanel(new BorderLayout(SPACING, SPACING))
+  val pnlRight = new JPanel()
+  pnlRight.setLayout(new BoxLayout(pnlRight, BoxLayout.Y_AXIS))
+  val pnlBottom = new JPanel(new BorderLayout(SPACING, SPACING))
+  val pnlOptions = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0))
+  val pnlDirection = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0))
+  pane.add(pnlCenter, BorderLayout.CENTER)
+  pane.add(pnlRight, BorderLayout.EAST)
+  pnlCenter.add(pnlBottom, BorderLayout.SOUTH)
+  pnlBottom.add(pnlOptions, BorderLayout.WEST)
+  pnlBottom.add(pnlDirection, BorderLayout.EAST)
+  pnlOptions.setBorder(BorderFactory.createTitledBorder("Options"))
+  pnlDirection.setBorder(BorderFactory.createTitledBorder("Direction"))
+
+  val chkCase = new JCheckBox("Case sensitive")
+  pnlOptions.add(chkCase)
+  chkCase.setMnemonic('c')
+
+  val radUp = new RadioButton("Up") { mnemonic = Key('u') }
+  val radDown = new RadioButton("Down") {
+    mnemonic = Key('d')
+    selected = true
+  }
+  pnlDirection.add(radUp.peer)
+  pnlDirection.add(radDown.peer)
+
+  val txtFind = new JTextField()
+  pnlCenter.add(txtFind, BorderLayout.NORTH)
+
+  val butFind = new Button("Find Next")
+  val butCancel = new Button("Cancel")
+  pnlRight.add(butFind.peer)
+  pnlRight.add(butCancel.peer)
+
+  listenTo(butFind, butCancel)
+  reactions += {
+    case ButtonClicked(`butFind`) =>
+      findForward = radDown.selected
+      findNext(findForward)
+    case ButtonClicked(`butCancel`) =>
+      peer.setVisible(false)
+  }
+
+  preferredSize = new Dimension(330, 110)
+  resizable = false
+
+  def display() {
+    pack()
+    txtFind.requestFocus()
+    txtFind.selectAll()
+//    peer.setLocationRelativeTo(frame.peer)
+    peer.setLocation(950, 100);
+
+    peer.setVisible(true)
+  }
+
+  private var lastOcc: Occurrence = null
+
+  def findNext(forward: Boolean): Boolean = {
+    curFinder = makeFinder
+
+    val caret = currentScript.text.peer.getCaretPosition
+
+    lastOcc = curFinder.findNext(currentScript.text.peer.getDocument(), caret, forward)
+
+    if (lastOcc == null) {
+      selectNone()
+      //      alertInfo ("Finished searching the document")
+      println("not found")
+      false
+    } else {
+      selectText(lastOcc.pos, lastOcc.length)
+      true
+    }
+  }
+
+  def selectText(index: Int, length: Int) {
+    currentScript.text.peer.setSelectionStart(index)
+    currentScript.text.peer.setSelectionEnd(index + length)
+  }
+  def selectNone() {
+    selectText(0, 0)
+  }
+
+  def makeFinder: Finder = {
+    new PlainTextFinder(txtFind.getText, chkCase.isSelected)
+  }
+}
+
+case class Occurrence(pos: Int, length: Int)
+
+abstract class Finder {
+  def findNext(doc: Document, startPos: Int, findForward: Boolean): Occurrence
+}
+
+class PlainTextFinder(casedTarget: String, caseSensitive: Boolean) extends Finder {
+  def findNext(doc: Document, startPos: Int, findForward: Boolean): Occurrence = {
+    val docText = doc.getText(0, doc.getLength)
+    val text = if (caseSensitive) docText else docText.toLowerCase
+    val target = if (caseSensitive) casedTarget else casedTarget.toLowerCase
+    val pos =
+      if (findForward) {
+        if (startPos == text.length)
+          -1
+        else
+          text.indexOf(target, startPos)
+      } else {
+        //        if (startPos == 0)
+        //          -1
+        //        else
+        text.lastIndexOf(target, /*startPos - */ target.length)
+      }
+    if (pos >= 0)
+      return new Occurrence(pos, target.length)
+    else
+      return null
+  }
+}

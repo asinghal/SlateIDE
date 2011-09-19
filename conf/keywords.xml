@@ -1,0 +1,121 @@
+<keywords>
+	  <reserved>abstract</reserved>
+      <reserved>case</reserved>
+      <reserved>catch</reserved>
+      <reserved>class</reserved>
+      <reserved>def</reserved>
+      <reserved>do</reserved>
+      <reserved>else</reserved>
+      <reserved>extends</reserved>
+      <reserved>final</reserved>
+      <reserved>finally</reserved>
+      <reserved>for</reserved>
+      <reserved>forSome</reserved>
+      <reserved>if</reserved>
+      <reserved>implicit</reserved>
+      <reserved>import</reserved>
+      <reserved>lazy</reserved>
+      <reserved>match</reserved>
+      <reserved>new</reserved>
+      <reserved>object</reserved>
+      <reserved>override</reserved>
+      <reserved>package</reserved>
+      <reserved>private</reserved>
+      <reserved>protected</reserved>
+      <reserved>requires</reserved>
+      <reserved>return</reserved>
+      <reserved>sealed</reserved>
+      <reserved>throw</reserved>
+      <reserved>trait</reserved>
+      <reserved>try</reserved>
+      <reserved>type</reserved>
+      <reserved>val</reserved>
+      <reserved>var</reserved>
+      <reserved>with</reserved>
+      <reserved>while</reserved>
+      <reserved>yield</reserved>
+      <reserved>=&gt;</reserved>
+	  
+	  <reserved>false</reserved>
+	  <reserved>null</reserved>
+	  <reserved>super</reserved>
+	  <reserved>this</reserved>
+	  <reserved>true</reserved>
+
+      <!-- java.lang.* wrapper types -->
+      <type>Character</type>
+      <type>Integer</type>
+
+      <!-- scala.* primitive types -->
+      <type>Boolean</type>
+      <type>Byte</type>
+      <type>Char</type>
+      <type>Double</type>
+      <type>Float</type>
+      <type>Int</type>
+      <type>Long</type>
+      <type>Short</type>
+      <type>Unit</type>
+
+      <!-- scala.* predefined types -->
+      <!--<predefinedType>Actor</predefinedType>
+      <predefinedType>ActorProxy</predefinedType>
+      <predefinedType>ActorTask</predefinedType>
+      <predefinedType>ActorThread</predefinedType>
+      <predefinedType>AllRef</predefinedType>-->
+      <predefinedType>Any</predefinedType>
+      <predefinedType>AnyRef</predefinedType>
+      <!--<predefinedType>Application</predefinedType>
+      <predefinedType>AppliedType</predefinedType>-->
+      <predefinedType>Array</predefinedType>>
+      <!--<predefinedType>ArrayBuffer</predefinedType>
+      <predefinedType>Attribute</predefinedType>
+      <predefinedType>BoxedArray</predefinedType>
+      <predefinedType>BoxedBooleanArray</predefinedType>
+      <predefinedType>BoxedByteArray</predefinedType>
+      <predefinedType>BoxedCharArray</predefinedType>
+      <predefinedType>Buffer</predefinedType>
+      <predefinedType>BufferedIterator</predefinedType>
+      <predefinedType>Enumeration</predefinedType>
+      <predefinedType>Fluid</predefinedType>
+      <predefinedType>Function</predefinedType>
+      <predefinedType>IScheduler</predefinedType>
+      <predefinedType>ImmutableMapAdaptor</predefinedType>
+      <predefinedType>ImmutableSetAdaptor</predefinedType>
+      <predefinedType>Iterable</predefinedType>
+      <predefinedType>List</predefinedType> -->
+      <predefinedType>Option</predefinedType>
+      <predefinedType>Pair</predefinedType>
+      <!--<predefinedType>PartialFunction</predefinedType>
+      <predefinedType>Pid</predefinedType>
+      <predefinedType>PriorityQueue</predefinedType>
+      <predefinedType>PriorityQueueProxy</predefinedType>
+      <predefinedType>Reaction</predefinedType>
+      <predefinedType>Ref</predefinedType>
+      <predefinedType>Responder</predefinedType> -->
+      <predefinedType>RichInt</predefinedType>
+      <predefinedType>RichString</predefinedType>
+      <!-- <predefinedType>Rule</predefinedType>
+      <predefinedType>RuleTransformer</predefinedType>
+      <predefinedType>Script</predefinedType> -->
+      <predefinedType>Some</predefinedType>
+      <!-- <predefinedType>Stream</predefinedType>-->
+      <predefinedType>String</predefinedType>
+      <predefinedType>Symbol</predefinedType>
+      <!--<predefinedType>TcpService</predefinedType>
+      <predefinedType>TcpServiceWorker</predefinedType>
+      <predefinedType>Vector</predefinedType>
+      <predefinedType>WorkerThread</predefinedType>-->
+
+      <!-- scala.* predefined objects -->
+      <predefinedType>Console</predefinedType>
+      <predefinedType>Nil</predefinedType>
+      <predefinedType>None</predefinedType>
+      <predefinedType>Predef</predefinedType>
+      <!--<predefinedType>RemoteActor</predefinedType>
+      <predefinedType>SUnit</predefinedType>
+      <predefinedType>ScalaRunTime</predefinedType>
+      <predefinedType>Scheduler</predefinedType>
+      <predefinedType>TIMEOUT</predefinedType>
+      <predefinedType>TimerThread</predefinedType>-->
+</keywords>
