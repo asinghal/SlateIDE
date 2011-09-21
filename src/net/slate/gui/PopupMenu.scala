@@ -24,8 +24,10 @@ class PopupMenu extends Component with Wrapper {
 }
 
 class EditorPopupMenu extends PopupMenu with MenuPainter {
+  import net.slate.action._
+
   contents += new Menu("Source") with MenuFont {
-    contents += new MenuItem("Format") with MenuFont
+    contents += new MenuItem("Format") with MenuFont { peer.addActionListener(new FormatFileAction) }
     contents += new MenuItem("Organise Imports") with MenuFont
   }
   contents += new Menu("Execute") with MenuFont {

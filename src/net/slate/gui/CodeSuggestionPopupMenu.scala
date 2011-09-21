@@ -12,14 +12,15 @@ import net.slate.Launch._
 object CodeSuggestionPopupMenu {
   import java.awt.event.KeyEvent
   import javax.swing.{ DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, Popup, PopupFactory }
-  import net.slate.editor.tools.{ CodeAssist, TypeIndexer }
+  import net.slate.ExecutionContext
+  import net.slate.editor.tools.{ CodeAssist, CodeTemplates, TypeIndexer }
 
   var popup: Popup = null
 
   def show(owner: Component, x: Int, y: Int) {
     val factory = PopupFactory.getSharedInstance()
     val word = CodeAssist.getWord
-    val list = new TypeIndexer("").find(word._2)
+    val list = new TypeIndexer(ExecutionContext.currentProjectName).find(word._2)
     val contents = new JList(list)
     contents.setCellRenderer(new CodeSuggestionRenderer)
     val scrollpane = new JScrollPane(contents)
@@ -33,8 +34,11 @@ object CodeSuggestionPopupMenu {
           val pane = currentScript.text
           list(index) match {
             case x: String =>
-              val text = x.substring(0, x.indexOf("-")).trim
+              var text = x.substring(0, x.indexOf("-")).trim
               pane.doc.remove(word._1, pane.caret.position - word._1)
+              if (CodeTemplates.map.contains(text)) {
+            	  text = CodeTemplates.map(text)
+              }
 
               pane.doc.insertString(pane.caret.position, text, null)
           }

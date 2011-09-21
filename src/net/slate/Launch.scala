@@ -4,7 +4,7 @@ import scala.swing._
 import scala.swing.event._
 import scala.actors.Actor._
 import java.awt.{ Color, Cursor, Font, Frame, Toolkit }
-import java.io._
+import java.io.{ PipedInputStream, PipedOutputStream, PrintStream }
 import javax.swing.event._
 import javax.swing.{ SwingUtilities, UIManager }
 import javax.swing.text.DefaultStyledDocument
@@ -13,7 +13,7 @@ import net.slate.gui._
 import net.slate.formatting.Configuration
 
 /**
- * 
+ *
  * @author Aishwarya Singhal
  *
  */
@@ -57,9 +57,7 @@ object Launch extends SimpleGUIApplication {
     val splitPane = new SplitPane(Orientation.Horizontal) {
       topComponent = tabPane
 
-      bottomComponent = new ScrollPane {
-        viewportView = outputPane
-      }
+      bottomComponent = bottomTabPane
 
       preferredSize = new Dimension(1024, 1024)
 
@@ -100,6 +98,7 @@ object Launch extends SimpleGUIApplication {
   }
 
   lazy val findDialog = new FindDialog(top)
+  lazy val lookUpDialog = new LookupResourceDialog(top)
   lazy val newItemDialog = new NewItemDetailsDialog(top)
 
   def textPane(name: String, path: String) = new EditorTabbedPane(name, path)
@@ -108,24 +107,28 @@ object Launch extends SimpleGUIApplication {
     focusable = false
   }
 
+  val bottomTabPane = new ResultsTabbedPane
+
+  val outputPane = bottomTabPane.outputPane
+
   def currentScript = tabPane.selection.page.content.asInstanceOf[ScriptScrollPane]
 
   def addTab(name: String, path: String): Boolean = {
     if (!tabs.contains(name)) {
       tabPane.pages += new TabbedPane.Page(name, new ScriptScrollPane(name, path))
-      
+
       val index = tabPane.pages.length - 1
-      
+
       tabPane.selection.index = index
       tabs += (name -> index)
-      
-//      val pnl = new javax.swing.JPanel();
-//      pnl.setOpaque(false);
-//      pnl.add(new Label(tabPane.peer.getTitleAt(index)).peer)
-//      pnl.add(new TabButton().peer)
-//      
-//      tabPane.peer.setTabComponentAt(index, pnl)
-      
+
+      //      val pnl = new javax.swing.JPanel();
+      //      pnl.setOpaque(false);
+      //      pnl.add(new Label(tabPane.peer.getTitleAt(index)).peer)
+      //      pnl.add(new TabButton().peer)
+      //      
+      //      tabPane.peer.setTabComponentAt(index, pnl)
+
       true
     } else {
       tabPane.selection.index = tabs(name)
@@ -150,13 +153,6 @@ object Launch extends SimpleGUIApplication {
       add(text, Position.Center)
       add(new BorderPanel { add(new TabButton(), Position.East) }, Position.North)
     }
-  }
-
-  val outputPane = new TextPane {
-    font = displayFont
-    background = (Configuration.editorBackground)
-    foreground = (Configuration.editorForeground)
-    peer.setCaretColor(Configuration.editorCursorColor)
   }
 
   val statusBar = new Label {

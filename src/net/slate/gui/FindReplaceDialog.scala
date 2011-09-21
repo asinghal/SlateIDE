@@ -15,14 +15,15 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   var findForward = true
 
   var curFinder: Finder = null
-  
-//  com.sun.awt.AWTUtilities.setWindowOpacity(peer, 0.8f)
+
+  //  com.sun.awt.AWTUtilities.setWindowOpacity(peer, 0.8f)
 
   val pane = new JPanel(new BorderLayout(SPACING, SPACING));
   pane.setBorder(BorderFactory.createEmptyBorder(SPACING, SPACING, SPACING, SPACING))
   peer.getContentPane.add(pane)
 
   val pnlCenter = new JPanel(new BorderLayout(SPACING, SPACING))
+  val pnlTextBoxes = new JPanel(new BorderLayout(SPACING, SPACING))
   val pnlRight = new JPanel()
   pnlRight.setLayout(new BoxLayout(pnlRight, BoxLayout.Y_AXIS))
   val pnlBottom = new JPanel(new BorderLayout(SPACING, SPACING))
@@ -49,11 +50,16 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   pnlDirection.add(radDown.peer)
 
   val txtFind = new JTextField()
-  pnlCenter.add(txtFind, BorderLayout.NORTH)
+  pnlCenter.add(pnlTextBoxes, BorderLayout.NORTH)
+  pnlTextBoxes.add(txtFind, BorderLayout.NORTH)
+  val txtReplace = new JTextField()
+  pnlTextBoxes.add(txtReplace, BorderLayout.SOUTH)
 
   val butFind = new Button("Find Next")
+  val butReplace = new Button("Replace All")
   val butCancel = new Button("Cancel")
   pnlRight.add(butFind.peer)
+  pnlRight.add(butReplace.peer)
   pnlRight.add(butCancel.peer)
 
   listenTo(butFind, butCancel)
@@ -61,18 +67,21 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
     case ButtonClicked(`butFind`) =>
       findForward = radDown.selected
       findNext(findForward)
+    case ButtonClicked(`butReplace`) =>
+      findForward = radDown.selected
+      findNext(findForward)
     case ButtonClicked(`butCancel`) =>
       peer.setVisible(false)
   }
 
-  preferredSize = new Dimension(330, 110)
+  preferredSize = new Dimension(330, 150)
   resizable = false
 
   def display() {
     pack()
     txtFind.requestFocus()
     txtFind.selectAll()
-//    peer.setLocationRelativeTo(frame.peer)
+    //    peer.setLocationRelativeTo(frame.peer)
     peer.setLocation(950, 100);
 
     peer.setVisible(true)
@@ -90,12 +99,16 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
     if (lastOcc == null) {
       selectNone()
       //      alertInfo ("Finished searching the document")
-      println("not found")
+      println("Text not found. Perhaps start at the beginning of this file? ")
       false
     } else {
       selectText(lastOcc.pos, lastOcc.length)
       true
     }
+  }
+
+  def replace = {
+    makeFinder.replaceAll(currentScript.text.peer.getDocument(), txtReplace.getText)
   }
 
   def selectText(index: Int, length: Int) {
@@ -115,6 +128,8 @@ case class Occurrence(pos: Int, length: Int)
 
 abstract class Finder {
   def findNext(doc: Document, startPos: Int, findForward: Boolean): Occurrence
+
+  def replaceAll(doc: Document, replacement: String)
 }
 
 class PlainTextFinder(casedTarget: String, caseSensitive: Boolean) extends Finder {
@@ -138,5 +153,15 @@ class PlainTextFinder(casedTarget: String, caseSensitive: Boolean) extends Finde
       return new Occurrence(pos, target.length)
     else
       return null
+  }
+
+  def replaceAll(doc: Document, replacement: String) = {
+    var next: Occurrence = findNext(doc, 0, true)
+
+    while (next != null) {
+      doc.remove(next.pos, next.length)
+      doc.insertString(next.pos, replacement, null)
+      next = findNext(doc, 0, true)
+    }
   }
 }

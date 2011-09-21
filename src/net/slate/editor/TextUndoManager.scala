@@ -1,9 +1,11 @@
 package net.slate.editor
 
-import javax.swing.undo.{UndoableEdit, CompoundEdit, UndoManager}
+import javax.swing.undo.{ UndoableEdit, CompoundEdit, UndoManager }
 import java.lang.Boolean
 import java.beans.PropertyChangeListener
-import javax.swing.event.{UndoableEditEvent, SwingPropertyChangeSupport}
+import javax.swing.event.{ UndoableEditEvent, SwingPropertyChangeSupport }
+
+import net.slate.Launch._
 
 class TextUndoManager extends UndoManager {
   def addPropertyChangeListener(listener: PropertyChangeListener) {
@@ -18,13 +20,14 @@ class TextUndoManager extends UndoManager {
   var firstModified = 0L
   var modificationMarker = editToBeUndone()
 
+  var hasChangedSinceLastSave = false
+  var titlePrefix = ""
 
   override def die() {
     val undoable = canUndo
     super.die()
     firePropertyChangeEvent('Undo.name, undoable, canUndo)
   }
-
 
   override def discardAllEdits() {
     val undoable = canUndo
@@ -33,14 +36,18 @@ class TextUndoManager extends UndoManager {
     modificationMarker = editToBeUndone()
     firePropertyChangeEvent('Undo.name, undoable, canUndo)
     firePropertyChangeEvent('Redo.name, redoable, canRedo)
+    titlePrefix = ""
+    hasChangedSinceLastSave = false
+    if (tabPane.selection.page.title.startsWith("* ")) {
+      tabPane.selection.page.title = tabPane.selection.page.title.substring(2)
+    }
   }
 
   def hasChanged = modificationMarker != editToBeUndone()
 
-
   override def redo() {
     compoundEdit.end()
-    if(firstModified == 0L) {
+    if (firstModified == 0L) {
       firstModified = editToBeRedone().asInstanceOf[StructuredEdit].editedTime
     }
     val undoable = canUndo
@@ -48,10 +55,9 @@ class TextUndoManager extends UndoManager {
     firePropertyChangeEvent('Undo.name, undoable, canUndo)
   }
 
-
   override def redoTo(edit: UndoableEdit) {
     compoundEdit.end()
-    if(firstModified == 0L) {
+    if (firstModified == 0L) {
       firstModified = editToBeRedone().asInstanceOf[StructuredEdit].editedTime
     }
     val undoable = canUndo
@@ -60,11 +66,10 @@ class TextUndoManager extends UndoManager {
   }
 
   def reset() {
-    if(modificationMarker != editToBeUndone()) {
+    if (modificationMarker != editToBeUndone()) {
       modificationMarker = editToBeUndone()
     }
   }
-
 
   override def trimEdits(from: Int, to: Int) {
     val undoable = canUndo
@@ -76,7 +81,7 @@ class TextUndoManager extends UndoManager {
 
   override def undo() {
     compoundEdit.end()
-    if(firstModified == editToBeUndone.asInstanceOf[StructuredEdit].editedTime) {
+    if (firstModified == editToBeUndone.asInstanceOf[StructuredEdit].editedTime) {
       firstModified = 0
     } else if (firstModified == 0) {
       firstModified = editToBeUndone().asInstanceOf[StructuredEdit].editedTime
@@ -86,27 +91,31 @@ class TextUndoManager extends UndoManager {
     firePropertyChangeEvent('Redo.name, redoable, canRedo)
   }
 
-
   override def undoableEditHappened(e: UndoableEditEvent) {
     val edit = e.getEdit
     val undoable = canUndo
     var editTime = System.currentTimeMillis()
-    if(firstModified == 0 || editTime - compoundEdit.editedTime > 700){
+    if (firstModified == 0 || editTime - compoundEdit.editedTime > 700) {
       compoundEdit.end()
       compoundEdit = new StructuredEdit
     }
     compoundEdit.addEdit(edit)
-    if(firstModified == 0) {
+    if (firstModified == 0) {
       firstModified = compoundEdit.editedTime
     }
-    if(lastEdit() != compoundEdit) {
+    if (lastEdit() != compoundEdit) {
       addEdit(compoundEdit)
       firePropertyChangeEvent('Undo.name, undoable, canUndo)
     }
 
+    hasChangedSinceLastSave = true
+    if (titlePrefix == "") {
+      titlePrefix = "* "
+      tabPane.selection.page.title = titlePrefix + tabPane.selection.page.title
+    }
   }
 
-  protected def firePropertyChangeEvent(name:String, oldValue:Boolean, newValue:Boolean) {
+  protected def firePropertyChangeEvent(name: String, oldValue: Boolean, newValue: Boolean) {
     propChangeSupport.firePropertyChange(name, oldValue, newValue)
   }
 
@@ -115,7 +124,7 @@ class TextUndoManager extends UndoManager {
 
     override def addEdit(anEdit: UndoableEdit) = {
       val result = super.addEdit(anEdit)
-      if(result && editedTime == 0L){
+      if (result && editedTime == 0L) {
         editedTime = System.currentTimeMillis
       }
       result

@@ -10,6 +10,6 @@ object ExecutionContext {
       file.contains(project)
     }
 
-    if (p.isEmpty) null else p(0)
+    if (p.isEmpty) loadedProjects(0) else p(0)
   }
 }

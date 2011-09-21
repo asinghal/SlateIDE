@@ -3,70 +3,98 @@ package net.slate.builder
 import scala.xml._
 import scala.actors.Actor._
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, File }
+import java.io.{ File, FileReader }
 import scala.io.Source
 
 trait Builder {
 
+  import net.slate.util.FileUtils
+
   lazy val configuration = loadConfig
 
-  def build
+  def build: List[Message]
 
+  /**
+   *
+   * @return
+   */
   protected def supportedExtension: String
 
-  protected def findAllFiles(dir: String): List[String] = {
-    var list = List[String]()
+  /**
+   *
+   * @param dir
+   * @return
+   */
+  protected def findAllFiles(dir: String): List[String] = FileUtils.findAllFiles(dir, supportedExtension)
 
-    new File(dir).list.foreach { f =>
-      val file = dir + File.separator + f
-      
-      if (f.toLowerCase.endsWith(supportedExtension)) {
-        list :::= List(file)
-      } else if (new File(file).isDirectory) {
-        list :::= findAllFiles(file)
-      }
-    }
-    
-    list
-  }
+  /**
+   *
+   * @param dir
+   * @param command
+   */
+  protected def execute(dir: String, command: String*) = {
 
-  protected def execute(command: Array[String]) = {
-    //
-    //    val pb =
-    //      new ProcessBuilder("C:\\scala-2.8.1.final\\bin\\scalac.bat", " -d " + "C:\\project\\github\\portal\\bin " + dir + "\\controllers\\PersonsController.scala" /*, "myArg1", "myArg2"*/ )
-    //    pb.directory(new File("C:\\project\\github\\portal\\app"))
-    //    val p = pb.start()
-    //    actor {
-    //      p.waitFor
-    //      val source = Source.fromInputStream(p.getInputStream)
-    //      val lines = source.mkString
-    //      source.close()
-    //      println(">>>>>>>>>>>>>   " + p.exitValue);
-    //      println(lines);
-    //    }
-
-    val p = Runtime.getRuntime.exec(command)
-    actor {
+    val a = actor {
+      val pb =
+        new ProcessBuilder(command: _*)
+      var env = pb.environment
+      env.put("JAVA_OPTS", "-Xmx512M -Xms32M -Xss20M")
+      pb.directory(new File(dir))
+      val p = pb.start()
       p.waitFor
-      val source = Source.fromInputStream(p.getErrorStream)
-      val lines = source.mkString
-      source.close()
-      println(lines);
-    println ("done")
+      println("done")
+      println(read(p.getErrorStream))
+      println(read(p.getInputStream))
+      p.destroy
     }
   }
 
+  /**
+   * 
+   * @param stream
+   */
+  private def read(stream: java.io.InputStream) = {
+    val source = Source.fromInputStream(stream)
+    val lines = source.mkString
+    source.close()
+  }
+
+  /**
+   * 
+   * @return
+   */
   private def loadConfig = {
-    val skin = XML.load(getClass.getClassLoader.getResourceAsStream("builders.xml"))
+    val xml = XML.load(getClass.getClassLoader.getResourceAsStream("builders.xml"))
 
     var config = Map[String, String]()
 
-    skin \\ "builder" foreach { builder =>
+    xml \\ "builder" foreach { builder =>
       val builderType = (builder \\ "@type").text
       val executablePath = (builder \\ "@executable_path").text
       config += (builderType -> executablePath)
     }
 
     config
+  }
+
+  /**
+   * 
+   * @param project
+   * @return
+   */
+  protected def settings(project: String) = {
+    val xml = XML.load(new FileReader(project + File.separator + ".slate" + File.separator + "settings.xml"))
+
+    var config = Map[String, String]()
+
+    var src = List[String]()
+
+    xml \\ "srcdirs" \\ "dir" foreach { srcdir =>
+      src :::= List(project + File.separator + (srcdir \\ "@path").text)
+    }
+    val destdir = project + File.separator + (xml \\ "destdir" \\ "@path").text
+
+    val classpath = (xml \\ "classpath" \\ "@path").text
+    (src, destdir, classpath)
   }
 }

@@ -1,0 +1,8 @@
+<templates>
+    <template name="sysout" description="print to stdout">
+    	println
+    </template>
+    <template name="asin" description="as instance of">
+    	asInstanceOf[]
+    </template>
+</templates>

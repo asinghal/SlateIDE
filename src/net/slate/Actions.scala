@@ -37,8 +37,8 @@ object Actions {
       loop {
         val line = reader.readLine()
         if (line != null) {
-          outputPane.text += (line + "\n")
-          outputPane.caret.position = outputPane.text.length
+          outputPane.pane.text += (line + "\n")
+          outputPane.pane.caret.position = outputPane.pane.text.length
         } else exit()
       }
     }
@@ -126,11 +126,21 @@ object Actions {
   }
 
   val saveAction = registerAction("Save", "control S", new ImageIcon("images/save_edit.gif")) {
+    if (currentScript.text.undoManager.hasChangedSinceLastSave) {
+      saveFile
+      bottomTabPane.problems.clear
+      actor {
+        ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName) }
+        bottomTabPane.selection.index = 1
+      }
+    }
+  }
+
+  def saveFile = {
     val writer = new BufferedWriter(new FileWriter(currentScript.text.path))
     writer.write(currentScript.text.text)
     writer.close()
-    
-    ScalaBuilder.build
+    currentScript.text.undoManager.discardAllEdits
   }
 
   val saveAsAction = registerAction("Save As", "F5", new ImageIcon("images/saveas_edit.gif")) {
@@ -141,6 +151,7 @@ object Actions {
         val writer = new BufferedWriter(new FileWriter(file))
         writer.write(currentScript.text.text)
         writer.close()
+        currentScript.text.undoManager.discardAllEdits
         lastFileOperationDirectory = Some(file.getParent)
       case _ =>
     }
@@ -160,11 +171,11 @@ object Actions {
     currentScript.text.text = ""
   }
   val clearOutputAction = registerAction("Clear", "control E") {
-    outputPane.text = ""
+    outputPane.pane.text = ""
   }
   val resetReplAction = registerAction("Reset", "control shift E") {}
   val newTabAction = registerAction("New Tab", "control T") {
-	  val name = "Script" + (tabPane.pages.length + 1) + ".scala";
+    val name = "Script" + (tabPane.pages.length + 1) + ".scala";
     addTab(name, "." + File.separator + name)
   }
   val closeTabAction = registerAction("Close Tab", "control F4") {

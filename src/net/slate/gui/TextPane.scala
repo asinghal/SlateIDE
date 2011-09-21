@@ -8,7 +8,7 @@ import net.slate.Launch._
 import net.slate.Actions
 
 /**
- * 
+ *
  * @author Aishwarya Singhal
  *
  */
@@ -23,7 +23,7 @@ class TextPane extends TextComponent {
 }
 
 /**
- * 
+ *
  * @author Aishwarya Singhal
  *
  */
@@ -47,10 +47,24 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   foreground_=(Configuration.editorForeground)
 
   addActionforKeyStroke(KeyEvent.VK_ENTER, new AutoIndentAction(peer))
+  addActionforKeyStroke(KeyEvent.VK_F11, new javax.swing.AbstractAction {
+    import net.slate.Launch._
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      top.fileExplorer.size = new Dimension(5, top.fileExplorer.size.getHeight.asInstanceOf[Int])
+      top.splitPane.size = new Dimension(1024, top.splitPane.size.getHeight.asInstanceOf[Int])
+    }
+  })
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction(peer))
+  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift F"), new FormatFileAction)
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       findDialog.display
+    }
+  })
+
+  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift R"), new javax.swing.AbstractAction {
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      lookUpDialog.display
     }
   })
 

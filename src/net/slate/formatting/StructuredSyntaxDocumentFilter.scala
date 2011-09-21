@@ -211,8 +211,12 @@ object FilterFactory {
       filter = new PropertiesFileFilter(doc)
     } else if (name != null && (name.toLowerCase.endsWith(".xml") || name.toLowerCase.endsWith(".html"))) {
       filter = new XMLFilter(doc)
-      } else if (name != null && name.toLowerCase.endsWith(".yml")) {
+    } else if (name != null && name.toLowerCase.endsWith(".yml")) {
       filter = new YMLFilter(doc)
+    } else if (name != null && name.toLowerCase.endsWith(".css")) {
+      filter = new CSSFilter(doc)
+    } else if (name != null && name.toLowerCase.endsWith(".js")) {
+      filter = new JSFilter(doc)
     } else {
       filter = new DocumentFilter {}
     }

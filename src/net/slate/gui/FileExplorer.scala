@@ -8,12 +8,12 @@ import scala.swing._
 import scala.swing.event._
 
 import net.slate.{ ExecutionContext, Launch }
+import net.slate.builder.ProjectConfigurator
 
 class FileExplorer(dir: File) extends ScrollPane {
   import Launch._
   import net.slate.editor.tools.TypeIndexer
-
-  val IDE_CONF_DIR = ".cafe"
+  import net.slate.util.FileUtils
 
   val customLeafIcon = new ImageIcon("images/file.png")
 
@@ -29,18 +29,12 @@ class FileExplorer(dir: File) extends ScrollPane {
       val treePath = tree.getPathForLocation(e.getX(), e.getY())
       if (treePath != null) {
         if (e.getButton == java.awt.event.MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+          val start = System.currentTimeMillis
           val node = treePath.getLastPathComponent().asInstanceOf[DefaultMutableTreeNode]
 
           node.getUserObject match {
             case fileNode: FileNode =>
-              if (!fileNode.isDirectory && addTab(fileNode.name, fileNode.path)) {
-                val source = scala.io.Source.fromFile(fileNode.path)
-                val lines = source.mkString
-                source.close()
-                currentScript.text.text = lines
-                currentScript.text.peer.setSelectionStart(0)
-                currentScript.text.peer.setSelectionEnd(0)
-                currentScript.text.undoManager.reset
+              if (!fileNode.isDirectory && FileUtils.open(fileNode.name, fileNode.path)) {
               }
             case _ =>
           }
@@ -92,10 +86,12 @@ class FileExplorer(dir: File) extends ScrollPane {
       var files = List[FileNode]()
       // Make two passes, one for Dirs and one for Files. This is #1.
       ol foreach { file =>
-        val newPath = if (curPath.equals(".")) file else (curPath + File.separator + file)
-        val f = new File(newPath)
+        if (file != ".slate") {
+          val newPath = if (curPath.equals(".")) file else (curPath + File.separator + file)
+          val f = new File(newPath)
 
-        if (f.isDirectory()) addNodes(curDir, f) else files :::= List(new FileNode(file, newPath))
+          if (f.isDirectory()) addNodes(curDir, f) else files :::= List(new FileNode(file, newPath))
+        }
       }
 
       // Pass two: for files.
@@ -116,13 +112,8 @@ class FileExplorer(dir: File) extends ScrollPane {
   def openProject(project: File, persist: Boolean = true) = {
     if (project != null) {
       tree.setModel(new DefaultTreeModel(addNodes(top, project)))
-      new TypeIndexer("").index
-      
-      val ideDir = new File(project.getPath + File.separator + IDE_CONF_DIR)
-      
-      if (!ideDir.exists) {
-    	  ideDir.mkdir
-      }
+      ProjectConfigurator.init(project)
+      new TypeIndexer(project.getAbsolutePath).index
 
       ExecutionContext.loadedProjects :::= List(project.getPath)
 

@@ -27,7 +27,6 @@ object ScalaFilter {
   val SYMBOL = "'[\\w]*"
   val QUOTES = "(?ms:\"{3}(?!\\\"{1,3}).*?(?:\"{3}|\\z))|(?:\"{1}(?!\\\").*?(?:\"|\\Z))"
   val IDENT = "[\\w\\$&&[\\D]][\\w\\$]*"
-  val IDENT2 = "[\\w]*"
   val OPERATION = "[\\w\\$&&[\\D]][\\w\\$]* *\\("
   val LEFT_PARENS = "\\("
   val DIGITS = "\\d+?[efld]?"
