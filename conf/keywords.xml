@@ -34,7 +34,7 @@
       <reserved>with</reserved>
       <reserved>while</reserved>
       <reserved>yield</reserved>
-      <reserved>=&gt;</reserved>
+      <!--<reserved>=&gt;</reserved>-->
 	  
 	  <reserved>false</reserved>
 	  <reserved>null</reserved>
@@ -43,8 +43,8 @@
 	  <reserved>true</reserved>
 
       <!-- java.lang.* wrapper types -->
-      <type>Character</type>
-      <type>Integer</type>
+      <!--<type>Character</type>
+      <type>Integer</type>-->
 
       <!-- scala.* primitive types -->
       <type>Boolean</type>
@@ -92,9 +92,9 @@
       <predefinedType>PriorityQueueProxy</predefinedType>
       <predefinedType>Reaction</predefinedType>
       <predefinedType>Ref</predefinedType>
-      <predefinedType>Responder</predefinedType> -->
+      <predefinedType>Responder</predefinedType>
       <predefinedType>RichInt</predefinedType>
-      <predefinedType>RichString</predefinedType>
+      <predefinedType>RichString</predefinedType>-->
       <!-- <predefinedType>Rule</predefinedType>
       <predefinedType>RuleTransformer</predefinedType>
       <predefinedType>Script</predefinedType> -->
@@ -108,10 +108,11 @@
       <predefinedType>WorkerThread</predefinedType>-->
 
       <!-- scala.* predefined objects -->
-      <predefinedType>Console</predefinedType>
+      <!--<predefinedType>Console</predefinedType>-->
       <predefinedType>Nil</predefinedType>
       <predefinedType>None</predefinedType>
-      <predefinedType>Predef</predefinedType>
+      <predefinedType>Nothing</predefinedType>
+      <!--<predefinedType>Predef</predefinedType>-->
       <!--<predefinedType>RemoteActor</predefinedType>
       <predefinedType>SUnit</predefinedType>
       <predefinedType>ScalaRunTime</predefinedType>

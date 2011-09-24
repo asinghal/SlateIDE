@@ -6,7 +6,7 @@ import net.slate.Actions._
 import net.slate.Launch._
 
 /**
- * 
+ *
  *
  */
 class FormatFileAction extends AbstractAction with IndentText with LineParser {
@@ -22,19 +22,33 @@ class FormatFileAction extends AbstractAction with IndentText with LineParser {
     var formattedText = ""
     var previousLineBlank = false
 
+    var previousExtraIndent = 0
+
     lines.split("\n").foreach { l =>
       val lastOpeningBrace = previousLine.lastIndexOf("{")
-      val indent = if (previousLine.trim.endsWith("{")) 2
+      val indent = if (previousLine.trim.startsWith("//") || l.trim.startsWith("//")) 0
+      else if (previousLine.trim.endsWith("{")) 2
       else if (l.trim.startsWith("}")) -2
       else if (previousLine.trim.startsWith("/*") && l.trim.startsWith("* ")) 1
       else if (previousLine.trim.endsWith("*/")) -1
       else if (lastOpeningBrace != -1 && lastOpeningBrace > previousLine.lastIndexOf("}")) 2
       else 0
-      val indentation = whitespace(countWhitespace(previousLine) + indent)
+
+      //      var extraIndent = if (l.trim.startsWith("else ")) previousLine.trim.lastIndexOf(" if ") + 1 else 0
+      var adjustment = indent
+      //      if (l.trim.startsWith("else if ")) {
+      //        previousExtraIndent = 0
+      //        if (previousLine.trim.startsWith("else if ")) {
+      //          0
+      //        } else (indent + extraIndent)
+      //      } else (indent + extraIndent - previousExtraIndent)
+
+      val indentation = whitespace(countWhitespace(previousLine) + adjustment)
       var indentedLine = ("\n" + indentation + l.trim.replaceAll("//[ \\t]*", "// "))
       indentedLine = indentedLine.replaceAll("[ \\t]*\\Z", "")
       indentedLine = formatAssignmentArrow(indentedLine)
       indentedLine = formatEqualsSign(indentedLine)
+      indentedLine = formatComment(indentedLine)
 
       if (!previousLineBlank || l.trim != "")
         formattedText += indentedLine
@@ -42,6 +56,8 @@ class FormatFileAction extends AbstractAction with IndentText with LineParser {
         previousLine = indentedLine.replace("\n", "")
         previousLineBlank = false
       } else previousLineBlank = true
+
+      //      previousExtraIndent = extraIndent
     }
 
     currentScript.text.text = formattedText.trim
@@ -56,6 +72,11 @@ class FormatFileAction extends AbstractAction with IndentText with LineParser {
   private def formatEqualsSign(s: String) = {
     // handle cases like "val x+=10; v::=a; v:::=a; v/=a; v*=a; v-=a; 
     // x += 10; v ::= a; v :::= a; v /= a; v *= a; v -= a; a { a=>b }"
-    s.replaceAll("[ \\t]*([:\\+\\-/\\*]*)?=[ \\t]*(>)?", " $1=$2 ")
+    s.replaceAll("[ \\t]*([:\\+\\-/\\*!><]*)?=(=)?[ \\t]*(>)?", " $1=$2$3 ")
+  }
+  
+  
+  private def formatComment(s: String) = {
+    s.replaceAll("//[ \\t]*", "// ")
   }
 }

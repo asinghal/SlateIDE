@@ -1,0 +1,19 @@
+/*
+ * ${className}
+ * Created on : ${date}
+ * Author : ${username}
+ */
+${packageName}
+
+${importStatements}
+
+/**
+ * TODO
+ * 
+ * @author ${username}
+ */
+object ${className} ${extends} ${traits} {
+
+  def main(args: Array[String]) = {
+  }
+}

@@ -8,9 +8,13 @@ import scala.io.Source
 
 trait Builder {
 
+  import net.slate.ExecutionContext._
   import net.slate.util.FileUtils
-
   lazy val configuration = loadConfig
+
+  private lazy val pathSeparator = System.getProperty("path.separator")
+
+  var buildInProgress = false
 
   def build: List[Message]
 
@@ -27,58 +31,38 @@ trait Builder {
    */
   protected def findAllFiles(dir: String): List[String] = FileUtils.findAllFiles(dir, supportedExtension)
 
-  /**
-   *
-   * @param dir
-   * @param command
-   */
-  protected def execute(dir: String, command: String*) = {
+  protected def execute(program: String, className: String, vmArgs: String = "") = {
+    val projectSettings = settings(currentProjectName)
 
-    val a = actor {
-      val pb =
-        new ProcessBuilder(command: _*)
-      var env = pb.environment
-      env.put("JAVA_OPTS", "-Xmx512M -Xms32M -Xss20M")
-      pb.directory(new File(dir))
-      val p = pb.start()
+    val command = configuration(program)
+    val dir = projectSettings._2
+    val classpath = dir + pathSeparator + projectSettings._3
+    
+    val pb =
+      new ProcessBuilder(command, "-classpath", classpath, vmArgs, className)
+    pb.directory(new File(dir))
+    val p = pb.start()
+    runningProcess = p
+    
+    actor {
       p.waitFor
-      println("done")
       println(read(p.getErrorStream))
       println(read(p.getInputStream))
       p.destroy
+      println("done")
+      runningProcess = null
     }
   }
 
-  /**
-   * 
-   * @param stream
-   */
   private def read(stream: java.io.InputStream) = {
     val source = Source.fromInputStream(stream)
     val lines = source.mkString
     source.close()
+    lines
   }
 
   /**
-   * 
-   * @return
-   */
-  private def loadConfig = {
-    val xml = XML.load(getClass.getClassLoader.getResourceAsStream("builders.xml"))
-
-    var config = Map[String, String]()
-
-    xml \\ "builder" foreach { builder =>
-      val builderType = (builder \\ "@type").text
-      val executablePath = (builder \\ "@executable_path").text
-      config += (builderType -> executablePath)
-    }
-
-    config
-  }
-
-  /**
-   * 
+   *
    * @param project
    * @return
    */
@@ -94,7 +78,57 @@ trait Builder {
     }
     val destdir = project + File.separator + (xml \\ "destdir" \\ "@path").text
 
+    if (!new File(destdir).exists) {
+      new File(destdir).mkdir
+    }
+
     val classpath = (xml \\ "classpath" \\ "@path").text
-    (src, destdir, classpath)
+    (src, destdir, qualifyClasspath(classpath, project))
+  }
+
+  /**
+   *
+   * @param src
+   * @return
+   */
+  protected def isModified(src: String, srcDir: String, destDir: String) = {
+    val bytecode = src.replace(supportedExtension, ".class").replace(srcDir, destDir)
+    new File(src).lastModified > new File(bytecode).lastModified
+  }
+
+  /**
+   *
+   * @return
+   */
+  private def loadConfig = {
+    val skin = XML.load(getClass.getClassLoader.getResourceAsStream("builders.xml"))
+
+    var config = Map[String, String]()
+
+    skin \\ "builder" foreach { builder =>
+      val builderType = (builder \\ "@type").text
+      val executablePath = (builder \\ "@executable_path").text
+      config += (builderType -> executablePath)
+    }
+
+    config
+  }
+
+  private def qualifyClasspath(classpath: String, project: String) = {
+    var cp = ""
+    classpath.split(pathSeparator).foreach { p =>
+      if (p.endsWith("*.jar") || p.endsWith("*.zip")) {
+        val dir = p.replace("*.jar", "").replace("*.zip", "")
+        new File(dir).list.filter { lib => lib.endsWith(".jar") || lib.endsWith(".zip") }.foreach { lib =>
+          cp += (dir + lib + pathSeparator)
+        }
+      } else if (p.startsWith(".\\")) {
+    	  cp += (project + File.separator + p.substring(2))
+      } else {
+    	  cp += (p + pathSeparator)
+      }
+    }
+    
+    cp
   }
 }

@@ -64,8 +64,6 @@ class TypeIndexer(project: String) {
 
       ready = true
 
-      println("done indexing")
-
       w.close()
     }
   }

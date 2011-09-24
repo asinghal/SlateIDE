@@ -1,0 +1,8 @@
+<settings>
+<srcdirs>
+<dir path="${src}"/>
+<dir path="${test}"/>
+</srcdirs>
+<destdir path="${classes}"/>
+<classpath path="${classpath}"/>
+</settings>

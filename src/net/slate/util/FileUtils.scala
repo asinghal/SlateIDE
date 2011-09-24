@@ -18,7 +18,7 @@ object FileUtils {
    *
    * @return List
    */
-  def findAllFiles(dir: String, supportedExtension: String): List[String] = {
+  def findAllFiles(dir: String, supportedExtension: String, ignoredExtension: String = ".class"): List[String] = {
     var list = List[String]()
 
     if (new File(dir).exists) {
@@ -27,10 +27,11 @@ object FileUtils {
 
         val isDirectory = new File(file).isDirectory
 
-        if (!isDirectory && (supportedExtension == null || f.toLowerCase.endsWith(supportedExtension))) {
+        if (!isDirectory && (supportedExtension == null || f.toLowerCase.endsWith(supportedExtension))
+        		 && (ignoredExtension == null || !f.toLowerCase.endsWith(ignoredExtension))) {
           list :::= List(file)
         } else if (isDirectory) {
-          list :::= findAllFiles(file, supportedExtension)
+          list :::= findAllFiles(file, supportedExtension, ignoredExtension)
         }
       }
     }

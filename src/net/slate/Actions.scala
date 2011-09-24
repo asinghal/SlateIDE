@@ -10,7 +10,7 @@ import scala.actors.Actor._
 import scala.util.Properties._
 import scala.tools.nsc.{ Interpreter, Settings, InterpreterResults }
 import swing._
-import net.slate.builder.ScalaBuilder
+import net.slate.builder.{ JavaBuilder, ScalaBuilder }
 
 object Actions {
 
@@ -70,40 +70,6 @@ object Actions {
     }
   }
 
-  def classPathAction(configure: JFileChooser => Unit) {
-    val fileChooser = new JFileChooser(lastFileOperationDirectory.getOrElse("~"))
-    configure(fileChooser)
-    fileChooser.showOpenDialog(top.self) match {
-      case JFileChooser.APPROVE_OPTION =>
-        //        ClasspathManager.addExtraClasspathTo(currentScalaVersion, fileChooser.getSelectedFiles)
-        //        ClassLoaderManager.reset(currentScalaVersion)
-        lastFileOperationDirectory = Some(fileChooser.getSelectedFiles.apply(0).getParent)
-        resetReplAction.apply()
-        updateStatusBar("Classpath changed. Repl reset.")
-      case _ =>
-    }
-  }
-
-  val addArtifactsAction = registerAction("Add Artifacts ...", "control I") {}
-
-  val showClassPathAction = registerAction("Show Added ClassPath ...", "control K") {}
-
-  val addJarsAction = registerAction("Add Jars ...", "control J")(classPathAction { fileChooser =>
-    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
-    fileChooser.setFileHidingEnabled(false)
-    fileChooser.setMultiSelectionEnabled(true)
-    fileChooser.setFileFilter(new FileFilter() {
-      def accept(pathname: File) = pathname.isDirectory || pathname.getName.endsWith(".jar")
-
-      def getDescription = "*.jar"
-    })
-  })
-  val addClassesAction = registerAction("Add Classes ...", "control d")(classPathAction { fileChooser =>
-    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-    fileChooser.setFileHidingEnabled(false)
-    fileChooser.setMultiSelectionEnabled(true)
-  })
-
   val openAction = registerAction("Open", "control O", new ImageIcon("images/open.gif")) {
     val fileChooser = new JFileChooser(lastFileOperationDirectory.getOrElse("~"))
 
@@ -130,6 +96,7 @@ object Actions {
       saveFile
       bottomTabPane.problems.clear
       actor {
+        JavaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName) }
         ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName) }
         bottomTabPane.selection.index = 1
       }
@@ -140,7 +107,7 @@ object Actions {
     val writer = new BufferedWriter(new FileWriter(currentScript.text.path))
     writer.write(currentScript.text.text)
     writer.close()
-    currentScript.text.undoManager.discardAllEdits
+    currentScript.text.undoManager.save
   }
 
   val saveAsAction = registerAction("Save As", "F5", new ImageIcon("images/saveas_edit.gif")) {
@@ -165,15 +132,11 @@ object Actions {
       writeToRepl ! (mode, toRun)
   }
 
-  val runAction = registerAction("Run", "control R") { runScript('Normal) }
-  val runSelectedAction = registerAction("Run selected", "control shift R") { runScript('Normal, true) }
-  val clearScriptAction = registerAction("Clear", "control L") {
-    currentScript.text.text = ""
-  }
+  val runAction = registerAction("Run on Interpreter", "control R") { runScript('Normal) }
+  val runSelectedAction = registerAction("Run selected on Interpreter", "control shift R") { runScript('Normal, true) }
   val clearOutputAction = registerAction("Clear", "control E") {
     outputPane.pane.text = ""
   }
-  val resetReplAction = registerAction("Reset", "control shift E") {}
   val newTabAction = registerAction("New Tab", "control T") {
     val name = "Script" + (tabPane.pages.length + 1) + ".scala";
     addTab(name, "." + File.separator + name)
@@ -190,6 +153,18 @@ object Actions {
       case c if c == tabPane.pages.length - 1 => 0
       case current => current + 1
     }
+  }
+
+  lazy val helpDialog = new net.slate.gui.HelpDialog(Launch.top)
+
+  lazy val aboutDialog = new net.slate.gui.AboutDialog(Launch.top)
+
+  val helpAction = registerAction("Help", "F1") {
+    helpDialog.display
+  }
+
+  val aboutAction = registerAction("About", "alt F1") {
+    aboutDialog.display
   }
 
   object UndoAction extends UpdateCaretListener("Undo") with PropertyChangeListener {
@@ -258,28 +233,23 @@ object MainMenuBar extends MenuBar {
       contents += new MenuItem(openAction)
       contents += new MenuItem(saveAction)
       contents += new MenuItem(saveAsAction)
-      contents += new MenuItem(clearScriptAction)
       contents += new MenuItem(newTabAction)
       contents += new MenuItem(closeTabAction)
     }
 
-    contents += new Menu("Script") {
-      contents += new MenuItem(runAction)
-      contents += new MenuItem(runSelectedAction)
-      contents += new Separator
-      contents += new MenuItem(clearOutputAction)
-      contents += new MenuItem(resetReplAction)
-      contents += new Separator
-      contents += new Menu("Add To Classpath") {
-        contents += new MenuItem(addJarsAction)
-        contents += new MenuItem(addClassesAction)
-        contents += new MenuItem(addArtifactsAction)
-      }
-      contents += new MenuItem(showClassPathAction)
-    }
     contents += new Menu("Edit") {
       contents += new MenuItem(UndoAction)
       contents += new MenuItem(RedoAction)
+    }
+    
+    contents += new Menu("Scala") {
+      contents += new MenuItem(runAction)
+      contents += new MenuItem(runSelectedAction)
+    }
+    
+    contents += new Menu("Help") {
+      contents += new MenuItem(helpAction)
+      contents += new MenuItem(aboutAction)
     }
   }.peer, BorderLayout.CENTER)
 }

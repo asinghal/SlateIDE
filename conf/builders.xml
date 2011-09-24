@@ -1,7 +1,6 @@
 <builders>
     
-    <builder type="scalac" executable_path="C:\scala-2.8.1.final\bin\scalac.bat"/>
-    <builder type="javac" executable_path="C:\Program Files\Java\jdk1.6.0_23\bin\javac.exe"/>
-    <builder type="ant" executable_path="C:\project\workspace\ScalaCafe\tools\apache-ant-1.8.2\bin\ant.bat"/>
+    <builder type="scala" executable_path="C:\scala-2.8.1.final\bin\scala.bat"/>
+    <builder type="java" executable_path="C:\Program Files\Java\jdk1.6.0_23\bin\java.exe"/>
     
 </builders>

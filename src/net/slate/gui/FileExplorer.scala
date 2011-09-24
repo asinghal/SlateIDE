@@ -29,7 +29,6 @@ class FileExplorer(dir: File) extends ScrollPane {
       val treePath = tree.getPathForLocation(e.getX(), e.getY())
       if (treePath != null) {
         if (e.getButton == java.awt.event.MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-          val start = System.currentTimeMillis
           val node = treePath.getLastPathComponent().asInstanceOf[DefaultMutableTreeNode]
 
           node.getUserObject match {
@@ -110,7 +109,7 @@ class FileExplorer(dir: File) extends ScrollPane {
   }
 
   def openProject(project: File, persist: Boolean = true) = {
-    if (project != null) {
+    if (project != null && project.exists) {
       tree.setModel(new DefaultTreeModel(addNodes(top, project)))
       ProjectConfigurator.init(project)
       new TypeIndexer(project.getAbsolutePath).index
@@ -119,6 +118,8 @@ class FileExplorer(dir: File) extends ScrollPane {
 
       if (persist)
         ProjectDetailsSerializer.write(ProjectDetailsSerializer.read ::: List(new ProjectDetails(project.getPath, true)))
+    } else {
+      ProjectDetailsSerializer.write(ProjectDetailsSerializer.read.remove(p => p.path == project.getPath))
     }
   }
 

@@ -39,6 +39,7 @@ object Launch extends SimpleGUIApplication {
       val str = new String(buf, off, len)
       SwingUtilities.invokeLater(new Runnable() {
         def run() {
+          bottomTabPane.selection.index = 0
           replOs.write(str.getBytes)
           replOs.flush()
         }
@@ -46,6 +47,7 @@ object Launch extends SimpleGUIApplication {
     }
   }
   System.setOut(sysOutErr)
+  System.setErr(sysOutErr)
 
   lazy val top = new MainFrame {
     iconImage = TrayIcon.icon
@@ -82,15 +84,8 @@ object Launch extends SimpleGUIApplication {
 
     listenTo(this)
     reactions += {
-      case SelectionChanged(_) =>
-        updateStatusBar("Switching Scala Version...")
-        actor {
-          Actions.resetReplAction.apply()
-          updateStatusBar("Ready")
-        }
-        currentScript.text.requestFocus()
       case WindowIconified(w) =>
-        if (TrayIcon.supported) w.visible = false
+        if (TrayIcon.supported) w.visible = true
     }
     centerOnScreen()
     updateStatusBar("Ready")
@@ -99,7 +94,7 @@ object Launch extends SimpleGUIApplication {
 
   lazy val findDialog = new FindDialog(top)
   lazy val lookUpDialog = new LookupResourceDialog(top)
-  lazy val newItemDialog = new NewItemDetailsDialog(top)
+  lazy val runDialog = new RunDialog(top)
 
   def textPane(name: String, path: String) = new EditorTabbedPane(name, path)
 

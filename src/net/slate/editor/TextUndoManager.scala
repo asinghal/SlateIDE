@@ -37,6 +37,10 @@ class TextUndoManager extends UndoManager {
     firePropertyChangeEvent('Undo.name, undoable, canUndo)
     firePropertyChangeEvent('Redo.name, redoable, canRedo)
     titlePrefix = ""
+    save
+  }
+
+  def save = {
     hasChangedSinceLastSave = false
     if (tabPane.selection.page.title.startsWith("* ")) {
       tabPane.selection.page.title = tabPane.selection.page.title.substring(2)

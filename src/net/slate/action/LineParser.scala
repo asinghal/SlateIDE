@@ -18,4 +18,10 @@ trait LineParser {
 
     doc.getParagraphElement(caret).getStartOffset
   }
+  
+  protected def endOfLine(textPane: JTextPane, caret: Int) = {
+    val doc = textPane.getDocument().asInstanceOf[javax.swing.text.DefaultStyledDocument]
+
+    doc.getParagraphElement(caret).getEndOffset
+  }
 }

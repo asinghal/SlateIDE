@@ -30,10 +30,10 @@ class EditorPopupMenu extends PopupMenu with MenuPainter {
     contents += new MenuItem("Format") with MenuFont { peer.addActionListener(new FormatFileAction) }
     contents += new MenuItem("Organise Imports") with MenuFont
   }
-  contents += new Menu("Execute") with MenuFont {
-    contents += new MenuItem("Run") with MenuFont
-    contents += new MenuItem("Debug") with MenuFont
-  }
+  //  contents += new Menu("Execute") with MenuFont {
+  //    contents += new MenuItem("Run") with MenuFont
+  //    contents += new MenuItem("Debug") with MenuFont
+  //  }
 }
 
 class ProjectTreeMenu extends PopupMenu with MenuPainter {
@@ -44,12 +44,31 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
   preferredSize = new Dimension(100, 100)
 
   contents += new Menu("New") with CreateNewItemMenuItem {
-    contents += new MenuItem(createNewItemAction("Scala Class", "ScalaClass")) with CreateNewItemMenuItem
-    contents += new MenuItem(createNewItemAction("Scala Object", "ScalaObject")) with CreateNewItemMenuItem
-    contents += new MenuItem(createNewItemAction("Scala Trait", "ScalaTrait")) with CreateNewItemMenuItem
+
+    // template names need to start with Scala/ Java/ General as the dialog box logic depends on it
+    contents += new Menu("Scala") with CreateNewItemMenuItem {
+      contents += new MenuItem(createNewItemAction("Application", "ScalaApplication", "newapplication")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Class", "ScalaClass", "newclass")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Object", "ScalaObject", "newobject")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Trait", "ScalaTrait", "newtrait")) with CreateNewItemMenuItem
+    }
+
+    contents += new Menu("Java") with CreateNewItemMenuItem {
+      contents += new MenuItem(createNewItemAction("Annotation", "JavaAnnotation", "newannotation")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Class", "JavaClass", "newclass")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Enum", "JavaEnum", "newenum")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Interface", "JavaInterface", "newint")) with CreateNewItemMenuItem
+    }
+
+    contents += new Menu("General") with CreateNewItemMenuItem {
+      contents += new MenuItem(createNewItemAction("File", "GeneralFile", "newfile")) with CreateNewItemMenuItem
+      contents += new MenuItem(createNewItemAction("Folder", "GeneralFolder", "newfolder")) with CreateNewItemMenuItem
+    }
   }
 
-  def createNewItemAction(text: String, templateName: String) = new Action(text) {
+  def createNewItemAction(text: String, templateName: String, iconName: String) = new Action(text) {
+    icon = new javax.swing.ImageIcon("images/" + iconName + ".gif")
+
     def apply() {
       form.display(templateName, path, nodeRow)
     }
@@ -67,7 +86,7 @@ trait MenuFont {
 
 trait CreateNewItemMenuItem {
   self: Component =>
-  val itemSize = new Dimension(100, 20)
+  val itemSize = new Dimension(150, 20)
   minimumSize = itemSize
   maximumSize = itemSize
 }

@@ -10,18 +10,19 @@ object ScalaBuilder extends Builder {
   def build: List[Message] = {
 
     val projectSettings = settings(currentProjectName)
-    var sourceFiles = List[File]()
+    var sourceFiles = List[String]()
 
     val destDir = projectSettings._2
     val classpath = projectSettings._3
 
     projectSettings._1.foreach { dir =>
-      findAllFiles(dir).filter { isModified(_) }.foreach { x => sourceFiles :::= List(new File(x)) }
+      findAllFiles(dir).filter { isModified(_, dir, destDir) }.foreach { x => sourceFiles :::= List(x) }
     }
 
     var errors = List[Message]()
 
-    if (!sourceFiles.isEmpty) {
+    if (!sourceFiles.isEmpty && !buildInProgress) {
+      buildInProgress = true
       val settings = new Settings
       settings.outdir.value = destDir
       settings.classpath.value = classpath
@@ -29,13 +30,12 @@ object ScalaBuilder extends Builder {
 
       val reporter = new ConsoleReporter(settings) {
         override def printMessage(msg: String) {
-          //          println(msg + "\n")
           if (msg.indexOf(": error:") != -1) { errors :::= List(Message.parse(msg)) }
         }
       }
       val compiler = new Global(settings, reporter) // compiles the actual code
-
-      try new compiler.Run compile (sourceFiles map (_.toString))
+      
+      try new compiler.Run compile (sourceFiles)
       catch {
         case ex: Throwable =>
           ex.printStackTrace()
@@ -45,14 +45,14 @@ object ScalaBuilder extends Builder {
 
       reporter.printSummary()
     }
+    buildInProgress = false
 
     errors
   }
 
-  protected def supportedExtension: String = ".scala"
-
-  private def isModified(src: String) = {
-    val bytecode = src.replace(supportedExtension, ".class")
-    new File(src).lastModified > new File(bytecode).lastModified
+  def run(className: String) = {
+    execute("scala", className)
   }
+
+  protected def supportedExtension: String = ".scala"
 }

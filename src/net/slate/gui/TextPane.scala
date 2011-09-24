@@ -67,6 +67,12 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       lookUpDialog.display
     }
   })
+  
+  addActionforKeyStroke(KeyStroke.getKeyStroke("control F11"), new javax.swing.AbstractAction {
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      runDialog.display
+    }
+  })
 
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {

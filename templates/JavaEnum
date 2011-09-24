@@ -1,0 +1,15 @@
+/*
+ * ${className}
+ * Created on : ${date}
+ * Author : ${username}
+ */
+${packageName}
+
+/**
+ * TODO
+ * 
+ * @author ${username}
+ */
+public enum ${className} {
+
+}

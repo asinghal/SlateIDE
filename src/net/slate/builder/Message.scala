@@ -13,12 +13,12 @@ class Message(val projectName: String, val description: String, val file: String
 object Message {
   import net.slate.ExecutionContext
 
-  def parse(line: String) = {
+  def parse(line: String, messageStartPosition:Int = 3) = {
     val projectName = ExecutionContext.currentProjectName
     val report = line.replace(projectName + java.io.File.separator, "").split(":")
     var msg = ""
     val name = projectName.substring(projectName.lastIndexOf(java.io.File.separator) + 1)
-    for (i <- 3 to report.length - 1) msg += report(i)
+    for (i <- messageStartPosition to report.length - 1) msg += report(i)
     new Message(name, msg, report(0), report(1).trim)
   }
 }

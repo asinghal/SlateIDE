@@ -1,0 +1,22 @@
+/*
+ * ${className}
+ * Created on : ${date}
+ * Author : ${username}
+ */
+${packageName}
+
+${importStatements}
+
+/**
+ * TODO
+ * 
+ * @author ${username}
+ */
+public class ${className} ${extends} ${interfaces} {
+	
+	/**
+	 * Default constructor
+	 */
+	public ${className}() {
+	}
+}

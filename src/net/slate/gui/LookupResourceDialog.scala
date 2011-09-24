@@ -1,8 +1,10 @@
 package net.slate.gui
 
-import java.awt.{ FlowLayout }
+import java.awt.FlowLayout
 import java.io.File
-import javax.swing.{ BoxLayout, DefaultListModel, JList, JPanel, JScrollPane, JTextField }
+import javax.swing.{ BoxLayout, DefaultListModel, DefaultListCellRenderer, ImageIcon, JList, JPanel, JScrollPane, JTextField }
+import javax.swing.event.{ ListSelectionEvent, ListSelectionListener }
+
 import scala.swing._
 import scala.swing.event.{ ButtonClicked, KeyReleased }
 
@@ -26,8 +28,10 @@ class LookupResourceDialog(frame: MainFrame) extends Dialog(frame.owner) {
 
   val listModel = new DefaultListModel
   val results = new JList(listModel)
+  results.setCellRenderer(new LookUpResourceRenderer)
+
   val resultsPane = new JScrollPane(results)
-  resultsPane.setPreferredSize(new Dimension(300, 300))
+  resultsPane.setPreferredSize(new Dimension(400, 400))
   pane.add(resultsPane)
 
   results.addMouseListener(new java.awt.event.MouseAdapter {
@@ -39,6 +43,17 @@ class LookupResourceDialog(frame: MainFrame) extends Dialog(frame.owner) {
     }
   })
 
+  results.addListSelectionListener(new ListSelectionListener {
+    override def valueChanged(evt: ListSelectionEvent) = {
+      if (!evt.getValueIsAdjusting()) {
+        val index = evt.getLastIndex
+        if (listModel.size > index) label.text = listModel.getElementAt(index).asInstanceOf[String]
+      }
+    }
+  })
+
+  val label = new Label
+  pane.add(label.peer)
   val buttonPanel = new JPanel(new FlowLayout)
   pane.add(buttonPanel)
   val btnOpen = new Button("Open")
@@ -53,6 +68,7 @@ class LookupResourceDialog(frame: MainFrame) extends Dialog(frame.owner) {
       listModel.clear
 
       l.foreach { listModel.addElement(_) }
+      label.text = if (!l.isEmpty) l(0) else ""
     case ButtonClicked(`btnOpen`) =>
       val index = results.getSelectedIndex()
       if (index != -1) {
@@ -73,10 +89,37 @@ class LookupResourceDialog(frame: MainFrame) extends Dialog(frame.owner) {
   def display() {
     projectFiles = FileUtils.findAllFiles(ExecutionContext.currentProjectName, null)
     pack()
+    txtFind.text = ""
     txtFind.requestFocus()
     txtFind.selectAll()
     peer.setLocationRelativeTo(frame.peer)
 
     peer.setVisible(true)
+  }
+
+  /**
+   * cell renderer for showing code options.
+   */
+  class LookUpResourceRenderer extends DefaultListCellRenderer {
+    val icon = new ImageIcon("images/img_bullet_blue.png");
+
+    /* This is the only method defined by ListCellRenderer.  We just
+     * reconfigure the Jlabel each time we're called.
+     */
+    override def getListCellRendererComponent(list: JList, value: AnyRef, index: Int, iss: Boolean, chf: Boolean) = {
+      /* The DefaultListCellRenderer class will take care of
+         * the JLabels text property, it's foreground and background
+         * colors, and so on.
+         */
+      var text = value.asInstanceOf[String]
+      text = text.substring(text.lastIndexOf(File.separator) + 1)
+      super.getListCellRendererComponent(list, text, index, iss, chf);
+
+      /* We additionally set the JLabels icon property here.
+         */
+      setIcon(icon);
+
+      this
+    }
   }
 }

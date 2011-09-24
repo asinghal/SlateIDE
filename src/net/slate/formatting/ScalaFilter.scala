@@ -16,7 +16,7 @@ class ScalaFilter(val doc: DefaultStyledDocument) extends StructuredSyntaxDocume
     (IDENT -> styles('ident)) :: Nil foreach { kv =>
       lexer.putStyle(kv._1, kv._2)
     }
-  lexer.putChild(OPERATION, new LexerNode().putStyle(LEFT_PARENS, styles('leftParen)))
+//  lexer.putChild(OPERATION, new LexerNode().putStyle(LEFT_PARENS, styles('leftParen)))
   lexer.putChild(IDENT, new LexerNode().putStyle(keywords, styles('reserved)).putStyle(typeDefs, styles('typeDefs)))
 }
 
@@ -24,8 +24,8 @@ object ScalaFilter {
   val COMMENT_COLOR = Color.LIGHT_GRAY.darker.darker
   val SLASH_STAR_COMMENT = "/\\*(?s:.)*?(?:\\*/|\\z)"
   val SLASH_SLASH_COMMENT = "//.*"
-  val SYMBOL = "'[\\w]*"
-  val QUOTES = "(?ms:\"{3}(?!\\\"{1,3}).*?(?:\"{3}|\\z))|(?:\"{1}(?!\\\").*?(?:\"|\\Z))"
+  val SYMBOL = "'[\\D][\\w]* "
+  val QUOTES = "'[\\w]'|(?ms:\"{3}(?!\\\"{1,3}).*?(?:\"{3}|\\z))|(?:\"{1}(?!\\\").*?(?:\"|\\Z))"
   val IDENT = "[\\w\\$&&[\\D]][\\w\\$]*"
   val OPERATION = "[\\w\\$&&[\\D]][\\w\\$]* *\\("
   val LEFT_PARENS = "\\("
