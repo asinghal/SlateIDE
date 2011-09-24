@@ -68,13 +68,20 @@ object Launch extends SimpleGUIApplication {
       dividerSize = 1
     }
 
+//    val panel = new javax.swing.JPanel
+//    val overlay = new javax.swing.OverlayLayout(panel)
+//    panel.setLayout(overlay)
+//
+//    panel.add(splitPane.peer)
+//    panel.add(overlayPane.peer)
+
     val toolbar = new NavigationToolBar
 
     val fileExplorer = new FileExplorer(null)
     contents = new BorderPanel {
       add(fileExplorer, BorderPanel.Position.West)
       add(toolbar, BorderPanel.Position.North)
-      add(splitPane, BorderPanel.Position.Center)
+      add(/*Component.wrap(panel)*/splitPane, BorderPanel.Position.Center)
       add(statusBar, BorderPanel.Position.South)
     }
 
@@ -105,6 +112,17 @@ object Launch extends SimpleGUIApplication {
   val bottomTabPane = new ResultsTabbedPane
 
   val outputPane = bottomTabPane.outputPane
+
+//  val overlayPane = new ScrollPane {
+//    val pane = new TextPane {
+//      font = displayFont
+//      background = (Configuration.editorBackground)
+//      foreground = (Configuration.editorForeground)
+//      peer.setCaretColor(Configuration.editorCursorColor)
+//    }
+//
+//    viewportView = pane
+//  }
 
   def currentScript = tabPane.selection.page.content.asInstanceOf[ScriptScrollPane]
 

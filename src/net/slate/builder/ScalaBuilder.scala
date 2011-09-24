@@ -50,8 +50,12 @@ object ScalaBuilder extends Builder {
     errors
   }
 
-  def run(className: String) = {
-    execute("scala", className)
+  def run(project: String, className: String, programArgs: String = "") = {
+    execute(project, "scala", className, false, programArgs.split(" "))
+  }
+
+  def runTests(project: String, className: String, programArgs: String = "") = {
+    execute(project, "scala", "org.scalatest.tools.Runner", true, Array("-p", ".", "-o", "-s", className))
   }
 
   protected def supportedExtension: String = ".scala"

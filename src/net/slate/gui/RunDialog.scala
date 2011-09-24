@@ -44,11 +44,13 @@ class RunDialog(frame: MainFrame) extends Dialog(frame.owner) {
   listenTo(btnRun, btnCancel)
   reactions += {
     case ButtonClicked(`btnRun`) =>
+    import net.slate.ExecutionContext._
 
       if (txtFind.text.trim != "") {
         peer.setVisible(false)
-        if (radScala.selected) ScalaBuilder.run(txtFind.text)
-        if (radJava.selected) JavaBuilder.run(txtFind.text)
+        val project = currentProjectName
+        if (radScala.selected) ScalaBuilder.run(project, txtFind.text)
+        if (radJava.selected) JavaBuilder.run(project, txtFind.text)
       }
 
     case ButtonClicked(`btnCancel`) =>

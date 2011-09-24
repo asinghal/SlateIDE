@@ -15,13 +15,46 @@ object TypeCacheBuilder {
     var classpath = System.getProperty("sun.boot.class.path")
     if (classpath != "") classpath += ";"
     classpath += System.getProperty("java.class.path")
-    
+
     val entries = classpath.split(";").foreach { entry =>
       if (entry.toLowerCase().endsWith(".jar")) { classes :::= getAllClassNamesFromJar(entry) }
       if (!entry.toLowerCase().endsWith(".jar")) { classes :::= findClasses(new File(entry), null) }
     }
 
     classes
+  }
+
+  /**
+   * Recursive method used to find all classes in a given directory and subdirs.
+   *
+   * @param directory   The base directory
+   * @param packageName The package name for classes found inside the base directory
+   * @return The classes
+   */
+  def findScalaTestCaseClasses(project: String): List[String] = {
+    import java.net.{ URL, URLClassLoader }
+    import net.slate.builder.ScalaBuilder
+    
+    val settings = ScalaBuilder.getClassPath(project)
+
+    var classLoader = URLClassLoader.newInstance(settings._1)
+    
+    val directory = new File(settings._2)
+
+    val scalaSuite = Class.forName("org.scalatest.Suite")
+    var classes = findClasses(directory, null).filter { file =>
+      try {
+        val method = classOf[URLClassLoader].getDeclaredMethod("findClass", classOf[String]);
+        method.setAccessible(true)
+        val c = method.invoke(classLoader, file).asInstanceOf[Class[_]]
+
+        scalaSuite.isAssignableFrom(c)
+      } catch {
+        case ex: Throwable => false
+      }
+    }
+
+    return classes;
   }
 
   /**
@@ -47,7 +80,6 @@ object TypeCacheBuilder {
       }
     } catch {
       case e: Exception =>
-//        e.printStackTrace
     }
 
     classes
@@ -77,5 +109,4 @@ object TypeCacheBuilder {
 
     return classes;
   }
-
 }

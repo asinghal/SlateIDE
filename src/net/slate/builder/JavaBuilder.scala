@@ -53,8 +53,8 @@ object JavaBuilder extends Builder {
     errors
   }
 
-  def run(className: String) = {
-    execute("java", className)
+  def run(project: String, className: String) = {
+    execute(project, "java", className)
   }
 
   protected def supportedExtension: String = ".java"

@@ -66,6 +66,24 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
     }
   }
 
+  contents += new Menu("Run") with CreateNewItemMenuItem {
+
+    // template names need to start with Scala/ Java/ General as the dialog box logic depends on it
+    contents += new Menu("Scala") with CreateNewItemMenuItem {
+      contents += new MenuItem(new Action("Test Cases") {
+        import net.slate.ExecutionContext
+        import net.slate.editor.tools.TypeCacheBuilder
+        import net.slate.builder.ScalaBuilder
+
+        def apply() {
+          val project = ExecutionContext.currentProjectName(path)
+          val classes = TypeCacheBuilder.findScalaTestCaseClasses(project)
+          classes.foreach { c => ScalaBuilder.runTests(project, c) }
+        }
+      }) with CreateNewItemMenuItem
+    }
+  }
+
   def createNewItemAction(text: String, templateName: String, iconName: String) = new Action(text) {
     icon = new javax.swing.ImageIcon("images/" + iconName + ".gif")
 

@@ -38,6 +38,7 @@ class FileExplorer(dir: File) extends ScrollPane {
             case _ =>
           }
         } else if (e.getButton == java.awt.event.MouseEvent.BUTTON3) {
+
           val node = tree.getPathForLocation(e.getX(), e.getY()).getLastPathComponent().asInstanceOf[DefaultMutableTreeNode]
           val row = tree.getRowForLocation(e.getX(), e.getY())
 

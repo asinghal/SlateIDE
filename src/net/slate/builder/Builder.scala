@@ -24,6 +24,13 @@ trait Builder {
    */
   protected def supportedExtension: String
 
+  def getClassPath(project: String) = {
+    val path = settings(project)._3
+    var urls = List[java.net.URL]()
+    path.split(pathSeparator).foreach { p => urls :::= List(new File(p).toURL) }
+
+    (urls.toArray, settings(project)._2)
+  }
   /**
    *
    * @param dir
@@ -31,25 +38,42 @@ trait Builder {
    */
   protected def findAllFiles(dir: String): List[String] = FileUtils.findAllFiles(dir, supportedExtension)
 
-  protected def execute(program: String, className: String, vmArgs: String = "") = {
-    val projectSettings = settings(currentProjectName)
+  protected def execute(project: String, program: String, className: String, test:Boolean= false,
+    programArgs: Array[String] = Array(), vmArgs: Array[String] = Array()) = {
 
-    val command = configuration(program)
+    val projectSettings = settings(project)
+
+    val executable = configuration(program)
     val dir = projectSettings._2
     val classpath = dir + pathSeparator + projectSettings._3
-    
+
+    var command = List[String]()
+
+    command :::= List.fromArray(programArgs)
+    command :::= List(className)
+    command :::= List.fromArray(vmArgs)
+    command :::= List(executable, "-classpath", classpath)
+
+    var commandList = java.util.Arrays.asList(command.toArray: _*)
+
     val pb =
-      new ProcessBuilder(command, "-classpath", classpath, vmArgs, className)
+      new ProcessBuilder(commandList)
     pb.directory(new File(dir))
+    pb.redirectErrorStream(true)
+    pb.environment.put("JAVA_OPTS", "-Xmx256M -Xms32M -Xss32M")
     val p = pb.start()
     runningProcess = p
-    
+
     actor {
+      val error = read(p.getErrorStream)
+//      println(error)
+      val output = read(p.getInputStream)
+//      println(output)
       p.waitFor
-      println(read(p.getErrorStream))
-      println(read(p.getInputStream))
       p.destroy
       println("done")
+      val netOutput = error + output
+      if (test) TestCaseMessage.parse(program, netOutput)
       runningProcess = null
     }
   }
@@ -123,12 +147,12 @@ trait Builder {
           cp += (dir + lib + pathSeparator)
         }
       } else if (p.startsWith(".\\")) {
-    	  cp += (project + File.separator + p.substring(2))
+        cp += (project + File.separator + p.substring(2))
       } else {
-    	  cp += (p + pathSeparator)
+        cp += (p + pathSeparator)
       }
     }
-    
+
     cp
   }
 }
