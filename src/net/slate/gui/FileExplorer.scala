@@ -109,6 +109,15 @@ class FileExplorer(dir: File) extends ScrollPane {
     tree.getModel.asInstanceOf[DefaultTreeModel].insertNodeInto(node, parent, parent.getChildCount())
   }
 
+  def removeNode(targetNodeRow: Int) {
+    val node = tree.getPathForRow(targetNodeRow).getLastPathComponent().asInstanceOf[DefaultMutableTreeNode]
+    val file = new File(node.getUserObject.asInstanceOf[FileNode].path)
+    println(file.getAbsolutePath)
+    FileUtils.delete(file)
+
+    tree.getModel.asInstanceOf[DefaultTreeModel].removeNodeFromParent(node)
+  }
+
   def openProject(project: File, persist: Boolean = true) = {
     if (project != null && project.exists) {
       tree.setModel(new DefaultTreeModel(addNodes(top, project)))

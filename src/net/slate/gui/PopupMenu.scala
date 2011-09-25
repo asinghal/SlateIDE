@@ -66,6 +66,14 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
     }
   }
 
+  contents += new MenuItem(new Action("Delete") {
+    import net.slate.Launch._
+
+    def apply() {
+      top.fileExplorer.removeNode(nodeRow)
+    }
+  }) with CreateNewItemMenuItem
+
   contents += new Menu("Run") with CreateNewItemMenuItem {
 
     // template names need to start with Scala/ Java/ General as the dialog box logic depends on it

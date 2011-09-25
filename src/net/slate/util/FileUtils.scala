@@ -28,7 +28,7 @@ object FileUtils {
         val isDirectory = new File(file).isDirectory
 
         if (!isDirectory && (supportedExtension == null || f.toLowerCase.endsWith(supportedExtension))
-        		 && (ignoredExtension == null || !f.toLowerCase.endsWith(ignoredExtension))) {
+          && (ignoredExtension == null || !f.toLowerCase.endsWith(ignoredExtension))) {
           list :::= List(file)
         } else if (isDirectory) {
           list :::= findAllFiles(file, supportedExtension, ignoredExtension)
@@ -58,5 +58,18 @@ object FileUtils {
     } else false
 
     opened
+  }
+
+  /**
+   * Delete a file/ directory recursively.
+   */
+  def delete(f: File): Boolean = {
+    if (f.isDirectory()) {
+      for (c <- f.listFiles) {
+        delete(c)
+      }
+    }
+
+    f.delete
   }
 }

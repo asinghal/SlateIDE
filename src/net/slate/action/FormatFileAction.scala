@@ -26,12 +26,12 @@ class FormatFileAction extends AbstractAction with IndentText with LineParser {
 
     lines.split("\n").foreach { l =>
       val lastOpeningBrace = previousLine.lastIndexOf("{")
-      val indent = if (previousLine.trim.startsWith("//") || l.trim.startsWith("//")) 0
-      else if (previousLine.trim.endsWith("{")) 2
-      else if (l.trim.startsWith("}")) -2
+      val indent = if (l.trim.startsWith("}")) -2
       else if (previousLine.trim.startsWith("/*") && l.trim.startsWith("* ")) 1
       else if (previousLine.trim.endsWith("*/")) -1
       else if (lastOpeningBrace != -1 && lastOpeningBrace > previousLine.lastIndexOf("}")) 2
+      else if (previousLine.trim.startsWith("//") || l.trim.startsWith("//")) 0
+      else if (previousLine.trim.endsWith("{")) 2
       else 0
 
       //      var extraIndent = if (l.trim.startsWith("else ")) previousLine.trim.lastIndexOf(" if ") + 1 else 0

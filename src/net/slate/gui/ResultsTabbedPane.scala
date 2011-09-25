@@ -36,15 +36,28 @@ class Console extends ScrollPane {
  *
  */
 class ProblemsTab extends ScrollPane {
+  import java.awt.event.{ MouseAdapter, MouseEvent }
   import javax.swing.table.DefaultTableModel
 
-  val columnNames: Array[AnyRef] = Array("Description", "File", "Line", "Project", "Type")
+  import net.slate.util.FileUtils
+
+  val columnNames: Array[AnyRef] = Array("Description", "File", "Line", "Project", "Type", "Location")
 
   val tableModel = new DefaultTableModel(Array[Array[AnyRef]](), columnNames)
 
   viewportView = new Table {
     font = displayFont
     model = tableModel
+
+    peer.addMouseListener(new MouseAdapter() {
+      override def mouseClicked(e: MouseEvent) = {
+        //        if (e.getButton == java.awt.event.MouseEvent.BUTTON3/* && e.getClickCount() == 2*/) {
+        val row = peer.getSelectedRow()
+        val path = peer.getValueAt(row, 5).asInstanceOf[String]
+        FileUtils.open(path.substring(path.lastIndexOf(java.io.File.separator) + 1), path)
+        //        }
+      }
+    })
   }
 
   /**
@@ -52,10 +65,12 @@ class ProblemsTab extends ScrollPane {
    * @param description
    * @param file
    * @param line
+   * @param project
+   * @param path
    * @param problemType
    */
-  def add(description: String, file: String, line: String, project: String, problemType: String = "Error") = {
-    tableModel.insertRow(tableModel.getRowCount, Array[AnyRef](description, file, line, project, problemType))
+  def add(description: String, file: String, line: String, project: String, path: String, problemType: String = "Error") = {
+    tableModel.insertRow(tableModel.getRowCount, Array[AnyRef](description, file, line, project, problemType, path))
   }
 
   /**

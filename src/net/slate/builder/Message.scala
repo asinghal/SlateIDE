@@ -4,7 +4,7 @@ package net.slate.builder
  * 
  *
  */
-class Message(val projectName: String, val description: String, val file: String, val line: String, val problemType: String = "Error") {}
+class Message(val projectName: String, val description: String, val file: String, val line: String, val path: String, val problemType: String = "Error") {}
 
 /**
  * 
@@ -19,6 +19,6 @@ object Message {
     var msg = ""
     val name = projectName.substring(projectName.lastIndexOf(java.io.File.separator) + 1)
     for (i <- messageStartPosition to report.length - 1) msg += report(i)
-    new Message(name, msg, report(0), report(1).trim)
+    new Message(name, msg, report(0), report(1).trim, projectName + java.io.File.separator + report(0))
   }
 }
