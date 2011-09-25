@@ -34,7 +34,7 @@ object ScalaBuilder extends Builder {
         }
       }
       val compiler = new Global(settings, reporter) // compiles the actual code
-      
+
       try new compiler.Run compile (sourceFiles)
       catch {
         case ex: Throwable =>
@@ -52,6 +52,12 @@ object ScalaBuilder extends Builder {
 
   def run(project: String, className: String, programArgs: String = "") = {
     execute(project, "scala", className, false, programArgs.split(" "))
+  }
+
+  def runPlay(project: String) = {
+    val play = net.slate.editor.tools.TypeCacheBuilder.findClass(project, "play.Play")
+    val init = play.getDeclaredMethod("init", classOf[File], classOf[String])
+    init.invoke(play, new File(project), "abc123123123")
   }
 
   def runTests(project: String, className: String, programArgs: String = "") = {

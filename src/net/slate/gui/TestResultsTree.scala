@@ -1,14 +1,13 @@
 package net.slate.gui
 
-import javax.swing.{ BorderFactory, ImageIcon, JTree }
+import javax.swing.{ ImageIcon, JTree }
 import javax.swing.tree.{ DefaultMutableTreeNode, DefaultTreeCellRenderer, DefaultTreeModel }
 import scala.swing._
 
 class TestResultsTree extends ScrollPane {
-  val top = new DefaultMutableTreeNode("")
+  val top = new DefaultMutableTreeNode("Test Results")
 
   val tree = new JTree(top)
-  //  tree.setBorder(BorderFactory.createEmptyBorder(10, 10, 220, 420))
   tree.setCellRenderer(new TestResultsCellRenderer)
   peer.getViewport().add(tree)
 
@@ -21,7 +20,10 @@ class TestResultsTree extends ScrollPane {
 
     val parent = addNewNode(top, className, false, !failed)
 
-    results.keys.foreach { key => addNewNode(parent, key.replace("*** FAILED ***", ""), true, results(key)._1) }
+    results.keys.foreach { key =>
+      val m = addNewNode(parent, key.replace("*** FAILED ***", ""), true, results(key)._1)
+      if (!results(key)._1) addNewNode(m, results(key)._2, false, false)
+    }
   }
 
   def clear = {
