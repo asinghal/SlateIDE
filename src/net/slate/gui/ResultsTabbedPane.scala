@@ -10,10 +10,12 @@ import net.slate.formatting.Configuration
 class ResultsTabbedPane extends TabbedPane {
   val outputPane = new Console
   val problems = new ProblemsTab
+  val testResults = new TestResultsTree
 
   focusable = false
   pages += new TabbedPane.Page("Console", outputPane)
   pages += new TabbedPane.Page("Problems", problems)
+  pages += new TabbedPane.Page("Test Results", testResults)
 
   selection.index = 0
 }

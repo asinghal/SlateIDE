@@ -112,7 +112,6 @@ class FileExplorer(dir: File) extends ScrollPane {
   def removeNode(targetNodeRow: Int) {
     val node = tree.getPathForRow(targetNodeRow).getLastPathComponent().asInstanceOf[DefaultMutableTreeNode]
     val file = new File(node.getUserObject.asInstanceOf[FileNode].path)
-    println(file.getAbsolutePath)
     FileUtils.delete(file)
 
     tree.getModel.asInstanceOf[DefaultTreeModel].removeNodeFromParent(node)

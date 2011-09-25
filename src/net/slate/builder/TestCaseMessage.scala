@@ -1,5 +1,7 @@
 package net.slate.builder
 
+import net.slate.Launch._
+
 object TestCaseMessage {
 
   def parse(program: String, line: String) = {
@@ -12,9 +14,8 @@ object TestCaseMessage {
 
   private def parseForScalaTest(line: String) = {
     var className = ""
-
-    var testcases = new java.util.HashMap[String, (Boolean, String)]()
-
+    var testcases = Map[String, (Boolean, String)]()
+    var failed = false
     var testName = ""
 
     line.split("\n").foreach { x =>
@@ -22,18 +23,19 @@ object TestCaseMessage {
 
       if (l.charAt(4) == '-') {
         testName = l.substring(6)
-        testcases.put(testName, (!l.endsWith("*** FAILED ***"), ""))
+        if (l.endsWith("*** FAILED ***")) failed = true
+        testcases = testcases.update(testName, (!l.endsWith("*** FAILED ***"), ""))
       } else if (l.startsWith("[32m") && className == "") {
         className = l.substring(4, l.indexOf(":"))
       } else if (l.startsWith("[31m ")) {
-        val status = testcases.get(testName)
+        val status = testcases(testName)
         val trace = status._2 + l.substring(5)
-        testcases.put(testName, (status._1, trace + "\n"))
+        testcases = testcases.update(testName, (status._1, trace + "\n"))
       }
     }
-
-    println(className)
-    println(testcases)
+    
+    bottomTabPane.testResults.addResult(className, testcases, failed)
+    bottomTabPane.selection.index = 2
   }
 
 }
