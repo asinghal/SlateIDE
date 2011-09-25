@@ -73,8 +73,6 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
       top.fileExplorer.removeNode(nodeRow)
     }
   }) with CreateNewItemMenuItem
-  
-  
 
   contents += new Menu("Run") with CreateNewItemMenuItem {
 
@@ -91,6 +89,40 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
           val project = ExecutionContext.currentProjectName(path)
           val classes = TypeCacheBuilder.findScalaTestCaseClasses(project)
           classes.foreach { c => ScalaBuilder.runTests(project, c) }
+        }
+      }) with CreateNewItemMenuItem
+    }
+
+    contents += new Menu("Play") with CreateNewItemMenuItem {
+      icon = new javax.swing.ImageIcon("images/play.png")
+
+      contents += new MenuItem(new Action("Server") {
+        import net.slate.ExecutionContext._
+        import net.slate.builder.PlayRunner
+
+        def apply() {
+          PlayRunner.run(currentProjectName(path))
+        }
+      }) with CreateNewItemMenuItem
+
+      contents += new MenuItem(new Action("Test Cases") {
+        import net.slate.ExecutionContext._
+        import net.slate.builder.PlayRunner
+        import net.slate.Launch._
+
+        def apply() {
+          bottomTabPane.testResults.clear
+
+          PlayRunner.runTests(currentProjectName(path))
+        }
+      }) with CreateNewItemMenuItem
+
+      contents += new MenuItem(new Action("Update Dependencies") {
+        import net.slate.ExecutionContext._
+        import net.slate.builder.PlayRunner
+
+        def apply() {
+          PlayRunner.updateDeps(currentProjectName(path))
         }
       }) with CreateNewItemMenuItem
     }

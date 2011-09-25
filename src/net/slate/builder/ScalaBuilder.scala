@@ -30,7 +30,7 @@ object ScalaBuilder extends Builder {
 
       val reporter = new ConsoleReporter(settings) {
         override def printMessage(msg: String) {
-          if (msg.indexOf(": error:") != -1) { errors :::= List(Message.parse(msg)) }
+          if (msg.indexOf(": error:") != -1) { errors :::= List(Message.parse(msg)) } else { println(msg) }
         }
       }
       val compiler = new Global(settings, reporter) // compiles the actual code
@@ -52,12 +52,6 @@ object ScalaBuilder extends Builder {
 
   def run(project: String, className: String, programArgs: String = "") = {
     execute(project, "scala", className, false, programArgs.split(" "))
-  }
-
-  def runPlay(project: String) = {
-    val play = net.slate.editor.tools.TypeCacheBuilder.findClass(project, "play.Play")
-    val init = play.getDeclaredMethod("init", classOf[File], classOf[String])
-    init.invoke(play, new File(project), "abc123123123")
   }
 
   def runTests(project: String, className: String, programArgs: String = "") = {

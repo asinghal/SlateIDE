@@ -51,7 +51,7 @@ object Launch extends SimpleGUIApplication {
 
   lazy val top = new MainFrame {
     iconImage = TrayIcon.icon
-    title = "Scala Cafe"
+    title = "Slate"
     menuBar = MainMenuBar
 
     TrayIcon.init

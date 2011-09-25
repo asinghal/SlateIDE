@@ -27,7 +27,7 @@ trait Builder {
   def getClassPath(project: String) = {
     settings(project)._3
   }
-  
+
   def getClassPathURLs(project: String) = {
     val path = System.getProperty("sun.boot.class.path") + pathSeparator + settings(project)._3
     var urls = List[java.net.URL]()
@@ -42,7 +42,7 @@ trait Builder {
    */
   protected def findAllFiles(dir: String): List[String] = FileUtils.findAllFiles(dir, supportedExtension)
 
-  protected def execute(project: String, program: String, className: String, test:Boolean= false,
+  protected def execute(project: String, program: String, className: String, test: Boolean = false,
     programArgs: Array[String] = Array(), vmArgs: Array[String] = Array()) = {
 
     val projectSettings = settings(project)
@@ -58,6 +58,10 @@ trait Builder {
     command :::= List.fromArray(vmArgs)
     command :::= List(executable, "-classpath", classpath)
 
+    executeCommand(command, dir, program, test)
+  }
+
+  protected def executeCommand(command: List[String], dir: String, program: String, test: Boolean) = {
     var commandList = java.util.Arrays.asList(command.toArray: _*)
 
     val pb =
