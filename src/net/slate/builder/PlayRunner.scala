@@ -26,7 +26,7 @@ object PlayRunner extends Builder {
 
     val executable = configuration("play")
 
-    executeCommand(List(executable, "run", "-Xmx256M", "-Xms256M", "-Xss32M"), project, executable, false)
+    executeCommand(List(executable, "run", "-Xmx256M", "-Xms256M", "-Xss32M"), project, "play", false)
   }
 
   /**
@@ -34,7 +34,7 @@ object PlayRunner extends Builder {
    */
   def updateDeps(project: String) = {
     val executable = configuration("play")
-    executeCommand(List(executable, "deps"), project, executable, false)
+    executeCommand(List(executable, "deps"), project, "play", false)
   }
 
   /**
@@ -43,7 +43,7 @@ object PlayRunner extends Builder {
   def runTests(project: String, className: String = "", programArgs: String = "") = {
     val executable = configuration("play")
 
-    executeCommand(List(executable, "autotest", "-Xmx256M", "-Xms256M", "-Xss32M"), project, executable, true)
+    executeCommand(List(executable, "autotest", "-Xmx256M", "-Xms256M", "-Xss32M"), project, "play", true)
   }
 
   /**

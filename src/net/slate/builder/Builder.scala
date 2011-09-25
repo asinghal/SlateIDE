@@ -81,7 +81,7 @@ trait Builder {
       p.destroy
       println("done")
       val netOutput = error + output
-      if (test) TestCaseMessage.parse(program, netOutput)
+      if (test) TestCaseMessage.parse(dir, program, netOutput)
       runningProcess = null
     }
   }
