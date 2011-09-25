@@ -38,15 +38,6 @@ class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
     }
   })
 
-  results.addListSelectionListener(new ListSelectionListener {
-    override def valueChanged(evt: ListSelectionEvent) = {
-      if (!evt.getValueIsAdjusting()) {
-        val index = evt.getLastIndex
-        select(index)
-      }
-    }
-  })
-
   val label = new Label
   pane.add(label.peer)
   val buttonPanel = new JPanel(new FlowLayout)
@@ -65,7 +56,7 @@ class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
 
         var list = new TypeIndexer(ExecutionContext.currentProjectName).find(txtFind.text.trim).map { s => s.asInstanceOf[String] }.filter { s => !s.contains("$") }
         list = if (txtFind.text.contains(".")) list.filter { s => s.contains(txtFind.text) } else list.filter { s => s.toLowerCase.startsWith(txtFind.text.toLowerCase) }
-        
+
         if (list.size > 1) {
           list = list.filter { s => s.toLowerCase.contains(txtFind.text.toLowerCase.substring(txtFind.text.lastIndexOf(".") + 1) + " ") }
         }
@@ -146,9 +137,24 @@ class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
   }
 
   private def select(index: Int) = {
+    import net.slate.Launch._
+
     listModel.getElementAt(index) match {
       case x: String =>
-        val list = new TypeIndexer(ExecutionContext.currentProjectName).find(x)
+
+        var text = x.substring(0, x.lastIndexOf(":"))
+
+        if (text.startsWith("__PUBLIC__")) {
+          text = text.replace("__PUBLIC__", "").trim
+        } else if (text.startsWith("__PRIVATE__")) {
+          text = text.replace("__PRIVATE__", "").trim
+        } else {
+          text = text.replace("__PROTECTED__", "").trim
+        }
+
+        val pane = currentScript.text
+        pane.doc.insertString(pane.caret.position, text, null)
+        peer.setVisible(false)
     }
   }
 
