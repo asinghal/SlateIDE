@@ -68,6 +68,12 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     }
   })
   
+  addActionforKeyStroke(KeyStroke.getKeyStroke("control T"), new javax.swing.AbstractAction {
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      codeAssistDialog.display
+    }
+  })
+  
   addActionforKeyStroke(KeyStroke.getKeyStroke("control F11"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       runDialog.display

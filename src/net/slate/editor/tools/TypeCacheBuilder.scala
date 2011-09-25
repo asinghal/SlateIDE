@@ -3,20 +3,23 @@ package net.slate.editor.tools
 import java.io.{ File, FileInputStream }
 import java.util.jar.{ JarEntry, JarInputStream }
 
+import net.slate.builder.ScalaBuilder
+
 /**
  *
  * @author Aishwarya Singhal
  */
 object TypeCacheBuilder {
+  private lazy val pathSeparator = System.getProperty("path.separator")
 
-  def getAllClassNames = {
+  def getAllClassNames(project: String) = {
     var classes = List[String]()
 
     var classpath = System.getProperty("sun.boot.class.path")
-    if (classpath != "") classpath += ";"
-    classpath += System.getProperty("java.class.path")
+    if (classpath != "") classpath += pathSeparator
+    classpath += ScalaBuilder.getClassPath(project)
 
-    val entries = classpath.split(";").foreach { entry =>
+    val entries = classpath.split(pathSeparator).foreach { entry =>
       if (entry.toLowerCase().endsWith(".jar")) { classes :::= getAllClassNamesFromJar(entry) }
       if (!entry.toLowerCase().endsWith(".jar")) { classes :::= findClasses(new File(entry), null) }
     }
@@ -33,12 +36,11 @@ object TypeCacheBuilder {
    */
   def findScalaTestCaseClasses(project: String): List[String] = {
     import java.net.{ URL, URLClassLoader }
-    import net.slate.builder.ScalaBuilder
-    
-    val settings = ScalaBuilder.getClassPath(project)
+
+    val settings = ScalaBuilder.getClassPathURLs(project)
 
     var classLoader = URLClassLoader.newInstance(settings._1)
-    
+
     val directory = new File(settings._2)
 
     val scalaSuite = Class.forName("org.scalatest.Suite")
@@ -55,6 +57,20 @@ object TypeCacheBuilder {
     }
 
     return classes;
+  }
+
+  /**
+   *
+   */
+  def findClass(project: String, file: String): Class[_] = {
+    import java.net.{ URL, URLClassLoader }
+
+    val settings = ScalaBuilder.getClassPathURLs(project)
+
+    var classLoader = URLClassLoader.newInstance(settings._1)
+    val method = classOf[URLClassLoader].getDeclaredMethod("findClass", classOf[String]);
+    method.setAccessible(true)
+    method.invoke(classLoader, file).asInstanceOf[Class[_]]
   }
 
   /**

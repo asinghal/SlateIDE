@@ -101,6 +101,7 @@ object Launch extends SimpleGUIApplication {
 
   lazy val findDialog = new FindDialog(top)
   lazy val lookUpDialog = new LookupResourceDialog(top)
+  lazy val codeAssistDialog = new CodeAssistDialog(top)
   lazy val runDialog = new RunDialog(top)
 
   def textPane(name: String, path: String) = new EditorTabbedPane(name, path)

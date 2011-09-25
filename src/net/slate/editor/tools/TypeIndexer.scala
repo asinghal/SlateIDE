@@ -38,7 +38,7 @@ class TypeIndexer(project: String) {
       val w = new IndexWriter(index_, config)
 
       // index all classes in the classpath
-      TypeCacheBuilder.getAllClassNames.foreach { fullName =>
+      TypeCacheBuilder.getAllClassNames(project).foreach { fullName =>
         val name = fullName.replace(".class", "")
         val simpleName = name.substring(name.lastIndexOf(".") + 1).replace("\\$", ".")
 

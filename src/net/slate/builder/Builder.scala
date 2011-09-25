@@ -25,7 +25,11 @@ trait Builder {
   protected def supportedExtension: String
 
   def getClassPath(project: String) = {
-    val path = settings(project)._3
+    settings(project)._3
+  }
+  
+  def getClassPathURLs(project: String) = {
+    val path = System.getProperty("sun.boot.class.path") + pathSeparator + settings(project)._3
     var urls = List[java.net.URL]()
     path.split(pathSeparator).foreach { p => urls :::= List(new File(p).toURL) }
 
@@ -66,9 +70,9 @@ trait Builder {
 
     actor {
       val error = read(p.getErrorStream)
-//      println(error)
+      println(error)
       val output = read(p.getInputStream)
-//      println(output)
+      println(output)
       p.waitFor
       p.destroy
       println("done")
