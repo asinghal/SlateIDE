@@ -145,8 +145,8 @@ object Actions {
       saveFile
       bottomTabPane.problems.clear
       actor {
-        JavaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path) }
-        ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path) }
+        JavaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
+        ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
         bottomTabPane.selection.index = 1
       }
     }

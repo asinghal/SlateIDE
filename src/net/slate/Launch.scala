@@ -32,7 +32,7 @@ import net.slate.formatting.Configuration
  * @author Aishwarya Singhal
  *
  */
-object Launch extends SimpleGUIApplication {
+object Launch extends SimpleSwingApplication {
   var lastFileOperationDirectory: Option[String] = None
 
   var displayFont = Font.decode(System.getProperty("font", "Monospaced-12"))
@@ -41,7 +41,7 @@ object Launch extends SimpleGUIApplication {
   val replOs = new PipedOutputStream(outputIs)
 
   var tabs = Map[String, Int]()
-
+  
   try {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
   } catch {

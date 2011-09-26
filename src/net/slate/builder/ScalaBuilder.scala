@@ -41,11 +41,12 @@ object ScalaBuilder extends Builder {
       val settings = new Settings
       settings.outdir.value = destDir
       settings.classpath.value = classpath
+      settings.deprecation.value = true
       settings.unchecked.value = true
 
       val reporter = new ConsoleReporter(settings) {
         override def printMessage(msg: String) {
-          if (msg.indexOf(": error:") != -1) { errors :::= List(Message.parse(msg)) } else { println(msg) }
+          if (msg.indexOf(": error:") != -1 || msg.indexOf(": warning:") != -1) { errors :::= List(Message.parse(msg)) } else { println(msg) }
         }
       }
       val compiler = new Global(settings, reporter) // compiles the actual code
