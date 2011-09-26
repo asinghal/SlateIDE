@@ -62,6 +62,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   foreground_=(Configuration.editorForeground)
 
   addActionforKeyStroke(KeyEvent.VK_ENTER, new AutoIndentAction(peer))
+  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift O"), new OrganiseImportsAction)
   addActionforKeyStroke(KeyEvent.VK_F11, new javax.swing.AbstractAction {
     import net.slate.Launch._
     def actionPerformed(e: java.awt.event.ActionEvent) {
@@ -82,13 +83,13 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       lookUpDialog.display
     }
   })
-  
+
   addActionforKeyStroke(KeyStroke.getKeyStroke("control T"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       codeAssistDialog.display
     }
   })
-  
+
   addActionforKeyStroke(KeyStroke.getKeyStroke("control F11"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       runDialog.display
