@@ -27,26 +27,41 @@ import scala.tools.nsc.{ Interpreter, Settings, InterpreterResults }
 import swing._
 import net.slate.builder.{ JavaBuilder, ScalaBuilder }
 
+/**
+ * Defines the main menu actions and Scala interpreter usage.
+ *
+ * @author Aishwarya Singhal
+ */
 object Actions {
 
   import Launch._
 
+  /**
+   * Actor that enables interaction with the Scala interpreter. It listens to messages that might
+   * come in from user, runs them on the interpreter and prints the output to the console
+   * (tab on the bottom of the editor).
+   */
   var writeToRepl = actor {
 
+    // handle any errors - simply put them on the console.
     def handleError(res: String) {
       println("Error: " + res)
     }
 
+    // build a stream reader
     def isToReader(is: InputStream) = new BufferedReader(new InputStreamReader(is))
 
+    // build a stream writer
     def osToWriter(is: OutputStream) = new PrintWriter(new OutputStreamWriter(is))
 
-    val replIs = new PipedInputStream(4096)
+    // writer that will put received output to the console. 
     val writer = new StringWriter()
 
     val settings = new Settings(handleError _)
+    // create an instance of the interpreter
     val interp = new Interpreter(settings, new PrintWriter(writer))
 
+    // actor that interpreter output
     val readFromRepl = actor {
       val reader = isToReader(outputIs)
       loop {
@@ -58,20 +73,32 @@ object Actions {
       }
     }
 
+    // start the listener and wait for messages to arrive
     loop {
       receive {
         case ('Normal, script: String) =>
+          // dump the user input to the console
           println(script)
 
+          // run the interpreter
           interp.interpret(script)
 
+          // now print the received responses
           println(writer.getBuffer);
           if (script == ":q") exit()
       }
     }
   }
 
-  def registerAction(title: String, acce: String = "", ico: Icon = null)(action: => Unit) = new Action(title) {
+  /**
+   * Register an action and build a Scala swing Action object.
+   *
+   *  @param title
+   *  @param accelerator
+   *  @param icon
+   *  @param action body
+   */
+  private def registerAction(title: String, acce: String = "", ico: Icon = null)(action: => Unit) = new Action(title) {
     val shortcut = if (isMac && acce.contains("control"))
       acce.replace("control", "meta")
     else acce
@@ -85,6 +112,9 @@ object Actions {
     }
   }
 
+  /**
+   * Register the open file action.
+   */
   val openAction = registerAction("Open", "control O", new ImageIcon("images/open.gif")) {
     val fileChooser = new JFileChooser(lastFileOperationDirectory.getOrElse("~"))
 
@@ -106,6 +136,10 @@ object Actions {
 
   }
 
+  /**
+   * Register the save file action. Saves the file and runs Java and Scala builds. Also reports any
+   * error on the problems tab.
+   */
   val saveAction = registerAction("Save", "control S", new ImageIcon("images/save_edit.gif")) {
     if (currentScript.text.undoManager.hasChangedSinceLastSave) {
       saveFile
@@ -118,6 +152,9 @@ object Actions {
     }
   }
 
+  /**
+   * Save the file to the disk.
+   */
   def saveFile = {
     val writer = new BufferedWriter(new FileWriter(currentScript.text.path))
     writer.write(currentScript.text.text)
@@ -125,6 +162,9 @@ object Actions {
     currentScript.text.undoManager.save
   }
 
+  /**
+   * Save "file as" action. 
+   */
   val saveAsAction = registerAction("Save As", "F5", new ImageIcon("images/saveas_edit.gif")) {
     val fileChooser = new JFileChooser(lastFileOperationDirectory.getOrElse("~"))
     fileChooser.showSaveDialog(top.self) match {
@@ -139,6 +179,9 @@ object Actions {
     }
   }
 
+  /**
+   * Runs the current script on the interpreter.
+   */
   def runScript(mode: Symbol, selectedOnly: Boolean = false) {
     val toRun = if (selectedOnly) {
       Option(currentScript.text.selected) getOrElse ""
@@ -147,21 +190,44 @@ object Actions {
       writeToRepl ! (mode, toRun)
   }
 
+
+  /**
+   * Register the run script action. 
+   */  
   val runAction = registerAction("Run on Interpreter", "control R") { runScript('Normal) }
+
+  /**
+   * Register the run "selected" text as script action. 
+   */
   val runSelectedAction = registerAction("Run selected on Interpreter", "control shift R") { runScript('Normal, true) }
+
+  /**
+   * Register the clear console action. 
+   */
   val clearOutputAction = registerAction("Clear", "control E") {
     outputPane.pane.text = ""
   }
+
+  /**
+   * Register the new tab action. 
+   */
   val newTabAction = registerAction("New Tab", "control T") {
     val name = "Script" + (tabPane.pages.length + 1) + ".scala";
     addTab(name, "." + File.separator + name)
   }
+
+  /**
+   * Register the close tab action. 
+   */
   val closeTabAction = registerAction("Close Tab", "control F4") {
     if (tabPane.pages.length > 1)
       closeTab
     else updateStatusBar("At lease 1 tab needed.")
   }
 
+  /**
+   * Register the switch tab action. 
+   */
   // See key reaction definition in textPane. shortcut defined here has no effect.
   val switchTabAction = registerAction("Switch Tab", "control TAB") {
     tabPane.selection.index = tabPane.selection.index match {
@@ -170,18 +236,33 @@ object Actions {
     }
   }
 
+  /**
+   * Initialize the Help dialog. 
+   */
   lazy val helpDialog = new net.slate.gui.HelpDialog(Launch.top)
 
+  /**
+   * Initialize the About dialog. 
+   */
   lazy val aboutDialog = new net.slate.gui.AboutDialog(Launch.top)
 
+  /**
+   * Register the "help" action. 
+   */
   val helpAction = registerAction("Help", "F1") {
     helpDialog.display
   }
 
+  /**
+   * Register the "about" action. 
+   */
   val aboutAction = registerAction("About", "alt F1") {
     aboutDialog.display
   }
 
+  /**
+   * Enables "undo" on the text pane. 
+   */
   object UndoAction extends UpdateCaretListener("Undo") with PropertyChangeListener {
     accelerator = Some(KeyStroke.getKeyStroke("control Z"))
     enabled = false
@@ -200,6 +281,9 @@ object Actions {
     }
   }
 
+  /**
+   * Enables "redo" on the text pane. 
+   */
   object RedoAction extends UpdateCaretListener("Redo") with PropertyChangeListener {
     title = "Redo"
     accelerator = Some(KeyStroke.getKeyStroke("control Y"))
@@ -219,6 +303,9 @@ object Actions {
     }
   }
 
+  /**
+   * Basic text pane listener. 
+   */
   class UpdateCaretListener(title: String) extends Action(title) with DocumentListener {
     var lastUpdate: Int = _
 
@@ -238,12 +325,16 @@ object Actions {
   }
 }
 
+/**
+ * Defines the Main menu bar that appear on the top.
+ */
 object MainMenuBar extends MenuBar {
   peer.setLayout(new BorderLayout)
   peer.add(new MenuBar {
 
     import Actions._
 
+    // "File" menu
     contents += new Menu("File") {
       contents += new MenuItem(openAction)
       contents += new MenuItem(saveAction)
@@ -252,16 +343,19 @@ object MainMenuBar extends MenuBar {
       contents += new MenuItem(closeTabAction)
     }
 
+    // "Edit" menu
     contents += new Menu("Edit") {
       contents += new MenuItem(UndoAction)
       contents += new MenuItem(RedoAction)
     }
-    
+
+    // "Scala" menu
     contents += new Menu("Scala") {
       contents += new MenuItem(runAction)
       contents += new MenuItem(runSelectedAction)
     }
-    
+
+    // "Help" menu
     contents += new Menu("Help") {
       contents += new MenuItem(helpAction)
       contents += new MenuItem(aboutAction)
