@@ -19,13 +19,26 @@ import javax.swing.{ ImageIcon, JTree }
 import javax.swing.tree.{ DefaultMutableTreeNode, DefaultTreeCellRenderer, DefaultTreeModel }
 import scala.swing._
 
+/**
+ *
+ * @author Aishwarya Singhal
+ *
+ */
 class TestResultsTree extends ScrollPane {
+  // root node
   val top = new DefaultMutableTreeNode("Test Results")
 
+  // the tree
   val tree = new JTree(top)
   tree.setCellRenderer(new TestResultsCellRenderer)
   peer.getViewport().add(tree)
 
+  /**
+   *
+   * @param className
+   * @param results
+   * @param failed
+   */
   def addResult(className: String, results: Map[String, (Boolean, String)], failed: Boolean) = {
     def addNewNode(parent: DefaultMutableTreeNode, name: String, isMethod: Boolean, hasPassed: Boolean): DefaultMutableTreeNode = {
       val node = new DefaultMutableTreeNode(new TestResultsNode(name, isMethod, hasPassed))
@@ -41,19 +54,34 @@ class TestResultsTree extends ScrollPane {
     }
   }
 
+  /**
+   * clears the tree.
+   */
   def clear = {
     val model = tree.getModel.asInstanceOf[DefaultTreeModel]
     val count = model.getChildCount(top)
 
-    for (i <- 0 to (count - 1)) {
-      model.removeNodeFromParent(model.getChild(top, 0).asInstanceOf[DefaultMutableTreeNode])
+    if (count > 0) {
+      for (i <- 0 to (count - 1)) {
+        model.removeNodeFromParent(model.getChild(top, 0).asInstanceOf[DefaultMutableTreeNode])
+      }
     }
   }
 
+  /**
+   * Defines a tree node.
+   *
+   * @author Aishwarya Singhal
+   */
   class TestResultsNode(val name: String, val isMethod: Boolean, val hasPassed: Boolean) {
     override def toString = { name }
   }
 
+  /**
+   * Cell renderer for tree nodes
+   *
+   * @author Aishwarya Singhal
+   */
   class TestResultsCellRenderer extends DefaultTreeCellRenderer {
 
     import java.awt.Color
@@ -61,6 +89,9 @@ class TestResultsTree extends ScrollPane {
     val failedIcon = new ImageIcon("images/testerr.gif")
     val passedIcon = new ImageIcon("images/testok.gif")
 
+    /**
+     * Colors the nodes based on the execution status. Also displays a relevant icon alongside.
+     */
     override def getTreeCellRendererComponent(tree: JTree, value: AnyRef, selected: Boolean,
       expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean) = {
       super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus)
@@ -83,7 +114,5 @@ class TestResultsTree extends ScrollPane {
 
       this
     }
-
   }
-
 }
