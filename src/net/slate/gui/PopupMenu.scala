@@ -43,7 +43,7 @@ class EditorPopupMenu extends PopupMenu with MenuPainter {
 
   contents += new Menu("Source") with MenuFont {
     contents += new MenuItem("Format") with MenuFont { peer.addActionListener(new FormatFileAction) }
-    contents += new MenuItem("Organise Imports") with MenuFont
+    contents += new MenuItem("Organise Imports") with MenuFont { peer.addActionListener(new OrganiseImportsAction) }
   }
   //  contents += new Menu("Execute") with MenuFont {
   //    contents += new MenuItem("Run") with MenuFont

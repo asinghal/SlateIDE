@@ -15,26 +15,46 @@
  */
 package net.slate
 
+/**
+ * Container for recording in flight operations.
+ *
+ * @author Aishwarya Singhal
+ */
 object ExecutionContext {
 
+  /**
+   * A list of all projects  that have been loaded into the context.
+   */
   var loadedProjects = List[String]()
 
+  /**
+   * The process that is running at the moment. Null denotes no running processes.
+   */
   var runningProcess: Process = null
 
+  /**
+   * Gets the current project based on the file open in editor.
+   */
   def currentProjectName: String = {
     val file = Launch.currentScript.text.path
     currentProjectName(file)
   }
 
-  def currentProjectName(selectedDir : String) = {
+  /**
+   * Gets the current project based on the supplied path.
+   */
+  def currentProjectName(selectedDir: String) = {
     val file = selectedDir
     val p = loadedProjects.sort { _ > _ }.filter { project =>
       file.contains(project)
     }
-    
+
     if (p.isEmpty) loadedProjects(0) else p(0)
   }
 
+  /**
+   * Stops the running process.
+   */
   def stop = {
     runningProcess.destroy
     runningProcess = null
