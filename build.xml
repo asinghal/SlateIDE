@@ -1,0 +1,52 @@
+<project name="Slate" default="dist" basedir=".">
+
+<!--<property name="scala.home" value="" />-->
+<property name="sources.dir" value="${basedir}/src" />
+<property name="build.dir" value="${basedir}/classes" />
+<property name="dist.dir" value="${basedir}/dist" />
+
+	<target name="-init">
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.home}/lib/scala-compiler.jar"   />
+        <pathelement location="${scala.home}/lib/scala-library.jar"   />
+      </classpath>
+    </taskdef>
+	
+	<delete file="${basedir}/lib/slate-0.1.jar"/>
+      <delete dir="${build.dir}" />
+      <mkdir dir="${build.dir}" />
+	  
+	  <delete dir="${dist.dir}" />
+      <mkdir dir="${dist.dir}" />
+	</target>
+	
+	<target name="build" depends="-init">
+      <scalac srcdir="${sources.dir}"
+            destdir="${build.dir}" includes="**/*.scala">
+			<classpath>
+                <fileset dir="${basedir}/lib">
+                    <include name="**/*.jar"/>
+                    <exclude name="**/slate*.jar"/>
+                </fileset>
+                <pathelement location="${build.dir}"/>
+				<fileset dir="${scala.home}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+      </scalac>
+	  <copy todir="${build.dir}">
+	    <fileset dir="${sources.dir}" includes="**/*.html" />
+	  </copy>
+	  
+	  <jar destfile="${basedir}/lib/slate-0.1.jar"
+         basedir="${build.dir}" />
+		 
+  </target>
+  
+  <target name="dist" depends="build">
+   <zip destfile="${dist.dir}/slate-0.1.zip" basedir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*" />
+   <tar destfile="${dist.dir}/slate-0.1.tar.gz" basedir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*" compression="gzip" />
+  </target>
+  
+</project>
