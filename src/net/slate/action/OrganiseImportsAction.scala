@@ -19,6 +19,8 @@ import javax.swing.AbstractAction
 import java.awt.event.ActionEvent
 
 import net.slate.Launch._
+import net.slate.ExecutionContext._
+import net.slate.editor.tools.TypeIndexer
 
 /**
  *
@@ -43,8 +45,12 @@ class OrganiseImportsAction extends AbstractAction {
    * @param lines
    */
   def organise(lines: String) {
+
+    // identify any errors for this file and see if any additional imports can help
+    val additionalImports = loadErrorsAndFixImports
+
     // get all imports in this file
-    val all = getAllImports(lines)
+    val all = getAllImports(lines, additionalImports)
     val imports = all._1
     val text = all._2
 
@@ -103,21 +109,25 @@ class OrganiseImportsAction extends AbstractAction {
    * @param lines
    * @return
    */
-  private def getAllImports(lines: String) = {
+  private def getAllImports(lines: String, additionalImports: List[String]) = {
     val all = lines.split("\n")
 
     var modifiedText = ""
     var classDef = false
 
     var i = 0
-    var imports = List[String]()
+    var imports = List[String]() ::: additionalImports
     while (!classDef && i < all.length) {
 
       val l = all(i)
       val trimmed = l.trim
       if (trimmed.startsWith("class") || trimmed.startsWith("object") || trimmed.startsWith("trait")) {
         classDef = true
-        modifiedText += l
+        if (!additionalImports.isEmpty && modifiedText.indexOf(MARKER) == -1) {
+          // no imports yet in the file, so we'll need a place holder for the new ones
+          modifiedText += (MARKER + "\n")
+        }
+        modifiedText += (l + "\n")
       } else if (trimmed.startsWith("import ")) {
         imports ::= (l + "\n")
         if (modifiedText.indexOf(MARKER) == -1) {
@@ -135,5 +145,30 @@ class OrganiseImportsAction extends AbstractAction {
     }
 
     (imports.sort { _ < _ }.distinct, modifiedText)
+  }
+
+  private def loadErrorsAndFixImports = {
+    val rows = bottomTabPane.problems.tableModel.getRowCount
+
+    var additionalImports = List[String]()
+
+    for (i <- 0 to rows - 1) {
+      val problemType = bottomTabPane.problems.tableModel.getValueAt(i, 4).asInstanceOf[String]
+      val location = bottomTabPane.problems.tableModel.getValueAt(i, 5).asInstanceOf[String]
+      val message = bottomTabPane.problems.tableModel.getValueAt(i, 0).asInstanceOf[String]
+
+      if (location == currentScript.text.path && problemType == "Error" && message.toLowerCase.trim.startsWith("not found")) {
+        val className = message.trim.substring(message.trim.lastIndexOf(" ") + 1)
+        val options = for (i <- new TypeIndexer(currentProjectName).find(className, true) if (i != null)) yield i.asInstanceOf[String]
+        if (options.length == 1) {
+          val parts = options(0).split("-")
+          val typeName = if (parts(1) != parts(0)) parts(1) + "." + parts(0) else parts(0)
+
+          additionalImports ::= ("import " + typeName.trim);
+        }
+      }
+    }
+
+    additionalImports
   }
 }

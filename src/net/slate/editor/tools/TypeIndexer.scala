@@ -70,12 +70,12 @@ class TypeIndexer(project: String) {
       }
 
       // index all files
-//      FileUtils.findAllFiles(project, null).foreach { file =>
-//        val path = file
-//        val name = file.substring(file.lastIndexOf(File.separator) + 1)
-//
-//        addDoc(w, name, path, "resource", "")
-//      }
+      //      FileUtils.findAllFiles(project, null).foreach { file =>
+      //        val path = file
+      //        val name = file.substring(file.lastIndexOf(File.separator) + 1)
+      //
+      //        addDoc(w, name, path, "resource", "")
+      //      }
 
       ready = true
 
@@ -83,9 +83,11 @@ class TypeIndexer(project: String) {
     }
   }
 
-  def find(name: String) = {
+  def find(name: String, exact: Boolean = false) = {
+    val keyword = if (!exact) name + "*" else name
+
     val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
-      .parse(name + "*")
+      .parse(keyword)
     val hitsPerPage = 100
     val searcher = new IndexSearcher(index_, true)
     val collector = TopScoreDocCollector.create(
@@ -95,12 +97,19 @@ class TypeIndexer(project: String) {
 
     val results = new Array[AnyRef](hits.length)
 
+    var skipped = 0
+
     // prepare results
     for (i <- 0 to (hits.length - 1)) {
       val docId = hits(i).doc
       val d = searcher.doc(docId)
-      val fullName = d.get("fullName").replace("." + d.get("name"), "")
-      results(i) = d.get("name") + " - " + fullName
+
+      if ((exact && d.get("name") == name) || !exact) {
+        val fullName = d.get("fullName").replace("." + d.get("name"), "").replace(".class", "")
+        results(i - skipped) = d.get("name") + " - " + fullName
+      } else {
+        skipped += 1
+      }
     }
 
     // searcher can only be closed when there
