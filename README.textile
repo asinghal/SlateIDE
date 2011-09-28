@@ -10,6 +10,12 @@ Now, all of those are great tools (JEdit, Vim, Eclipse), they just didn't fulfil
 
 If you are looking for a full-bodied IDE, Eclipse/Netbeans/IntelliJ Idea may be better choices. 
 
+h2. Installation
+
+Download an appropriate package from under dist directory and unzip/ untar into a local directory. Ensure that you have SCALA_HOME and JAVA_HOME defined in the environment. Also, please ensure that none of these paths have spaces in their names.
+
+Slate has been built on Scala 2.8.1, Sun JDK 1.6 and Play 1.2.3
+
 h2. Main Features
 
 1. Syntax coloring: Based on the file's type, colors the text. Support for JS, CSS, Properties files, XML and YML apart from Scala. 
