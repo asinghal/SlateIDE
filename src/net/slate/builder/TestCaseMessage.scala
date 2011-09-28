@@ -43,13 +43,13 @@ object TestCaseMessage {
       if (l.charAt(4) == '-') {
         testName = l.substring(6)
         if (l.endsWith("*** FAILED ***")) failed = true
-        testcases = testcases.update(testName, (!l.endsWith("*** FAILED ***"), ""))
+        testcases = testcases.updated(testName, (!l.endsWith("*** FAILED ***"), ""))
       } else if (l.startsWith("[32m") && className == "") {
         className = l.substring(4, l.indexOf(":"))
       } else if (l.startsWith("[31m ")) {
         val status = testcases(testName)
         val trace = status._2 + l.substring(5)
-        testcases = testcases.update(testName, (status._1, trace + "\n"))
+        testcases = testcases.updated(testName, (status._1, trace + "\n"))
       }
     }
 
@@ -70,7 +70,7 @@ object TestCaseMessage {
           val testName = (testcase \\ "@name").text
           val hasError = (testcase \\ "error") != null
           val message = if ((testcase \\ "error") != null) (testcase \\ "error" \\ "@message").text else ""
-          testcases = testcases.update(testName, (hasError, message))
+          testcases = testcases.updated(testName, (hasError, message))
         }
         bottomTabPane.testResults.addResult(className, testcases, failed)
       }
