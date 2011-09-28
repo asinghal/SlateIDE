@@ -46,11 +46,11 @@
   
   <target name="dist" depends="build">
   <zip destfile="${dist.dir}/slate-0.1.zip">
-	<zipfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*" prefix="slate-0.1" />
+	<zipfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*, bin/**/*" prefix="slate-0.1" />
   </zip>
   
    <tar destfile="${dist.dir}/slate-0.1.tar.gz" compression="gzip" >
-     <tarfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*" prefix="slate-0.1" />
+     <tarfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*, bin/**/*" prefix="slate-0.1" />
    </tar>
   
   </target>
