@@ -69,6 +69,8 @@ object Actions {
         if (line != null) {
           outputPane.pane.text += (line + "\n")
           outputPane.pane.caret.position = outputPane.pane.text.length
+          top.outputFrame.outputPane.pane.text += (line + "\n")
+          top.outputFrame.outputPane.pane.caret.position += top.outputFrame.outputPane.pane.text.length
         } else exit()
       }
     }
@@ -206,6 +208,7 @@ object Actions {
    */
   val clearOutputAction = registerAction("Clear", "control E") {
     outputPane.pane.text = ""
+    top.outputFrame.outputPane.pane.text = ""
   }
 
   /**

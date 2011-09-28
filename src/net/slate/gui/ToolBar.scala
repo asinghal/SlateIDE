@@ -48,7 +48,7 @@ class NavigationToolBar extends ToolBar("Navigation") {
   add(new Action("Open Project") {
     icon = new javax.swing.ImageIcon("images/open.gif")
     tooltip = title
-    accelerator = getAccelerator("control shift O")
+    accelerator = getAccelerator("control shift P")
 
     def apply() {
       val chooser = ProjectOpener.chooser
@@ -64,6 +64,7 @@ class NavigationToolBar extends ToolBar("Navigation") {
 
     def apply() {
       outputPane.pane.text = ""
+      top.outputFrame.outputPane.pane.text = ""
     }
   })
 

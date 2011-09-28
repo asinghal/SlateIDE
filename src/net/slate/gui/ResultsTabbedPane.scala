@@ -54,7 +54,8 @@ class Console extends ScrollPane {
  */
 class ProblemsTab extends ScrollPane {
   import java.awt.event.{ MouseAdapter, MouseEvent }
-  import javax.swing.table.DefaultTableModel
+  import javax.swing.ImageIcon
+  import javax.swing.table.{ DefaultTableModel, DefaultTableCellRenderer }
 
   import net.slate.util.FileUtils
 
@@ -65,6 +66,8 @@ class ProblemsTab extends ScrollPane {
   viewportView = new Table {
     font = displayFont
     model = tableModel
+
+    peer.getColumnModel().getColumn(1).setCellRenderer(new KeyIconCellRenderer)
 
     peer.addMouseListener(new MouseAdapter() {
       override def mouseClicked(e: MouseEvent) = {
@@ -96,6 +99,25 @@ class ProblemsTab extends ScrollPane {
   def clear = {
     for (r <- 0 to tableModel.getRowCount - 1) {
       tableModel.removeRow(0)
+    }
+  }
+
+  /**
+   * Key cell renderer to display error/ warning icons on the problems tab
+   *
+   * @author Aishwarya Singhal
+   */
+  class KeyIconCellRenderer extends DefaultTableCellRenderer {
+    import javax.swing.JTable
+
+    val errorIcon = new ImageIcon("images/error_tsk.gif")
+    val warnIcon = new ImageIcon("images/warn_tsk.gif")
+
+    override def getTableCellRendererComponent(table: JTable, value: AnyRef, selected: Boolean, hasFocus: Boolean, row: Int, column: Int) = {
+      super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column)
+      setIcon(errorIcon);
+
+      this
     }
   }
 }

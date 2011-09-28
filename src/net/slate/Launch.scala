@@ -41,7 +41,7 @@ object Launch extends SimpleSwingApplication {
   val replOs = new PipedOutputStream(outputIs)
 
   var tabs = Map[String, Int]()
-  
+
   try {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
   } catch {
@@ -68,6 +68,8 @@ object Launch extends SimpleSwingApplication {
     iconImage = TrayIcon.icon
     title = "Slate"
     menuBar = MainMenuBar
+    val outputFrame = new OutputFrame
+    outputFrame.setVisible(true)
 
     TrayIcon.init
 
@@ -83,20 +85,13 @@ object Launch extends SimpleSwingApplication {
       dividerSize = 1
     }
 
-//    val panel = new javax.swing.JPanel
-//    val overlay = new javax.swing.OverlayLayout(panel)
-//    panel.setLayout(overlay)
-//
-//    panel.add(splitPane.peer)
-//    panel.add(overlayPane.peer)
-
     val toolbar = new NavigationToolBar
 
     val fileExplorer = new FileExplorer(null)
     contents = new BorderPanel {
       add(fileExplorer, BorderPanel.Position.West)
       add(toolbar, BorderPanel.Position.North)
-      add(/*Component.wrap(panel)*/splitPane, BorderPanel.Position.Center)
+      add(splitPane, BorderPanel.Position.Center)
       add(statusBar, BorderPanel.Position.South)
     }
 
@@ -128,17 +123,6 @@ object Launch extends SimpleSwingApplication {
   val bottomTabPane = new ResultsTabbedPane
 
   val outputPane = bottomTabPane.outputPane
-
-//  val overlayPane = new ScrollPane {
-//    val pane = new TextPane {
-//      font = displayFont
-//      background = (Configuration.editorBackground)
-//      foreground = (Configuration.editorForeground)
-//      peer.setCaretColor(Configuration.editorCursorColor)
-//    }
-//
-//    viewportView = pane
-//  }
 
   def currentScript = tabPane.selection.page.content.asInstanceOf[ScriptScrollPane]
 
