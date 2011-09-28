@@ -1,0 +1,34 @@
+h1. Slate - A light weight IDE for Scala
+
+Slate is a simple light weight editor that integrates with the Scala compiler for auto compilation, Play framework for running tests and server and enables an easy execution of Scala applications and Scalatest test cases.
+
+Slate is heavily inspired by Eclipse IDE but keeps coding light and unintrusive. For example, code is autocompiled on every save but the user is not blocked until the compilation completes.
+
+However, it does offer a better Scala support than JEdit or Vim.
+
+Now, all of those are great tools (JEdit, Vim, Eclipse), they just didn't fulfill my need. The first two offered too little, while Eclipse offered too much to make it hang every now and then.
+
+If you are looking for a full-bodied IDE, Eclipse/Netbeans/IntelliJ Idea may be better choices. 
+
+h2. Main Features
+
+1. Syntax coloring: Based on the file's type, colors the text. Support for JS, CSS, Properties files, XML and YML apart from Scala. 
+2. Integration with Scala Interpreter
+3. Organise Imports: Does not remove any existing imports but will add imports if there were problems found in the last compilation. Also removes duplicate imports, rolls up imports into one where needed and arranges them in alphabetical order.
+4. Format File: Indents the code based on opening and closing braces, ensures space around equals sign ("="), removes extra blank lines and extra spaces at the end of each line.
+5. Open a resource: Looks up and opens a file based on its name. The search is incremental so resource list is refreshed with every key stroke.
+6. Code Assist: While Slate does not provide a direct code assist, it does provide 2 useful features. You can lookup all methods of a class and select one of those to be injected into your code. Also, you could look up a type name (so for example, if you wanted to use an InputStream, you could type inputs, do a control space, and it will show all types having InputStream in their names! So you could then choose to use FileInputStream or ByteArrayInputStream).
+7. Run an application
+8. Run Scalatest Test cases: The results are parsed and output is shown in a nice Eclipse Junit style tree fashion.
+9. Run Play test cases: This runs "play autotest" and publishes unit test results in tree fashion. The Selenese test cases are run but not shown in IDE. The are available as HTML files in "project path"/test-results directory.
+10. Run the Play server from within the IDE!
+11. Ability to create different types of Scala and Java classes using templates.
+12. A separate window to show console, so if you use a 2 monitor set up, you could dock the console in one and editor in another. The console is slightly translucent so if you are using console on same window as editor, you could watch it while watching your code too!
+
+h2. Future Plans
+
+If the IDE gathers sufficient interest, I would like to build the following:
+1. Integrate Java debugger
+2. Perform Static Code Analysis (like FindBugs) and report unused code.
+3. Support refactoring esp. renaming variables and methods.
+4. Display a call hierarcy of methods to know where all the method is getting called from.
