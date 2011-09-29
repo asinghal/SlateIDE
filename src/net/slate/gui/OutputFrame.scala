@@ -1,7 +1,7 @@
 package net.slate.gui
 
 class OutputFrame extends javax.swing.JFrame {
-
+  setIconImage(net.slate.TrayIcon.icon)
   com.sun.awt.AWTUtilities.setWindowOpacity(this, 0.8f)
 
   val outputPane = new Console

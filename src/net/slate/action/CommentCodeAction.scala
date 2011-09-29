@@ -15,12 +15,15 @@
  */
 package net.slate.action
 
-import javax.swing.{ JTextPane, AbstractAction }
+import javax.swing.AbstractAction
 import java.awt.event.ActionEvent
 
-class CommentCodeAction(textPane: JTextPane) extends AbstractAction with LineParser {
+import net.slate.Launch._
+
+class CommentCodeAction extends AbstractAction with LineParser {
 
   def actionPerformed(e: ActionEvent) = {
+    val textPane = currentScript.text.peer
     val doc = textPane.getDocument;
     var caret = textPane.getSelectionStart
 

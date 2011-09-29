@@ -84,42 +84,46 @@ class TypeIndexer(project: String) {
   }
 
   def find(name: String, exact: Boolean = false) = {
-    val keyword = if (!exact) name + "*" else name
+    try {
+      val keyword = if (!exact) name + "*" else name
 
-    val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
-      .parse(keyword)
-    val hitsPerPage = 100
-    val searcher = new IndexSearcher(index_, true)
-    val collector = TopScoreDocCollector.create(
-      hitsPerPage, true)
-    searcher.search(q, collector)
-    val hits = collector.topDocs().scoreDocs
+      val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
+        .parse(keyword)
+      val hitsPerPage = 100
+      val searcher = new IndexSearcher(index_, true)
+      val collector = TopScoreDocCollector.create(
+        hitsPerPage, true)
+      searcher.search(q, collector)
+      val hits = collector.topDocs().scoreDocs
 
-    val results = new Array[AnyRef](hits.length)
+      val results = new Array[AnyRef](hits.length)
 
-    var skipped = 0
+      var skipped = 0
 
-    // prepare results
-    for (i <- 0 to (hits.length - 1)) {
-      val docId = hits(i).doc
-      val d = searcher.doc(docId)
+      // prepare results
+      for (i <- 0 to (hits.length - 1)) {
+        val docId = hits(i).doc
+        val d = searcher.doc(docId)
 
-      if ((exact && d.get("name") == name) || !exact) {
-        val fullName = d.get("fullName").replace("." + d.get("name"), "").replace(".class", "")
-        results(i - skipped) = d.get("name") + " - " + fullName
-      } else {
-        skipped += 1
+        if ((exact && d.get("name") == name) || !exact) {
+          val fullName = d.get("fullName").replace("." + d.get("name"), "").replace(".class", "")
+          results(i - skipped) = d.get("name") + " - " + fullName
+        } else {
+          skipped += 1
+        }
       }
-    }
 
-    // searcher can only be closed when there
-    // is no need to access the documents any more.
-    searcher.close()
+      // searcher can only be closed when there
+      // is no need to access the documents any more.
+      searcher.close()
 
-    if (results.length == 0) {
-      Array[AnyRef]("No match")
-    } else {
-      results
+      if (results.length == 0) {
+        Array[AnyRef]("No match")
+      } else {
+        results
+      }
+    } catch {
+      case e: Throwable => Array[AnyRef]("No match")
     }
   }
 

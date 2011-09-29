@@ -18,9 +18,13 @@ package net.slate.action;
 import javax.swing.{ JTextPane, AbstractAction }
 import java.awt.event.ActionEvent
 
-class AutoIndentAction(textPane: JTextPane) extends AbstractAction with IndentText with LineParser {
+import net.slate.Launch._
+
+class AutoIndentAction extends AbstractAction with IndentText with LineParser {
 
   def actionPerformed(e: ActionEvent) = {
+    val textPane = currentScript.text.peer
+
     val doc = textPane.getDocument;
     val caret = textPane.getCaretPosition;
     val l = line(textPane, caret)

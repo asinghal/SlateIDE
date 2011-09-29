@@ -61,7 +61,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   background_=(Configuration.editorBackground)
   foreground_=(Configuration.editorForeground)
 
-  addActionforKeyStroke(KeyEvent.VK_ENTER, new AutoIndentAction(peer))
+  addActionforKeyStroke(KeyEvent.VK_ENTER, new AutoIndentAction)
   addActionforKeyStroke(KeyStroke.getKeyStroke("control shift O"), new OrganiseImportsAction)
   addActionforKeyStroke(KeyEvent.VK_F11, new javax.swing.AbstractAction {
     import net.slate.Launch._
@@ -70,7 +70,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       top.splitPane.size = new Dimension(1024, top.splitPane.size.getHeight.asInstanceOf[Int])
     }
   })
-  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction(peer))
+  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction)
   addActionforKeyStroke(KeyStroke.getKeyStroke("control shift F"), new FormatFileAction)
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
