@@ -72,6 +72,7 @@ class TextUndoManager extends UndoManager {
     val undoable = canUndo
     super.redo()
     firePropertyChangeEvent('Undo.name, undoable, canUndo)
+    markAsModified
   }
 
   override def redoTo(edit: UndoableEdit) {
@@ -108,6 +109,7 @@ class TextUndoManager extends UndoManager {
     val redoable = canRedo
     super.undo()
     firePropertyChangeEvent('Redo.name, redoable, canRedo)
+    markAsModified
   }
 
   override def undoableEditHappened(e: UndoableEditEvent) {
@@ -127,6 +129,10 @@ class TextUndoManager extends UndoManager {
       firePropertyChangeEvent('Undo.name, undoable, canUndo)
     }
 
+    markAsModified
+  }
+  
+  private def markAsModified {
     hasChangedSinceLastSave = true
     if (titlePrefix == "") {
       titlePrefix = "* "
