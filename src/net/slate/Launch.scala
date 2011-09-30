@@ -61,8 +61,8 @@ object Launch extends SimpleSwingApplication {
       })
     }
   }
-  System.setOut(sysOutErr)
-  System.setErr(sysOutErr)
+//  System.setOut(sysOutErr)
+//  System.setErr(sysOutErr)
 
   lazy val top = new MainFrame {
     iconImage = TrayIcon.icon
@@ -92,7 +92,7 @@ object Launch extends SimpleSwingApplication {
       add(fileExplorer, BorderPanel.Position.West)
       add(toolbar, BorderPanel.Position.North)
       add(splitPane, BorderPanel.Position.Center)
-      add(statusBar, BorderPanel.Position.South)
+      add(statusBarPane, BorderPanel.Position.South)
     }
 
     peer.setExtendedState(peer.getExtendedState() | Frame.MAXIMIZED_BOTH)
@@ -168,8 +168,21 @@ object Launch extends SimpleSwingApplication {
     }
   }
 
+  val progressBar = new ProgressBar {
+	  min = 0
+	  max = 100
+	  value = 0
+	  indeterminate = true
+	  visible = false
+  }
+  
   val statusBar = new Label {
     xAlignment = Alignment.Left
+  }
+
+  lazy val statusBarPane = new BorderPanel {
+    add(statusBar, BorderPanel.Position.West)
+    add(progressBar, BorderPanel.Position.East)
   }
 
   def updateStatusBar(text: String) {

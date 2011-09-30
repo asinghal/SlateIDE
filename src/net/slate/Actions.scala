@@ -147,8 +147,10 @@ object Actions {
       saveFile
       bottomTabPane.problems.clear
       actor {
+        progressBar.visible = true
         JavaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
         ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
+        progressBar.visible = false
         bottomTabPane.selection.index = 1
       }
     }
@@ -165,7 +167,7 @@ object Actions {
   }
 
   /**
-   * Save "file as" action. 
+   * Save "file as" action.
    */
   val saveAsAction = registerAction("Save As", "F5", new ImageIcon("images/saveas_edit.gif")) {
     val fileChooser = new JFileChooser(lastFileOperationDirectory.getOrElse("~"))
@@ -192,19 +194,18 @@ object Actions {
       writeToRepl ! (mode, toRun)
   }
 
-
   /**
-   * Register the run script action. 
-   */  
+   * Register the run script action.
+   */
   val runAction = registerAction("Run on Interpreter", "control R") { runScript('Normal) }
 
   /**
-   * Register the run "selected" text as script action. 
+   * Register the run "selected" text as script action.
    */
   val runSelectedAction = registerAction("Run selected on Interpreter", "control shift R") { runScript('Normal, true) }
 
   /**
-   * Register the clear console action. 
+   * Register the clear console action.
    */
   val clearOutputAction = registerAction("Clear", "control E") {
     outputPane.pane.text = ""
@@ -212,7 +213,7 @@ object Actions {
   }
 
   /**
-   * Register the new tab action. 
+   * Register the new tab action.
    */
   val newTabAction = registerAction("New Tab", "control T") {
     val name = "Script" + (tabPane.pages.length + 1) + ".scala";
@@ -220,7 +221,7 @@ object Actions {
   }
 
   /**
-   * Register the close tab action. 
+   * Register the close tab action.
    */
   val closeTabAction = registerAction("Close Tab", "control F4") {
     if (tabPane.pages.length > 1)
@@ -229,7 +230,7 @@ object Actions {
   }
 
   /**
-   * Register the switch tab action. 
+   * Register the switch tab action.
    */
   // See key reaction definition in textPane. shortcut defined here has no effect.
   val switchTabAction = registerAction("Switch Tab", "control TAB") {
@@ -240,31 +241,31 @@ object Actions {
   }
 
   /**
-   * Initialize the Help dialog. 
+   * Initialize the Help dialog.
    */
   lazy val helpDialog = new net.slate.gui.HelpDialog(Launch.top)
 
   /**
-   * Initialize the About dialog. 
+   * Initialize the About dialog.
    */
   lazy val aboutDialog = new net.slate.gui.AboutDialog(Launch.top)
 
   /**
-   * Register the "help" action. 
+   * Register the "help" action.
    */
   val helpAction = registerAction("Help", "F1") {
     helpDialog.display
   }
 
   /**
-   * Register the "about" action. 
+   * Register the "about" action.
    */
   val aboutAction = registerAction("About", "alt F1") {
     aboutDialog.display
   }
 
   /**
-   * Enables "undo" on the text pane. 
+   * Enables "undo" on the text pane.
    */
   object UndoAction extends UpdateCaretListener("Undo") with PropertyChangeListener {
     accelerator = Some(KeyStroke.getKeyStroke("control Z"))
@@ -285,7 +286,7 @@ object Actions {
   }
 
   /**
-   * Enables "redo" on the text pane. 
+   * Enables "redo" on the text pane.
    */
   object RedoAction extends UpdateCaretListener("Redo") with PropertyChangeListener {
     title = "Redo"
@@ -307,7 +308,7 @@ object Actions {
   }
 
   /**
-   * Basic text pane listener. 
+   * Basic text pane listener.
    */
   class UpdateCaretListener(title: String) extends Action(title) with DocumentListener {
     var lastUpdate: Int = _
