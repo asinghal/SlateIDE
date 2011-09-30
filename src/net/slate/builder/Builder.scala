@@ -24,6 +24,7 @@ import scala.io.Source
 trait Builder {
 
   import net.slate.ExecutionContext._
+  import net.slate.Launch._
   import net.slate.util.FileUtils
   lazy val configuration = loadConfig
 
@@ -77,6 +78,7 @@ trait Builder {
   }
 
   protected def executeCommand(command: List[String], dir: String, program: String, test: Boolean) = {
+	  progressBar.visible = true
     var commandList = java.util.Arrays.asList(command.toArray: _*)
 
     val pb =
@@ -97,6 +99,7 @@ trait Builder {
       println("done")
       val netOutput = error + output
       if (test) TestCaseMessage.parse(dir, program, netOutput)
+	  progressBar.visible = false
       runningProcess = null
     }
   }

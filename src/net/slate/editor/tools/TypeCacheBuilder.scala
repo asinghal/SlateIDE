@@ -58,7 +58,7 @@ object TypeCacheBuilder {
 
     val directory = new File(settings._2)
 
-    val scalaSuite = Class.forName("org.scalatest.Suite")
+    val scalaSuite = Class.forName("org.scalatest.Suite", true, classLoader)
     var classes = findClasses(directory, null).filter { file =>
       try {
         val method = classOf[URLClassLoader].getDeclaredMethod("findClass", classOf[String]);
