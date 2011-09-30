@@ -61,8 +61,8 @@ object Launch extends SimpleSwingApplication {
       })
     }
   }
-//  System.setOut(sysOutErr)
-//  System.setErr(sysOutErr)
+  System.setOut(sysOutErr)
+  System.setErr(sysOutErr)
 
   lazy val top = new MainFrame {
     iconImage = TrayIcon.icon
@@ -127,13 +127,13 @@ object Launch extends SimpleSwingApplication {
   def currentScript = tabPane.selection.page.content.asInstanceOf[ScriptScrollPane]
 
   def addTab(name: String, path: String): Boolean = {
-    if (!tabs.contains(name)) {
+    if (!tabs.contains(path)) {
       tabPane.pages += new TabbedPane.Page(name, new ScriptScrollPane(name, path))
 
       val index = tabPane.pages.length - 1
 
       tabPane.selection.index = index
-      tabs += (name -> index)
+      tabs += (path -> index)
 
       //      val pnl = new javax.swing.JPanel();
       //      pnl.setOpaque(false);
@@ -144,13 +144,14 @@ object Launch extends SimpleSwingApplication {
 
       true
     } else {
-      tabPane.selection.index = tabs(name)
+      tabPane.selection.index = tabs(path)
       false
     }
   }
 
   def closeTab = {
-    val name = tabPane.selection.page.title
+    //    val name = tabPane.selection.page.title
+    val name = currentScript.text.path
     if (tabs.contains(name)) {
       tabs -= (name)
       tabPane.pages.remove(tabPane.selection.index)
@@ -169,13 +170,13 @@ object Launch extends SimpleSwingApplication {
   }
 
   val progressBar = new ProgressBar {
-	  min = 0
-	  max = 100
-	  value = 0
-	  indeterminate = true
-	  visible = false
+    min = 0
+    max = 100
+    value = 0
+    indeterminate = true
+    visible = false
   }
-  
+
   val statusBar = new Label {
     xAlignment = Alignment.Left
   }
