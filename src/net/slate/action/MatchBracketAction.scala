@@ -18,7 +18,7 @@ package net.slate.action
 import java.awt.Color
 import javax.swing.{ JTextPane, SwingUtilities }
 import javax.swing.event.{ CaretEvent, CaretListener }
-import javax.swing.text.{ Style, StyleContext, StyleConstants }
+import javax.swing.text.DefaultHighlighter
 
 import net.slate.Launch._
 
@@ -29,9 +29,6 @@ import net.slate.Launch._
  */
 class MatchBracketAction extends CaretListener {
   private val map = Map('{' -> ('}', true), '[' -> (']', true), '(' -> (')', true), '}' -> ('{', false), ']' -> ('[', false), ')' -> ('(', false))
-  val sc = StyleContext.getDefaultStyleContext
-  val defaultStyle = sc.getStyle(StyleContext.DEFAULT_STYLE)
-  val style = getStyle
 
   // last index that was styled (that should be reset first!)
   var styledIndex = -1
@@ -65,7 +62,7 @@ class MatchBracketAction extends CaretListener {
 
       if (bracketCount == 0) {
         // highlight the match
-        setCharacterAttributes(textPane, index, style)
+        highlight(textPane, index, true)
         styledIndex = index
       }
     }
@@ -75,7 +72,7 @@ class MatchBracketAction extends CaretListener {
 
       if (styledIndex != -1 && styledIndex < doc.getLength) {
         // reset the previous highlight
-        setCharacterAttributes(textPane, styledIndex, defaultStyle)
+        highlight(textPane, styledIndex, false)
         styledIndex = -1
       }
 
@@ -89,30 +86,20 @@ class MatchBracketAction extends CaretListener {
 
   /**
    * Set the character attributes (aka the style or highlight)
-   * 
+   *
    * @param textPane
    * @param index
-   * @param style
+   * @param add
    */
-  private def setCharacterAttributes(textPane: JTextPane, index: Int, style: Style) = {
+  private def highlight(textPane: JTextPane, index: Int, add: Boolean) = {
     SwingUtilities.invokeLater(new Runnable {
       def run {
-        textPane.getStyledDocument.setCharacterAttributes(index, 1, style, true)
+        val hilite = textPane.getHighlighter()
+        if (add)
+          hilite.addHighlight(index, index + 1, new DefaultHighlighter.DefaultHighlightPainter(Color.decode("0x888888")))
+        else
+          hilite.removeAllHighlights()
       }
     })
-  }
-
-  /**
-   * Build a style to be used for highlighting.
-   *
-   * @return
-   */
-  private def getStyle = {
-    val style = sc.addStyle("bracketMatch", defaultStyle)
-    StyleConstants.setBackground(style, Color.decode("0x888888"))
-    StyleConstants.setForeground(style, Color.decode("0x000000"))
-    StyleConstants.setBold(style, true)
-
-    style
   }
 }
