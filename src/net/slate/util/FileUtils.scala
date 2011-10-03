@@ -68,6 +68,7 @@ object FileUtils {
       currentScript.text.peer.setSelectionStart(0)
       currentScript.text.peer.setSelectionEnd(0)
       currentScript.text.undoManager.discardAllEdits
+      currentScript.text.onload
       updateStatusBar("Ready")
       true
     } else false

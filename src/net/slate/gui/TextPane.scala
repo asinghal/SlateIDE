@@ -154,6 +154,11 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
 
   override protected def paintComponent(g: Graphics2D) {
     super.paintComponent(g)
+    val color = g.getColor
+    g.setColor(java.awt.Color.decode("0x666666"))
+    g.drawLine(700, 0, 700, g.getDeviceConfiguration.getBounds.getHeight.asInstanceOf[Int])
+    g.setColor(color)
+
     if (documentChangedSinceLastRepaint) {
       numbersPane.repaint()
       documentChangedSinceLastRepaint = false
@@ -199,5 +204,9 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
         line += 1
       }
     }
+  }
+
+  def onload = {
+    peer.addCaretListener(new MatchBracketAction)
   }
 }
