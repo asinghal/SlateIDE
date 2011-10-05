@@ -22,7 +22,7 @@ package net.slate.gui
  */
 object WordCompletionPopupMenu {
   import java.awt.event.KeyEvent
-  import javax.swing.{ DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, Popup, PopupFactory }
+  import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, Popup, PopupFactory }
   import scala.swing.Component
   import net.slate.Launch._
   import net.slate.editor.tools.{ CodeAssist, WordCompletion }
@@ -47,6 +47,9 @@ object WordCompletionPopupMenu {
     if (!list.isEmpty) {
       val contents = new JList(list)
       val scrollpane = new JScrollPane(contents)
+      scrollpane.setBackground(java.awt.Color.decode("0xffffff"))
+      scrollpane.setViewportBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5))
+      
       if (popup != null) popup.hide
       
       popup = factory.getPopup(owner.peer, scrollpane, 210 + x, 110 + y)

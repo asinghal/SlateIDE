@@ -77,7 +77,7 @@ class FileExplorer(dir: File) extends ScrollPane {
   renderer.setLeafIcon(customLeafIcon);
 
   tree.setCellRenderer(renderer)
-  tree.setBorder(BorderFactory.createEmptyBorder(10, 10, 220, 420))
+  tree.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
   peer.getViewport().add(tree)
 
   openProjects

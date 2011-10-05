@@ -20,13 +20,13 @@ import scala.swing.{ Action, Component }
 import net.slate.Launch._
 
 /**
- * 
+ *
  * @author Aishwarya Singhal
  *
  */
 object CodeSuggestionPopupMenu {
   import java.awt.event.KeyEvent
-  import javax.swing.{ DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, Popup, PopupFactory }
+  import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, Popup, PopupFactory }
   import net.slate.ExecutionContext
   import net.slate.editor.tools.{ CodeAssist, CodeTemplates, TypeIndexer }
 
@@ -39,6 +39,9 @@ object CodeSuggestionPopupMenu {
     val contents = new JList(list)
     contents.setCellRenderer(new CodeSuggestionRenderer)
     val scrollpane = new JScrollPane(contents)
+    scrollpane.setBackground(java.awt.Color.decode("0xffffff"))
+    scrollpane.setViewportBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5))
+
     if (popup != null) popup.hide
 
     popup = factory.getPopup(owner.peer, scrollpane, 210 + x, 110 + y)
@@ -52,7 +55,7 @@ object CodeSuggestionPopupMenu {
               var text = x.substring(0, x.indexOf("-")).trim
               pane.doc.remove(word._1, pane.caret.position - word._1)
               if (CodeTemplates.map.contains(text)) {
-            	  text = CodeTemplates.map(text)
+                text = CodeTemplates.map(text)
               }
 
               pane.doc.insertString(pane.caret.position, text, null)
