@@ -5,4 +5,5 @@
 </srcdirs>
 <destdir path="${classes}"/>
 <classpath path="${classpath}"/>
+<enableAlacs>true</enableAlacs>
 </settings>

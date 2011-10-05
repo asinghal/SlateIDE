@@ -3,5 +3,7 @@
     <builder type="scala" executable_path="C:\scala-2.8.1.final\bin\scala.bat"/>
     <builder type="java" executable_path="C:\Program Files\Java\jdk1.6.0_23\bin\java.exe"/>
     <builder type="play" executable_path="C:\play-1.2.2\play.bat"/>
+	
+	<alacs jar="C:\project\github\alacs\lib\alacs-0.1_2.8.1.jar" />
     
 </builders>

@@ -27,6 +27,7 @@ trait Builder {
   import net.slate.Launch._
   import net.slate.util.FileUtils
   lazy val configuration = loadConfig
+  var alacsJar: String = null
 
   private lazy val pathSeparator = System.getProperty("path.separator")
 
@@ -131,9 +132,11 @@ trait Builder {
     if (!new File(destdir).exists) {
       new File(destdir).mkdir
     }
+    
+    val enableAlacs = if ((xml \\ "enableAlacs").text != "") (xml \\ "enableAlacs").text.toBoolean else false
 
     val classpath = (xml \\ "classpath" \\ "@path").text
-    (src, destdir, qualifyClasspath(classpath, project))
+    (src, destdir, qualifyClasspath(classpath, project), enableAlacs)
   }
 
   /**
@@ -160,6 +163,8 @@ trait Builder {
       val executablePath = (builder \\ "@executable_path").text
       config += (builderType -> executablePath)
     }
+    
+    alacsJar = (skin \\ "alacs" \\ "@jar").text
 
     config
   }

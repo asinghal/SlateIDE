@@ -20,8 +20,16 @@ import net.slate.ExecutionContext._
 import scala.tools.nsc.{ Global, Settings }
 import scala.tools.nsc.reporters.ConsoleReporter
 
+/**
+ *
+ * @author Aishwarya Singhal
+ *
+ */
 object ScalaBuilder extends Builder {
 
+  /**
+   * Compiles Scala files.
+   */
   def build: List[Message] = {
 
     val projectSettings = settings(currentProjectName)
@@ -29,6 +37,7 @@ object ScalaBuilder extends Builder {
 
     val destDir = projectSettings._2
     val classpath = projectSettings._3
+    val enableAlacs = projectSettings._4
 
     projectSettings._1.foreach { dir =>
       findAllFiles(dir).filter { isModified(_, dir, destDir) }.foreach { x => sourceFiles :::= List(x) }
@@ -38,11 +47,18 @@ object ScalaBuilder extends Builder {
 
     if (!sourceFiles.isEmpty && !buildInProgress) {
       buildInProgress = true
+      configuration
+      
       val settings = new Settings
       settings.outdir.value = destDir
       settings.classpath.value = classpath
       settings.deprecation.value = true
       settings.unchecked.value = true
+
+      if (enableAlacs) {
+        settings.plugin.value = List(alacsJar)
+        settings.require.value = List("alacs")
+      }
 
       val reporter = new ConsoleReporter(settings) {
         override def printMessage(msg: String) {
