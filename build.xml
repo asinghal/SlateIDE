@@ -14,10 +14,10 @@
     </taskdef>
 	
 	<delete file="${basedir}/lib/slate-0.1.jar"/>
+	<delete file="${basedir}/lib/alacs-0.1.jar"/>
       <delete dir="${build.dir}" />
       <mkdir dir="${build.dir}" />
 	  
-	  <delete dir="${dist.dir}" />
       <mkdir dir="${dist.dir}" />
 	</target>
 	
@@ -38,6 +38,7 @@
 	  <copy todir="${build.dir}">
 	    <fileset dir="${sources.dir}" includes="**/*.html" />
 	  </copy>
+	  <copy tofile="${basedir}/lib/alacs-0.1.jar" file="${alacs.jar}" />
 	  
 	  <jar destfile="${basedir}/lib/slate-0.1.jar"
          basedir="${build.dir}" />
@@ -45,12 +46,12 @@
   </target>
   
   <target name="dist" depends="build">
-  <zip destfile="${dist.dir}/slate-0.1.zip">
-	<zipfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*, bin/**/*" prefix="slate-0.1" />
+  <zip destfile="${dist.dir}/slate-0.2.zip">
+	<zipfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*, bin/**/*" prefix="slate-0.2" />
   </zip>
   
-   <tar destfile="${dist.dir}/slate-0.1.tar.gz" compression="gzip" >
-     <tarfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*, bin/**/*" prefix="slate-0.1" />
+   <tar destfile="${dist.dir}/slate-0.2.tar.gz" compression="gzip" >
+     <tarfileset dir="${basedir}" includes="lib/**/*, images/**/*, conf/**/*, templates/**/*, bin/**/*" prefix="slate-0.2" />
    </tar>
   
   </target>

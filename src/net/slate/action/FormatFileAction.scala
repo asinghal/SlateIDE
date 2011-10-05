@@ -87,7 +87,7 @@ class FormatFileAction extends AbstractAction with IndentText with LineParser {
   private def formatEqualsSign(s: String) = {
     // handle cases like "val x+=10; v::=a; v:::=a; v/=a; v*=a; v-=a; 
     // x += 10; v ::= a; v :::= a; v /= a; v *= a; v -= a; a { a=>b }"
-    s.replaceAll("[ \\t]*([:\\+\\-/\\*!><=]*)?=[ \\t]*(>)?[ \\t]*", " $1=$2 ")
+    s.replaceAll("[ \\t]*([:\\+\\-/\\*!><=]*)?[ \\t]*=[ \\t]*(>)?[ \\t]*", " $1=$2 ")
   }
   
   
