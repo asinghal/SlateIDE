@@ -79,13 +79,19 @@ trait Builder {
   }
 
   protected def executeCommand(command: List[String], dir: String, program: String, test: Boolean) = {
-	  progressBar.visible = true
+    progressBar.visible = true
     var commandList = java.util.Arrays.asList(command.toArray: _*)
 
     val pb =
       new ProcessBuilder(commandList)
     pb.directory(new File(dir))
     pb.redirectErrorStream(true)
+
+    System.getenv().keySet.toArray.foreach { key =>
+      println(key)
+      pb.environment.put(key.toString, System.getenv().get(key))
+    }
+
     pb.environment.put("JAVA_OPTS", "-Xmx256M -Xms32M -Xss32M")
     val p = pb.start()
     runningProcess = p
@@ -100,7 +106,7 @@ trait Builder {
       println("done")
       val netOutput = error + output
       if (test) TestCaseMessage.parse(dir, program, netOutput)
-	  progressBar.visible = false
+      progressBar.visible = false
       runningProcess = null
     }
   }
@@ -132,7 +138,7 @@ trait Builder {
     if (!new File(destdir).exists) {
       new File(destdir).mkdir
     }
-    
+
     val enableAlacs = if ((xml \\ "enableAlacs").text != "") (xml \\ "enableAlacs").text.toBoolean else false
 
     val classpath = (xml \\ "classpath" \\ "@path").text
@@ -163,7 +169,7 @@ trait Builder {
       val executablePath = (builder \\ "@executable_path").text
       config += (builderType -> executablePath)
     }
-    
+
     alacsJar = (skin \\ "alacs" \\ "@jar").text
 
     config
