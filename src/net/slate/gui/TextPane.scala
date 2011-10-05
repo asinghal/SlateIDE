@@ -110,8 +110,9 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       val pane = currentScript
       val point = pane.text.peer.getCaret.getMagicCaretPosition
-      val x = if (point != null) (point.getX.asInstanceOf[Int] + 50) else 50
-      val y = if (point != null) (point.getY.asInstanceOf[Int] + 10) else 10
+      val editor = pane.peer.getViewport.getViewPosition
+      val x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
+      val y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 10) else 10
       CodeSuggestionPopupMenu.show(pane, x, y)
     }
   })
@@ -214,11 +215,13 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       def caretUpdate(e: CaretEvent) {
         val pane = currentScript
         // suggest word completions only for scala/java/css/js files. 
-        if (pane.text.path.endsWith(".scala") || pane.text.path.endsWith(".java") 
-        		|| pane.text.path.endsWith(".css") || pane.text.path.endsWith(".js")) {
+        if (pane.text.path.endsWith(".scala") || pane.text.path.endsWith(".java")
+          || pane.text.path.endsWith(".css") || pane.text.path.endsWith(".js")) {
           val point = pane.text.peer.getCaret.getMagicCaretPosition
-          val x = if (point != null) (point.getX.asInstanceOf[Int] + 50) else 50
-          val y = if (point != null) (point.getY.asInstanceOf[Int] + 10) else 10
+          val editor = pane.peer.getViewport.getViewPosition
+          val x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
+          val y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 10) else 10
+
           WordCompletionPopupMenu.show(pane, x, y)
         }
       }

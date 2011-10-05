@@ -41,7 +41,7 @@ object CodeSuggestionPopupMenu {
     val scrollpane = new JScrollPane(contents)
     if (popup != null) popup.hide
 
-    popup = factory.getPopup(owner.peer, scrollpane, 200 + x, 100 + y)
+    popup = factory.getPopup(owner.peer, scrollpane, 210 + x, 110 + y)
     contents.addMouseListener(new java.awt.event.MouseAdapter {
       override def mouseClicked(e: java.awt.event.MouseEvent) {
         if (e.getButton == java.awt.event.MouseEvent.BUTTON1 && e.getClickCount() == 2) {
