@@ -31,10 +31,15 @@ h2. Main Features
 11. Ability to create different types of Scala and Java classes using templates.
 12. A separate window to show console, so if you use a 2 monitor set up, you could dock the console in one and editor in another. The console is slightly translucent so if you are using console on same window as editor, you could watch it while watching your code too!
 
+h2. New in Release 0.2
+
+1. A 100 character marker (ruler) to indicate long lines in code.
+2. Static code analysis that helps identify unused private/ local methods/ variables. This is implemented using Alacs
+3. Word completion assistance. This works on the basis of words already defined in the current code.
+
 h2. Future Plans
 
 If the IDE gathers sufficient interest, I would like to build the following:
 1. Integrate Java debugger
-2. Perform Static Code Analysis (like FindBugs) and report unused code.
-3. Support refactoring esp. renaming variables and methods.
-4. Display a call hierarcy of methods to know where all the method is getting called from.
+2. Support refactoring esp. renaming variables and methods.
+3. Display a call hierarcy of methods to know where all the method is getting called from.
