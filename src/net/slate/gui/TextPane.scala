@@ -95,12 +95,12 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       runDialog.display
     }
   })
-
-  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
-    def actionPerformed(e: java.awt.event.ActionEvent) {
-      currentScript.size = (new Dimension(1024, 1024))
-    }
-  })
+  //
+  //  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
+  //    def actionPerformed(e: java.awt.event.ActionEvent) {
+  //      currentScript.size = (new Dimension(1024, 1024))
+  //    }
+  //  })
 
   peer.setCaretColor(Configuration.editorCursorColor)
 
@@ -156,7 +156,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     super.paintComponent(g)
     val color = g.getColor
     g.setColor(java.awt.Color.decode("0x666666"))
-    g.drawLine(700, 0, 700, g.getDeviceConfiguration.getBounds.getHeight.asInstanceOf[Int])
+    g.drawLine(700, currentScript.peer.getViewport.getViewPosition.y, 700, currentScript.peer.getViewport.getViewPosition.y + peer.getVisibleRect.getHeight.toInt)
     g.setColor(color)
 
     if (documentChangedSinceLastRepaint) {
@@ -207,6 +207,21 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   }
 
   def onload = {
+    import javax.swing.event.{ CaretEvent, CaretListener }
+
     peer.addCaretListener(new MatchBracketAction)
+    peer.addCaretListener(new CaretListener {
+      def caretUpdate(e: CaretEvent) {
+        val pane = currentScript
+        // suggest word completions only for scala/java/css/js files. 
+        if (pane.text.path.endsWith(".scala") || pane.text.path.endsWith(".java") 
+        		|| pane.text.path.endsWith(".css") || pane.text.path.endsWith(".js")) {
+          val point = pane.text.peer.getCaret.getMagicCaretPosition
+          val x = if (point != null) (point.getX.asInstanceOf[Int] + 50) else 50
+          val y = if (point != null) (point.getY.asInstanceOf[Int] + 10) else 10
+          WordCompletionPopupMenu.show(pane, x, y)
+        }
+      }
+    })
   }
 }

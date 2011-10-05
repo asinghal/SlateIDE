@@ -57,7 +57,7 @@ object CodeSuggestionPopupMenu {
 
               pane.doc.insertString(pane.caret.position, text, null)
           }
-          popup.hide
+          restoreFocus
         }
       }
 
@@ -70,14 +70,6 @@ object CodeSuggestionPopupMenu {
       }
     });
     popup.show()
-  }
-
-  def insertTextAction(text: String) = new Action(text) {
-    def apply() {
-      val pane = currentScript.text
-      pane.doc.insertString(pane.caret.position, text, null)
-      restoreFocus
-    }
   }
 
   def restoreFocus = {
