@@ -88,7 +88,6 @@ trait Builder {
     pb.redirectErrorStream(true)
 
     System.getenv().keySet.toArray.foreach { key =>
-      println(key)
       pb.environment.put(key.toString, System.getenv().get(key))
     }
 
