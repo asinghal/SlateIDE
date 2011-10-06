@@ -66,8 +66,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   addActionforKeyStroke(KeyEvent.VK_F11, new javax.swing.AbstractAction {
     import net.slate.Launch._
     def actionPerformed(e: java.awt.event.ActionEvent) {
-      top.fileExplorer.size = new Dimension(5, top.fileExplorer.size.getHeight.asInstanceOf[Int])
-      top.splitPane.size = new Dimension(1024, top.splitPane.size.getHeight.asInstanceOf[Int])
+      if (!top.mainPanel.maximized) top.mainPanel.maximize else top.mainPanel.restore
     }
   })
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction)
@@ -95,12 +94,12 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       runDialog.display
     }
   })
-  //
-  //  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
-  //    def actionPerformed(e: java.awt.event.ActionEvent) {
-  //      currentScript.size = (new Dimension(1024, 1024))
-  //    }
-  //  })
+
+  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      currentScript.peer.getViewport.setViewSize(new Dimension(1024, 1024))
+    }
+  })
 
   peer.setCaretColor(Configuration.editorCursorColor)
 

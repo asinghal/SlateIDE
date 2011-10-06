@@ -73,12 +73,11 @@ object Launch extends SimpleSwingApplication {
 
     TrayIcon.init
 
-    val splitPane = new SplitPane(Orientation.Horizontal) {
+    // editor panel that houses editor + console
+    private val splitPane = new SplitPane(Orientation.Horizontal) {
       topComponent = tabPane
 
       bottomComponent = bottomTabPane
-
-      preferredSize = new Dimension(1024, 1024)
 
       dividerLocation = 900
       resizeWeight = 1.0
@@ -88,10 +87,41 @@ object Launch extends SimpleSwingApplication {
     val toolbar = new NavigationToolBar
 
     val fileExplorer = new FileExplorer(null)
+
+    // main panel that houses the file explorer as well as the editor + console
+    val mainPanel = new SplitPane(Orientation.Vertical) {
+      var maximized = false
+
+      topComponent = fileExplorer
+
+      bottomComponent = splitPane
+
+      dividerLocation = 200
+      resizeWeight = 0.0
+      dividerSize = 1
+
+      /**
+       * maximize the editor. 
+       */
+      def maximize = {
+        resizeWeight = 1d
+        dividerLocation = 10
+        maximized = true
+      }
+
+      /**
+       * restore the editor. 
+       */
+      def restore = {
+        resizeWeight = 0.0
+        dividerLocation = 200
+        maximized = false
+      }
+    }
+
     contents = new BorderPanel {
-      add(fileExplorer, BorderPanel.Position.West)
       add(toolbar, BorderPanel.Position.North)
-      add(splitPane, BorderPanel.Position.Center)
+      add(mainPanel, BorderPanel.Position.Center)
       add(statusBarPane, BorderPanel.Position.South)
     }
 

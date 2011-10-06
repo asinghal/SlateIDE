@@ -82,8 +82,6 @@ class FileExplorer(dir: File) extends ScrollPane {
 
   openProjects
 
-  preferredSize = new Dimension(200, 400)
-
   def addNodes(curTop: DefaultMutableTreeNode, dir: File): DefaultMutableTreeNode = {
     if (dir != null) {
       val curPath = dir.getPath()
