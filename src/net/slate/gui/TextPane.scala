@@ -95,12 +95,6 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     }
   })
 
-  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
-    def actionPerformed(e: java.awt.event.ActionEvent) {
-      currentScript.peer.getViewport.setViewSize(new Dimension(1024, 1024))
-    }
-  })
-
   peer.setCaretColor(Configuration.editorCursorColor)
 
   val popupMenu = new EditorPopupMenu

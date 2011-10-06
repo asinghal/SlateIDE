@@ -70,11 +70,14 @@ class ProblemsTab extends ScrollPane {
     peer.getColumnModel().getColumn(1).setCellRenderer(new KeyIconCellRenderer)
 
     peer.addMouseListener(new MouseAdapter() {
+      import net.slate.editor.ErrorMarker
+
       override def mouseClicked(e: MouseEvent) = {
         //        if (e.getButton == java.awt.event.MouseEvent.BUTTON3/* && e.getClickCount() == 2*/) {
         val row = peer.getSelectedRow()
         val path = peer.getValueAt(row, 5).asInstanceOf[String]
         FileUtils.open(path.substring(path.lastIndexOf(java.io.File.separator) + 1), path)
+        ErrorMarker.mark
         //        }
       }
     })

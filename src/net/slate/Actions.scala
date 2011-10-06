@@ -143,6 +143,7 @@ object Actions {
    * error on the problems tab.
    */
   val saveAction = registerAction("Save", "control S", new ImageIcon("images/save_edit.gif")) {
+    import net.slate.editor.ErrorMarker
     if (currentScript.text.undoManager.hasChangedSinceLastSave) {
       saveFile
       bottomTabPane.problems.clear
@@ -152,6 +153,7 @@ object Actions {
         ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
         progressBar.visible = false
         bottomTabPane.selection.index = 1
+        ErrorMarker.mark
       }
     }
   }
