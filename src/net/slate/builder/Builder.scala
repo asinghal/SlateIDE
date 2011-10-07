@@ -92,19 +92,16 @@ trait Builder {
     }
 
     pb.environment.put("JAVA_OPTS", "-Xmx256M -Xms32M -Xss32M")
+    pb.redirectErrorStream(true)
     val p = pb.start()
     runningProcess = p
 
     actor {
-      val error = read(p.getErrorStream)
-      println(error)
       val output = read(p.getInputStream)
-      println(output)
       p.waitFor
       p.destroy
       println("done")
-      val netOutput = error + output
-      if (test) TestCaseMessage.parse(dir, program, netOutput)
+      if (test) TestCaseMessage.parse(dir, program, output)
       progressBar.visible = false
       runningProcess = null
     }
@@ -112,6 +109,13 @@ trait Builder {
 
   private def read(stream: java.io.InputStream) = {
     val source = Source.fromInputStream(stream)
+    val br = source.bufferedReader
+    var line = br.readLine
+    while (line != null) {
+      println(line);
+      line = br.readLine
+    }
+
     val lines = source.mkString
     source.close()
     lines
