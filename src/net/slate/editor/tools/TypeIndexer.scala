@@ -69,17 +69,11 @@ class TypeIndexer(project: String) {
         addDoc(w, name, description, "template", text)
       }
 
-      // index all files
-      //      FileUtils.findAllFiles(project, null).foreach { file =>
-      //        val path = file
-      //        val name = file.substring(file.lastIndexOf(File.separator) + 1)
-      //
-      //        addDoc(w, name, path, "resource", "")
-      //      }
-
       ready = true
 
       w.close()
+
+      TypeIndexer.recordTimeStamp(project)
     }
   }
 
@@ -136,4 +130,25 @@ class TypeIndexer(project: String) {
     w.addDocument(doc)
   }
 
+}
+
+object TypeIndexer {
+  var timestamps = Map[String, Long]()
+  val age = 5 * 60 * 1000L
+
+  /**
+   * Re-index the given project if the index is too old. The default age is 5 mins.
+   *
+   * @param project
+   */
+  def reindex(project: String) = {
+    if ((System.currentTimeMillis - timestamps(project.trim)) > age) {
+      // too old an index, lets refresh it
+      new TypeIndexer(project).index
+    }
+  }
+
+  def recordTimeStamp(project: String) = {
+    timestamps = timestamps.updated(project, System.currentTimeMillis)
+  }
 }

@@ -143,7 +143,10 @@ object Actions {
    * error on the problems tab.
    */
   val saveAction = registerAction("Save", "control S", new ImageIcon("images/save_edit.gif")) {
+    import net.slate.ExecutionContext._
     import net.slate.editor.ErrorMarker
+    import net.slate.editor.tools.TypeIndexer
+
     if (currentScript.text.undoManager.hasChangedSinceLastSave) {
       saveFile
       bottomTabPane.problems.clear
@@ -154,6 +157,9 @@ object Actions {
         progressBar.visible = false
         bottomTabPane.selection.index = 1
         ErrorMarker.mark
+
+        // reindex if necessary
+        TypeIndexer.reindex(currentProjectName)
       }
     }
   }
