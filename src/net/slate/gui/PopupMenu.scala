@@ -143,6 +143,75 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
     }
   }
 
+  contents += new Menu("Git") with CreateNewItemMenuItem {
+    import javax.swing.JOptionPane
+    import net.slate.Launch._
+
+    import net.slate.builder.GitRunner
+    contents += new MenuItem(new Action("Init") {
+
+      def apply() {
+        val remote = JOptionPane.showInputDialog(
+          top.peer,
+          "Please enter the path of remote Git",
+          "Git Init",
+          JOptionPane.PLAIN_MESSAGE,
+          null,
+          null,
+          null)
+        if (null != remote) new GitRunner(path).init(remote.toString)
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Add") {
+
+      def apply() {
+        new GitRunner(path) +
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Commit") {
+      import net.slate.ExecutionContext._
+      import net.slate.builder.PlayRunner
+
+      def apply() {
+        val comment = JOptionPane.showInputDialog(
+          top.peer,
+          "Please enter a comment for commit",
+          "Git Commit",
+          JOptionPane.PLAIN_MESSAGE,
+          null,
+          null,
+          null)
+        val git = new GitRunner(path)
+        if (git ?) git.commit(comment.toString)
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Checkout") {
+
+      def apply() {
+        new GitRunner(path).checkout
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Push") {
+
+      def apply() {
+        new GitRunner(path).push
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Pull") {
+      import net.slate.ExecutionContext._
+      import net.slate.builder.PlayRunner
+
+      def apply() {
+        new GitRunner(path).pull
+      }
+    }) with CreateNewItemMenuItem
+  }
+
   def createNewItemAction(text: String, templateName: String, iconName: String) = new Action(text) {
     icon = new javax.swing.ImageIcon("images/" + iconName + ".gif")
 

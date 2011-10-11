@@ -151,12 +151,15 @@ object Actions {
       saveFile
       bottomTabPane.problems.clear
       actor {
-        progressBar.visible = true
-        JavaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
-        ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
-        progressBar.visible = false
-        bottomTabPane.selection.index = 1
-        ErrorMarker.mark
+        val currentPath = currentScript.text.path.trim.toLowerCase
+        if (currentPath.endsWith(".java") || currentPath.endsWith(".scala")) {
+          progressBar.visible = true
+          JavaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
+          ScalaBuilder.build.foreach { msg => bottomTabPane.problems.add(msg.description, msg.file, msg.line, msg.projectName, msg.path, msg.problemType) }
+          progressBar.visible = false
+          bottomTabPane.selection.index = 1
+          ErrorMarker.mark
+        }
 
         // reindex if necessary
         TypeIndexer.reindex(currentProjectName)

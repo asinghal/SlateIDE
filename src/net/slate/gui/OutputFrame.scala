@@ -6,7 +6,11 @@ class OutputFrame extends javax.swing.JFrame {
   setIconImage(net.slate.TrayIcon.icon)
 
   if (isTranslucencySupported(Translucency.TRANSLUCENT)) {
-    setWindowOpacity(this, 0.8f)
+    try {
+      setWindowOpacity(this, 0.8f)
+    } catch {
+      case e: Exception => // ignore this error. Opacity should not cause the system to fail.
+    }
   }
 
   val outputPane = new Console
