@@ -47,8 +47,11 @@ class GitRunner(path: String) extends Builder {
     if (!readme.exists) readme.createNewFile
     println("created " + readmePath)
     wt.add
+    println("added files")
     wt.commit("first commit")
+    println("first commit done")
     addRemote(remote)
+    println("Git init complete")
   }
 
   /**
@@ -94,16 +97,23 @@ class GitRunner(path: String) extends Builder {
   private def run(command: String) = {
     import net.slate.ExecutionContext
     val project = ExecutionContext.currentProjectName(path)
-    executeCommand(List(gitPath + File.separator + "git", command), project, "git", false)
+    executeCommand(List(gitPath + File.separator + getGitExecutable, command), project, "git", false)
   }
-  
+
   private def addRemote(remote: String) = {
-	  import net.slate.ExecutionContext
+    import net.slate.ExecutionContext
     val project = ExecutionContext.currentProjectName(path)
-    executeCommand(List(gitPath + File.separator + "git", "remote", "add", "origin", remote), project, "git", false)
+    println("adding remote origin")
+    println(project)
+    executeCommand(List(gitPath + File.separator + getGitExecutable, "remote", "add", "origin", remote), project, "git", false)
     val p = ExecutionContext.runningProcess
     if (p != null) p.waitFor
-    executeCommand(List(gitPath + File.separator + "git", "push", "origin", "master"), project, "git", false)
+    println("pushing origin to master")
+    executeCommand(List(gitPath + File.separator + getGitExecutable, "push", "origin", "master"), project, "git", false)
+  }
+  
+  private def getGitExecutable() = {
+      if (System.getProperty("os.name").startsWith("Windows")) "git.exe" else "git"
   }
 
   //get the instance of the dotGit Object

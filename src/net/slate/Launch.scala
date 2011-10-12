@@ -61,8 +61,6 @@ object Launch extends SimpleSwingApplication {
       })
     }
   }
-  System.setOut(sysOutErr)
-  System.setErr(sysOutErr)
 
   lazy val top = new MainFrame {
     iconImage = TrayIcon.icon
@@ -101,7 +99,7 @@ object Launch extends SimpleSwingApplication {
       dividerSize = 1
 
       /**
-       * maximize the editor. 
+       * maximize the editor.
        */
       def maximize = {
         resizeWeight = 1d
@@ -110,7 +108,7 @@ object Launch extends SimpleSwingApplication {
       }
 
       /**
-       * restore the editor. 
+       * restore the editor.
        */
       def restore = {
         resizeWeight = 0.0
@@ -137,6 +135,10 @@ object Launch extends SimpleSwingApplication {
     centerOnScreen()
     updateStatusBar("Ready")
     currentScript.text.requestFocus()
+    
+    // redirect all output and errors henceforth to the console in Slate
+    System.setOut(sysOutErr)
+    System.setErr(sysOutErr)
   }
 
   lazy val findDialog = new FindDialog(top)
