@@ -24,6 +24,7 @@ import scala.swing.event._
 
 import net.slate.{ ExecutionContext, Launch }
 import net.slate.builder.ProjectConfigurator
+import net.slate.gui.popupmenu.ProjectTreeMenu
 
 class FileExplorer(dir: File) extends ScrollPane {
   import Launch._
@@ -36,7 +37,7 @@ class FileExplorer(dir: File) extends ScrollPane {
 
   val tree = new JTree(addNodes(top, dir))
 
-  val projectTreeMenu = new ProjectTreeMenu
+  val projectTreeMenu = ProjectTreeMenu
 
   // Add a listener
   tree.addMouseListener(new java.awt.event.MouseAdapter {

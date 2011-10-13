@@ -13,50 +13,21 @@
  *
  *  Created on: 20th September 2011
  */
-package net.slate.gui
+package net.slate.gui.popupmenu
 
-import java.awt.{ Color, Dimension, Font }
-import javax.swing.{ BorderFactory, JPopupMenu }
-import javax.swing.border._
 import scala.swing.{ Action, Menu, Component, MenuItem }
-import scala.swing.SequentialContainer.Wrapper
-
 import net.slate.Launch
+import net.slate.gui.NewItemDetailsDialog
 
-object PopupMenu {
-  private[PopupMenu] trait JPopupMenuMixin { def popupMenuWrapper: PopupMenu }
-}
-
-class PopupMenu extends Component with Wrapper {
-
-  override lazy val peer: JPopupMenu = new JPopupMenu with PopupMenu.JPopupMenuMixin with SuperMixin {
-    def popupMenuWrapper = PopupMenu.this
-  }
-
-  def show(invoker: Component, x: Int, y: Int): Unit = peer.show(invoker.peer, x, y)
-
-  /* Create any other peer methods here */
-}
-
-class EditorPopupMenu extends PopupMenu with MenuPainter {
-  import net.slate.action._
-
-  contents += new Menu("Source") with MenuFont {
-    contents += new MenuItem("Format") with MenuFont { peer.addActionListener(new FormatFileAction) }
-    contents += new MenuItem("Organise Imports") with MenuFont { peer.addActionListener(new OrganiseImportsAction) }
-  }
-  //  contents += new Menu("Execute") with MenuFont {
-  //    contents += new MenuItem("Run") with MenuFont
-  //    contents += new MenuItem("Debug") with MenuFont
-  //  }
-}
-
-class ProjectTreeMenu extends PopupMenu with MenuPainter {
+/**
+ * Project tree menu that appears on the file explorer when mouse is right clicked.
+ *
+ * @author Aishwarya Singhal
+ */
+object ProjectTreeMenu extends PopupMenu with MenuPainter {
   var path = ""
   lazy val form = new NewItemDetailsDialog(Launch.top)
   var nodeRow = -1
-
-  preferredSize = new Dimension(100, 100)
 
   contents += new Menu("New") with CreateNewItemMenuItem {
 
@@ -212,6 +183,72 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
     }) with CreateNewItemMenuItem
   }
 
+  contents += new Menu("Heroku") with CreateNewItemMenuItem {
+    import javax.swing.JOptionPane
+    import net.slate.ExecutionContext._
+    import net.slate.Launch._
+
+    import net.slate.builder.HerokuRunner
+
+    contents += new MenuItem(new Action("Create") {
+
+      def apply() {
+        val name = JOptionPane.showInputDialog(
+          top.peer,
+          "Please enter the name of application for Heroku.\n The app name will appear in the url.",
+          "Heroku",
+          JOptionPane.PLAIN_MESSAGE,
+          null,
+          null,
+          null)
+        val project = currentProjectName(path)
+        if (null != name) new HerokuRunner(project).create(name.toString)
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Deploy") {
+
+      def apply() {
+        val project = currentProjectName(path)
+        new HerokuRunner(project).deploy
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Console") {
+      import net.slate.ExecutionContext._
+      import net.slate.builder.PlayRunner
+
+      def apply() {
+        val comment = JOptionPane.showInputDialog(
+          top.peer,
+          "Please enter any command",
+          "Heroku Console",
+          JOptionPane.PLAIN_MESSAGE,
+          null,
+          null,
+          null)
+        val project = currentProjectName(path)
+        new HerokuRunner(project).console(if (comment != null) comment.toString else "")
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Logs") {
+
+      def apply() {
+        val project = currentProjectName(path)
+        new HerokuRunner(project).logs
+      }
+    }) with CreateNewItemMenuItem
+
+    contents += new MenuItem(new Action("Restart") {
+
+      def apply() {
+        val project = currentProjectName(path)
+        new HerokuRunner(project).restart
+      }
+    }) with CreateNewItemMenuItem
+  }
+
   def createNewItemAction(text: String, templateName: String, iconName: String) = new Action(text) {
     icon = new javax.swing.ImageIcon("images/" + iconName + ".gif")
 
@@ -219,20 +256,4 @@ class ProjectTreeMenu extends PopupMenu with MenuPainter {
       form.display(templateName, path, nodeRow)
     }
   }
-}
-
-trait MenuPainter {
-  self: Component =>
-}
-
-trait MenuFont {
-  self: Component =>
-  border = BorderFactory.createEmptyBorder
-}
-
-trait CreateNewItemMenuItem {
-  self: Component =>
-  val itemSize = new Dimension(150, 20)
-  minimumSize = itemSize
-  maximumSize = itemSize
 }

@@ -21,6 +21,7 @@ import javax.swing.{ Action, KeyStroke, JTextPane }
 import java.awt.{ FlowLayout, Font, LayoutManager, Point }
 import net.slate.Launch._
 import net.slate.Actions
+import net.slate.gui.popupmenu.EditorPopupMenu
 
 /**
  *

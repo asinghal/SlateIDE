@@ -19,23 +19,16 @@ import java.io.File
 
 import edu.nyu.cs.javagit.api._
 import edu.nyu.cs.javagit.api.commands._
-import edu.nyu.cs.javagit.utilities._
 
 /**
  * Enables execution of git related commands.
  *
  * @author Aishwarya Singhal
  */
-class GitRunner(path: String) extends Builder {
+class GitRunner(path: String) extends Runner {
   // path to the working tree
   private val workingTreePath = new File(path)
   private val wt = instance.getWorkingTree
-
-  private val gitPath = configuration("git")
-  CheckUtilities.checkFileValidity(gitPath)
-
-  // Make sure you have JavaGit added as an external jar in your project
-  JavaGitConfiguration.setGitPath(gitPath)
 
   /**
    * Git init at the current path.
@@ -46,6 +39,7 @@ class GitRunner(path: String) extends Builder {
     val readme = new File(readmePath)
     if (!readme.exists) readme.createNewFile
     println("created " + readmePath)
+    createIgnoreFile
     wt.add
     println("added files")
     wt.commit("first commit")
@@ -94,38 +88,69 @@ class GitRunner(path: String) extends Builder {
    */
   def pull = run("pull")
 
-  private def run(command: String) = {
+  /**
+   * execute a git command externally.
+   *
+   * @param command
+   */
+  private def run(command: String) {
     import net.slate.ExecutionContext
     val project = ExecutionContext.currentProjectName(path)
-    executeCommand(List(gitPath + File.separator + getGitExecutable, command), project, "git", false)
+    executeCommand(List(GitRunner.git, command), project, "git", false)
   }
 
-  private def addRemote(remote: String) = {
+  /**
+   * add git remote repository and push to master.
+   *
+   * @param remote
+   */
+  private def addRemote(remote: String) {
     import net.slate.ExecutionContext
     val project = ExecutionContext.currentProjectName(path)
     println("adding remote origin")
     println(project)
-    executeCommand(List(gitPath + File.separator + getGitExecutable, "remote", "add", "origin", remote), project, "git", false)
+    executeCommand(List(GitRunner.git, "remote", "add", "origin", remote), project, "git", false)
     val p = ExecutionContext.runningProcess
     if (p != null) p.waitFor
     println("pushing origin to master")
-    executeCommand(List(gitPath + File.separator + getGitExecutable, "push", "origin", "master"), project, "git", false)
+    executeCommand(List(GitRunner.git, "push", "origin", "master"), project, "git", false)
   }
-  
-  private def getGitExecutable() = {
-      if (System.getProperty("os.name").startsWith("Windows")) "git.exe" else "git"
+
+  /**
+   * creates the .gitignore file to indicate what must not be added to git.
+   */
+  private def createIgnoreFile {
+    import java.io.{ BufferedWriter, FileWriter }
+    import net.slate.ExecutionContext
+    val project = ExecutionContext.currentProjectName(path)
+    val writer = new BufferedWriter(new FileWriter(path + File.separator + ".gitignore"))
+    if (project == path) {
+      writer.write(".slate\n")
+      writer.write(settings(project)._2 + "\n")
+    }
+    writer.close()
   }
 
   //get the instance of the dotGit Object
   private def instance = DotGit.getInstance(path)
+}
+
+object GitRunner extends Runner {
+  private val gitPath = configuration("git")
+
+  // Make sure you have JavaGit added as an external jar in your project
+  JavaGitConfiguration.setGitPath(gitPath)
+
+  def git = {
+    gitPath + File.separator + getGitExecutable
+  }
 
   /**
-   * Not used
+   * gets the executable based on the operating system.
+   *
+   * @return
    */
-  def build: List[Message] = List()
-
-  /**
-   * Not used
-   */
-  protected def supportedExtension: String = ".*"
+  private def getGitExecutable = {
+    if (System.getProperty("os.name").startsWith("Windows")) "git.exe" else "git"
+  }
 }
