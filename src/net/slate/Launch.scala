@@ -18,7 +18,7 @@ package net.slate
 import scala.swing._
 import scala.swing.event._
 import scala.actors.Actor._
-import java.awt.{ Color, Cursor, Font, Frame, Toolkit }
+import java.awt.{ Color, Cursor, Font, Frame, SplashScreen, Toolkit }
 import java.io.{ PipedInputStream, PipedOutputStream, PrintStream }
 import javax.swing.event._
 import javax.swing.{ SwingUtilities, UIManager }
@@ -62,12 +62,34 @@ object Launch extends SimpleSwingApplication {
     }
   }
 
+  private val splash = new MainFrame {
+    iconImage = TrayIcon.icon
+    title = "Slate"
+    preferredSize = new Dimension(400, 150)
+    peer.setUndecorated(true)
+    contents = new BorderPanel {
+      import javax.swing.BorderFactory
+      
+      val color = Color.decode("0xFFFFFF")
+      val largeFont = new Font("Dialog", 1, 30) 
+
+      border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+      background = Color.decode("0x7092BE")
+      add(new Label("Slate - An IDE for Scala") { foreground = color; font = largeFont }, BorderPanel.Position.North)
+      add(new Label("Loading Slate...") { foreground = color }, BorderPanel.Position.Center)
+      add(new Label("Version 0.2 | Released October 2011 | Written By Aishwarya Singhal") { foreground = color }, BorderPanel.Position.South)
+    }
+    centerOnScreen()
+    visible = true
+  }
+
   lazy val top = new MainFrame {
     iconImage = TrayIcon.icon
     title = "Slate"
     menuBar = MainMenuBar
     val outputFrame = new OutputFrame
     outputFrame.setVisible(true)
+    outputFrame.toBack
 
     TrayIcon.init
 
@@ -135,10 +157,12 @@ object Launch extends SimpleSwingApplication {
     centerOnScreen()
     updateStatusBar("Ready")
     currentScript.text.requestFocus()
-    
+
     // redirect all output and errors henceforth to the console in Slate
     System.setOut(sysOutErr)
     System.setErr(sysOutErr)
+    splash.visible = false
+    splash.dispose
   }
 
   lazy val findDialog = new FindDialog(top)
