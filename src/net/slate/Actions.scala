@@ -236,7 +236,7 @@ object Actions {
    */
   val closeTabAction = registerAction("Close Tab", "control F4") {
     if (tabPane.pages.length > 1)
-      closeTab
+      closeTab()
     else updateStatusBar("At lease 1 tab needed.")
   }
 

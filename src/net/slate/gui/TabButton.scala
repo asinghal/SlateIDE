@@ -21,7 +21,7 @@ import net.slate.Launch._
 /**
  * This is the 'close' button that appears on each tab of the editor.
  */
-class TabButton extends Button {
+class TabButton(name: String) extends Button {
   import java.awt.{ BasicStroke, Color, Dimension, Graphics2D }
   import javax.swing.BorderFactory
   import javax.swing.plaf.basic.BasicButtonUI
@@ -40,7 +40,7 @@ class TabButton extends Button {
 
   peer.addMouseListener(new java.awt.event.MouseAdapter {
     override def mousePressed(e: java.awt.event.MouseEvent) {
-      closeTab
+      closeTab(name)
     }
   })
 
@@ -54,6 +54,7 @@ class TabButton extends Button {
     val delta = 6;
     g.drawLine(delta, delta, peer.getWidth() - delta - 1, peer.getHeight() - delta - 1);
     g.drawLine(peer.getWidth() - delta - 1, delta, delta, peer.getHeight() - delta - 1);
+
     g.dispose()
   }
 }

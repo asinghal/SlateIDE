@@ -25,7 +25,6 @@ import javax.swing.{ SwingUtilities, UIManager }
 import javax.swing.text.DefaultStyledDocument
 
 import net.slate.gui._
-import net.slate.formatting.Configuration
 
 /**
  *
@@ -69,9 +68,9 @@ object Launch extends SimpleSwingApplication {
     peer.setUndecorated(true)
     contents = new BorderPanel {
       import javax.swing.BorderFactory
-      
+
       val color = Color.decode("0xFFFFFF")
-      val largeFont = new Font("Dialog", 1, 30) 
+      val largeFont = new Font("Dialog", 1, 30)
 
       border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
       background = Color.decode("0x7092BE")
@@ -184,19 +183,21 @@ object Launch extends SimpleSwingApplication {
 
   def addTab(name: String, path: String): Boolean = {
     if (!tabs.contains(path)) {
-      tabPane.pages += new TabbedPane.Page(name, new ScriptScrollPane(name, path))
+      tabPane.pages += new TabbedPane.Page(name, new ScriptScrollPane(name, path)) { tip = path }
 
       val index = tabPane.pages.length - 1
 
       tabPane.selection.index = index
       tabs += (path -> index)
 
-      //      val pnl = new javax.swing.JPanel();
-      //      pnl.setOpaque(false);
-      //      pnl.add(new Label(tabPane.peer.getTitleAt(index)).peer)
-      //      pnl.add(new TabButton().peer)
-      //      
-      //      tabPane.peer.setTabComponentAt(index, pnl)
+      val pnl = new BorderPanel {
+        import BorderPanel.Position
+        
+        add(new Label(tabPane.peer.getTitleAt(index)), Position.West)
+        add(new TabButton(path), Position.East)
+      }
+
+      tabPane.peer.setTabComponentAt(index, pnl.peer)
 
       true
     } else {
@@ -205,12 +206,15 @@ object Launch extends SimpleSwingApplication {
     }
   }
 
-  def closeTab = {
-    //    val name = tabPane.selection.page.title
-    val name = currentScript.text.path
+  def closeTab(name: String = currentScript.text.path): Unit = {
     if (tabs.contains(name)) {
       tabs -= (name)
-      tabPane.pages.remove(tabPane.selection.index)
+      for (i <- 0 to (tabPane.peer.getTabCount - 1)) {
+        if (tabPane.peer.getToolTipTextAt(i) == name) {
+          tabPane.pages.remove(i)
+          return
+        }
+      }
     }
   }
 
@@ -221,7 +225,6 @@ object Launch extends SimpleSwingApplication {
 
       add(text.numbersPane, Position.West)
       add(text, Position.Center)
-      add(new BorderPanel { add(new TabButton(), Position.East) }, Position.North)
     }
   }
 
