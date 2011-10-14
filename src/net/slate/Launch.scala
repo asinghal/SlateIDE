@@ -230,12 +230,8 @@ object Launch extends SimpleSwingApplication {
   def closeTab(name: String = currentScript.text.path): Unit = {
     if (tabs.contains(name)) {
       tabs -= (name)
-      for (i <- 0 to (tabPane.peer.getTabCount - 1)) {
-        if (tabPane.peer.getToolTipTextAt(i) == name) {
-          tabPane.pages.remove(i)
-          return
-        }
-      }
+      
+      (0 until tabPane.peer.getTabCount).find { i => (tabPane.peer.getToolTipTextAt(i) == name)} foreach(tabPane.pages.remove)
     }
   }
 

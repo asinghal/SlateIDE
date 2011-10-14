@@ -34,6 +34,8 @@
       <reserved>with</reserved>
       <reserved>while</reserved>
       <reserved>yield</reserved>
+      <reserved>to</reserved>
+      <reserved>until</reserved>
       <!--<reserved>=&gt;</reserved>-->
 	  
 	  <reserved>false</reserved>
