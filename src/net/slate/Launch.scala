@@ -93,7 +93,7 @@ object Launch extends SimpleSwingApplication {
     TrayIcon.init
 
     // editor panel that houses editor + console
-    private val splitPane = new SplitPane(Orientation.Horizontal) {
+    val splitPane = new SplitPane(Orientation.Horizontal) {
       topComponent = tabPane
 
       bottomComponent = bottomTabPane
@@ -101,6 +101,25 @@ object Launch extends SimpleSwingApplication {
       dividerLocation = 900
       resizeWeight = 1.0
       dividerSize = 1
+      var maximized = false
+
+      /**
+       * maximize the editor.
+       */
+      def maximize = {
+        // resizeWeight = 1d
+        dividerLocation = 1200
+        maximized = true
+      }
+
+      /**
+       * restore the editor.
+       */
+      def restore = {
+        // resizeWeight = 0.8d
+        dividerLocation = 600
+        maximized = false
+      }
     }
 
     val toolbar = new NavigationToolBar
@@ -111,7 +130,10 @@ object Launch extends SimpleSwingApplication {
     val mainPanel = new SplitPane(Orientation.Vertical) {
       var maximized = false
 
-      topComponent = fileExplorer
+      topComponent = new BorderPanel {
+        add(toolbar, BorderPanel.Position.North)
+        add(fileExplorer, BorderPanel.Position.Center)
+      }
 
       bottomComponent = splitPane
 
@@ -139,7 +161,6 @@ object Launch extends SimpleSwingApplication {
     }
 
     contents = new BorderPanel {
-      add(toolbar, BorderPanel.Position.North)
       add(mainPanel, BorderPanel.Position.Center)
       add(statusBarPane, BorderPanel.Position.South)
     }
@@ -192,7 +213,7 @@ object Launch extends SimpleSwingApplication {
 
       val pnl = new BorderPanel {
         import BorderPanel.Position
-        
+
         add(new Label(tabPane.peer.getTitleAt(index)), Position.West)
         add(new TabButton(path), Position.East)
       }

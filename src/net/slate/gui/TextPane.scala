@@ -69,6 +69,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     import net.slate.Launch._
     def actionPerformed(e: java.awt.event.ActionEvent) {
       if (!top.mainPanel.maximized) top.mainPanel.maximize else top.mainPanel.restore
+      if (!top.splitPane.maximized) top.splitPane.maximize else top.splitPane.restore
     }
   })
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction)
