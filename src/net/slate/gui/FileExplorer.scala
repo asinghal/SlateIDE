@@ -219,7 +219,7 @@ class FileExplorer(dir: File) extends ScrollPane {
           }
       }
       val c = super.getTreeCellRendererComponent(tree, value, selected, expanded, isLeaf, row, hasFocus)
-      if (hidden) { setIcon(hiddenDirIcon) }
+      if (hidden) { setIcon(hiddenDirIcon); setForeground(java.awt.Color.decode("0x888888")) }
       if (isRoot) { setIcon(projectRootIcon) }
       if (srcDir) { setIcon(srcDirIcon) }
       if (destDir) { setIcon(destDirIcon) }
