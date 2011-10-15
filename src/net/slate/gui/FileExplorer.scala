@@ -31,13 +31,20 @@ class FileExplorer(dir: File) extends ScrollPane {
   import net.slate.editor.tools.TypeIndexer
   import net.slate.util.FileUtils
 
-  val customLeafIcon = new ImageIcon("images/file.png")
+  private val customLeafIcon = new ImageIcon("images/file.png")
+  private val projectRootIcon = new ImageIcon("images/project.png")
+  private val srcDirIcon = new ImageIcon("images/src.jpg")
+  private val destDirIcon = new ImageIcon("images/destDir.png")
+  private val hiddenDirIcon = new ImageIcon("images/hidden.png")
+  private val viewsDirIcon = new ImageIcon("images/views.png")
+  
+  private var allProjectSettings = Map[String, (List[String], String)]() 
 
-  val top = new DefaultMutableTreeNode(new File("."))
+  private val top = new DefaultMutableTreeNode(new File("."))
 
-  val tree = new JTree(addNodes(top, dir))
+  private val tree = new JTree(addNodes(top, dir))
 
-  val projectTreeMenu = ProjectTreeMenu
+  private val projectTreeMenu = ProjectTreeMenu
 
   // Add a listener
   tree.addMouseListener(new java.awt.event.MouseAdapter {
@@ -133,11 +140,12 @@ class FileExplorer(dir: File) extends ScrollPane {
 
   def openProject(project: File, persist: Boolean = true) = {
     if (project != null && project.exists) {
+      ExecutionContext.loadedProjects :::= List(project.getPath)
+      projectSettings(project.getPath)
+
       tree.setModel(new DefaultTreeModel(addNodes(top, project)))
       ProjectConfigurator.init(project)
       new TypeIndexer(project.getAbsolutePath).index
-
-      ExecutionContext.loadedProjects :::= List(project.getPath)
 
       if (persist)
         ProjectDetailsSerializer.write(ProjectDetailsSerializer.read ::: List(new ProjectDetails(project.getPath, true)))
@@ -150,6 +158,23 @@ class FileExplorer(dir: File) extends ScrollPane {
     ProjectDetailsSerializer.read.foreach { details =>
       if (details.open) openProject(new File(details.path), false)
     }
+  }
+
+  private def projectSettings(project: String) = {
+    import java.io.FileReader
+    import scala.xml.XML
+    val xml = XML.load(new FileReader(project + File.separator + ".slate" + File.separator + "settings.xml"))
+
+    var config = Map[String, String]()
+
+    var src = List[String]()
+
+    xml \\ "srcdirs" \\ "dir" foreach { srcdir =>
+      src :::= List(project + File.separator + (srcdir \\ "@path").text)
+    }
+    val destdir = project + File.separator + (xml \\ "destdir" \\ "@path").text
+
+    allProjectSettings = allProjectSettings.updated(project, (src, destdir))
   }
 
   case class FileNode(val name: String, val path: String, val isDirectory: Boolean = false) {
@@ -165,15 +190,41 @@ class FileExplorer(dir: File) extends ScrollPane {
       expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean) = {
       var isLeaf = leaf
 
+      var isRoot = false
+      var srcDir = false
+      var destDir = false
+      var hidden = false
+      
+      def identifyDirType(dir: String) {
+          hidden = dir.startsWith(".") || dir.contains(File.separator + ".")
+          val project = ExecutionContext.currentProjectName(dir)
+          isRoot = (dir == project)
+          val settings = allProjectSettings(project)
+          srcDir = settings._1.contains(dir)
+          destDir = (dir == settings._2)
+      }
+
       value match {
         case v: DefaultMutableTreeNode =>
           v.getUserObject match {
-            case file: FileNode => if (new File(file.path).isDirectory) { isLeaf = false; }
-            case file: File => if (file.isDirectory) { isLeaf = false; }
+            case file: FileNode =>
+              if (new File(file.path).isDirectory) { isLeaf = false; 
+              identifyDirType(file.path)
+              }
+            case file: File =>
+              if (file.isDirectory) { isLeaf = false; 
+              identifyDirType(file.getAbsolutePath)
+              }
             case _ =>
           }
       }
-      super.getTreeCellRendererComponent(tree, value, selected, expanded, isLeaf, row, hasFocus)
+      val c = super.getTreeCellRendererComponent(tree, value, selected, expanded, isLeaf, row, hasFocus)
+      if (hidden) { setIcon(hiddenDirIcon) }
+      if (isRoot) { setIcon(projectRootIcon) }
+      if (srcDir) { setIcon(srcDirIcon) }
+      if (destDir) { setIcon(destDirIcon) }
+      
+      c
     }
 
   }
