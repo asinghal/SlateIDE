@@ -159,7 +159,7 @@ class OrganiseImportsAction extends AbstractAction {
 
       if (location == currentScript.text.path && problemType == "Error" && message.toLowerCase.trim.startsWith("not found")) {
         val className = message.trim.substring(message.trim.lastIndexOf(" ") + 1)
-        val options = for (i <- new TypeIndexer(currentProjectName).find(className, true) if (i != null)) yield i.asInstanceOf[String]
+        val options = for (i <- new TypeIndexer(currentProjectName).find(className, false, true) if (i != null)) yield i.asInstanceOf[String]
         if (options.length == 1) {
           val parts = options(0).split("-")
           val typeName = if (parts(1) != parts(0)) parts(1) + "." + parts(0) else parts(0)

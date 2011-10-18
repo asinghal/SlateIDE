@@ -53,11 +53,12 @@ class TypeIndexer(project: String) {
       val w = new IndexWriter(index_, config)
 
       // index all classes in the classpath
-      TypeCacheBuilder.getAllClassNames(project).foreach { fullName =>
-        val name = fullName.replace(".class", "")
+      TypeCacheBuilder.getAllClasses(project).foreach { c =>
+        val name = c.getName
         val simpleName = name.substring(name.lastIndexOf(".") + 1).replace("\\$", ".")
+        val entryType = if (c.isAnnotation) "annotation" else "class"
 
-        addDoc(w, simpleName, fullName)
+        addDoc(w, simpleName, name, entryType)
       }
 
       // index all code templates
@@ -70,19 +71,19 @@ class TypeIndexer(project: String) {
       }
 
       ready = true
-
       w.close()
 
       TypeIndexer.recordTimeStamp(project)
     }
   }
 
-  def find(name: String, exact: Boolean = false) = {
+  def find(name: String, annotationsOnly: Boolean = false, exact: Boolean = false) = {
     try {
       val keyword = if (!exact) name + "*" else name
+      val query = if (!annotationsOnly) keyword else "type:\"annotation\" " + keyword
 
       val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
-        .parse(keyword)
+        .parse(query)
       val hitsPerPage = 100
       val searcher = new IndexSearcher(index_, true)
       val collector = TopScoreDocCollector.create(
@@ -121,12 +122,12 @@ class TypeIndexer(project: String) {
     }
   }
 
-  private def addDoc(w: IndexWriter, name: String, fullName: String, entryType: String = "class", details: String = "") = {
+  private def addDoc(w: IndexWriter, name: String, fullName: String, entryType: String, details: String = "") = {
     val doc = new Document()
     doc.add(new Field("name", name, Field.Store.YES, Field.Index.ANALYZED))
+    doc.add(new Field("type", entryType, Field.Store.YES, Field.Index.ANALYZED))
     doc.add(new Field("fullName", fullName, Field.Store.YES, Field.Index.NOT_ANALYZED))
     doc.add(new Field("details", details, Field.Store.YES, Field.Index.NOT_ANALYZED))
-    doc.add(new Field("type", entryType, Field.Store.YES, Field.Index.NOT_ANALYZED))
     w.addDocument(doc)
   }
 

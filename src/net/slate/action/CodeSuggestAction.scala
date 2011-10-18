@@ -19,7 +19,7 @@ import javax.swing.{ JTextPane, AbstractAction }
 import java.awt.event.ActionEvent
 
 import net.slate.Launch._
-import net.slate.gui.CodeCompletionPopupMenu
+import net.slate.gui.{ CodeCompletionPopupMenu, CodeSuggestionPopupMenu }
 
 /**
  *
@@ -37,17 +37,24 @@ class CodeSuggestAction extends AbstractAction with LineParser {
     val caret = textPane.getCaretPosition;
     val l = line(textPane, caret)
 
+    val pane = currentScript
+    var x = 0
+    var y = 0
+    def setPosition {
+      val point = pane.text.peer.getCaret.getMagicCaretPosition
+      val editor = pane.peer.getViewport.getViewPosition
+      x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
+      y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 20) else 20
+    }
+
     if (l.trim.startsWith("import ")) {
       val name = l.trim.substring("import ".length).trim
       val packages = Package.getPackages.filter { p => p.getName.startsWith(name) && (p.getName) != name }.sortWith { _.getName < _.getName }.map { _.getName }
-
-      val pane = currentScript
-      val point = pane.text.peer.getCaret.getMagicCaretPosition
-      val editor = pane.peer.getViewport.getViewPosition
-      val x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
-      val y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 20) else 20
-
+      setPosition
       CodeCompletionPopupMenu.show(pane, x, y, packages.asInstanceOf[Array[AnyRef]])
+    } else if (l.trim.startsWith("@")) {
+      setPosition
+      CodeSuggestionPopupMenu.show(pane, x, y)
     }
   }
 }

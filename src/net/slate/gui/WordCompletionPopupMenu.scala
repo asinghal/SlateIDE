@@ -42,7 +42,7 @@ object WordCompletionPopupMenu {
     val caret = textpane.getCaretPosition
     val currentChar = if (caret == 0) ' ' else (textpane.getDocument.getText(caret - 1, 1)).charAt(0)
     val word = CodeAssist.getWord
-    val list = if (Character.isLetterOrDigit(currentChar)) WordCompletion.suggest(word._2) else Array[AnyRef]()
+    val list = if (currentChar != '.' && Character.isLetterOrDigit(currentChar)) WordCompletion.suggest(word._2) else Array[AnyRef]()
     
     if (!list.isEmpty) {
       val contents = new JList(list)
@@ -76,7 +76,7 @@ object WordCompletionPopupMenu {
       });
       popup.show()
     } else {
-    	if (popup != null) popup.hide
+    	if (popup != null && currentChar != '.') popup.hide
     }
   }
 
