@@ -38,7 +38,7 @@ object CodeSuggestionPopupMenu {
     
     val annotation = word._2.startsWith("@")
     val w = if (annotation) word._2.substring(1) else word._2
-    val list = new TypeIndexer(ExecutionContext.currentProjectName).find(w, annotation)
+    val list = new TypeIndexer(ExecutionContext.currentProjectName).find(w, false)
     val contents = new JList(list)
     contents.setCellRenderer(new CodeSuggestionRenderer)
     val scrollpane = new JScrollPane(contents)

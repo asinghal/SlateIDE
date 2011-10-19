@@ -53,12 +53,14 @@ class TypeIndexer(project: String) {
       val w = new IndexWriter(index_, config)
 
       // index all classes in the classpath
-      TypeCacheBuilder.getAllClasses(project).foreach { c =>
-        val name = c.getName
-        val simpleName = name.substring(name.lastIndexOf(".") + 1).replace("\\$", ".")
-        val entryType = if (c.isAnnotation) "annotation" else "class"
+      TypeCacheBuilder.getAllClasses(project).foreach { name =>
 
-        addDoc(w, simpleName, name, entryType)
+        if (!name.contains("$$anonfun$") && !name.substring(name.lastIndexOf("$") + 1).matches("[\\d]*")) {
+          val simpleName = name.substring(name.lastIndexOf(".") + 1).replace("\\$", ".")
+          val entryType = "class"
+
+          addDoc(w, simpleName, name, entryType)
+        }
       }
 
       // index all code templates
@@ -78,12 +80,25 @@ class TypeIndexer(project: String) {
   }
 
   def find(name: String, annotationsOnly: Boolean = false, exact: Boolean = false) = {
-    try {
-      val keyword = if (!exact) name + "*" else name
-      val query = if (!annotationsOnly) keyword else "type:\"annotation\" " + keyword
+    val keyword = if (!exact) name + "*" else name
+    val query = if (!annotationsOnly) keyword else "type:\"annotation\" " + keyword
 
-      val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
-        .parse(query)
+    val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
+      .parse(query)
+    search(q, name, exact)
+  }
+
+  def findByFullName(name: String) = {
+    val keyword = name + "*"
+    val query = "fullName:\"" + keyword + "\" OR \"" + keyword + "\""
+
+    val q = new QueryParser(Version.LUCENE_33, "name", analyzer)
+      .parse(query)
+    search(q, name)
+  }
+
+  private def search(q: Query, name: String, exact: Boolean = false) = {
+    try {
       val hitsPerPage = 100
       val searcher = new IndexSearcher(index_, true)
       val collector = TopScoreDocCollector.create(
@@ -126,7 +141,7 @@ class TypeIndexer(project: String) {
     val doc = new Document()
     doc.add(new Field("name", name, Field.Store.YES, Field.Index.ANALYZED))
     doc.add(new Field("type", entryType, Field.Store.YES, Field.Index.ANALYZED))
-    doc.add(new Field("fullName", fullName, Field.Store.YES, Field.Index.NOT_ANALYZED))
+    doc.add(new Field("fullName", fullName, Field.Store.YES, Field.Index.ANALYZED))
     doc.add(new Field("details", details, Field.Store.YES, Field.Index.NOT_ANALYZED))
     w.addDocument(doc)
   }

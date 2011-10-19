@@ -28,15 +28,15 @@ object TypeCacheBuilder {
   private lazy val pathSeparator = System.getProperty("path.separator")
 
   def getAllClasses(project: String) = {
-    var classes = List[Class[_]]()
+    var classes = List[String]()
 
     var classpath = System.getProperty("sun.boot.class.path")
     if (classpath != "") classpath += pathSeparator
     classpath += ScalaBuilder.getClassPath(project)
-
+    
     val entries = classpath.split(pathSeparator).foreach { entry =>
       if (entry.toLowerCase().endsWith(".jar")) { classes :::= getAllClassesFromJar(entry) }
-      if (!entry.toLowerCase().endsWith(".jar")) { classes :::= findClasses(project, new File(entry), null) }
+      if (!entry.toLowerCase().endsWith(".jar")) { classes :::= findClasses(new File(entry), null) }
     }
 
     classes
@@ -57,9 +57,11 @@ object TypeCacheBuilder {
     var classLoader = URLClassLoader.newInstance(settings._1)
 
     val directory = new File(settings._2)
+    
+    def loadClass(name: String) = try { findClass(classLoader, name) } catch { case _ => Class.forName(name, true, classLoader) }
 
     val scalaSuite = Class.forName("org.scalatest.Suite", true, classLoader)
-    var classes = findClasses(project, directory, null) filter { scalaSuite.isAssignableFrom } map { _.getName }
+    var classes = findClasses(directory, null) map { loadClass } filter { scalaSuite.isAssignableFrom } map { _.getName }
 
     return classes;
   }
@@ -85,7 +87,7 @@ object TypeCacheBuilder {
   /**
    *
    */
-  def findClass(classLoader: AnyRef, file: String): Class[_] = {
+  def findClass(classLoader: ClassLoader, file: String): Class[_] = {
     import java.net.URLClassLoader
     val method = classOf[URLClassLoader].getDeclaredMethod("findClass", classOf[String]);
     method.setAccessible(true)
@@ -96,19 +98,20 @@ object TypeCacheBuilder {
    *
    */
   private def getAllClassesFromJar(jarName: String) = {
-    var classes = List[Class[_]]()
+    var classes = List[String]()
 
     try {
       val jarFile = new JarInputStream(new FileInputStream(
         jarName))
-
+      
       var continue = true
       while (continue) {
         val jarEntry = jarFile.getNextJarEntry
         if (jarEntry != null && jarEntry.getName.endsWith(".class")) {
-          classes ::= jarEntry.getClass
+          val name = jarEntry.getName.replace("/", ".").substring(0, jarEntry.getName().length() - 6)
+          classes ::= name
         }
-
+        
         if (jarEntry == null) {
           continue = false
         }
@@ -127,22 +130,19 @@ object TypeCacheBuilder {
    * @param packageName The package name for classes found inside the base directory
    * @return The classes
    */
-  private def findClasses(project: String, directory: File, packageName: String, classLoader: ClassLoader = null): List[Class[_]] = {
-    var classes = List[Class[_]]()
+  private def findClasses(directory: File, packageName: String): List[String] = {
+    var classes = List[String]()
     if (!directory.exists()) {
       return classes
     }
 
-    val cl = if (classLoader == null) getClassLoader(project) else classLoader
-
     directory.listFiles.foreach { file =>
       val packagePrefix = if (packageName != null) (packageName + ".") else ""
       if (file.isDirectory) {
-        classes :::= findClasses(project, file, packagePrefix + file.getName, cl)
-      } else if (file.getName().endsWith(".class")) {
+        classes :::= findClasses(file, packagePrefix + file.getName)
+      } else if (file.getName().endsWith(".class") && !file.getName().contains("$")) {
         val name = packagePrefix + file.getName().substring(0, file.getName().length() - 6)
-        var c = try { findClass(cl, name) } catch { case _ => Class.forName(name, true, cl) }
-        if (c != null) classes ::= c
+        classes ::= name
       }
     }
 

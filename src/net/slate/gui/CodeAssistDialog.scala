@@ -69,7 +69,7 @@ class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
 
       if (txtFind.text.trim != "") {
 
-        var list = new TypeIndexer(ExecutionContext.currentProjectName).find(txtFind.text.trim).map { s => s.asInstanceOf[String] }.filter { s => !s.contains("$") }
+        var list = new TypeIndexer(ExecutionContext.currentProjectName).findByFullName(txtFind.text.trim).map { s => s.asInstanceOf[String] }.filter { s => !s.contains("$") }
         list = if (txtFind.text.contains(".")) list.filter { s => s.contains(txtFind.text) } else list.filter { s => s.toLowerCase.startsWith(txtFind.text.toLowerCase) }
 
         if (list.size > 1) {
