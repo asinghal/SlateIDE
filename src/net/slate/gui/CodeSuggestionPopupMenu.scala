@@ -24,51 +24,62 @@ import net.slate.Launch._
  * @author Aishwarya Singhal
  *
  */
-object CodeSuggestionPopupMenu {
+object CodeSuggestionPopupMenu extends InlinePopup {
   import java.awt.event.KeyEvent
-  import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, Popup, PopupFactory }
+  import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, PopupFactory }
   import net.slate.ExecutionContext
   import net.slate.editor.tools.{ CodeAssist, CodeTemplates, TypeIndexer }
-
-  var popup: Popup = null
+  import scala.actors.Actor._
 
   def show(owner: Component, x: Int, y: Int) {
     val factory = PopupFactory.getSharedInstance()
     val word = CodeAssist.getWord
-    
+
     val annotation = word._2.startsWith("@")
     val w = if (annotation) word._2.substring(1) else word._2
     val list = new TypeIndexer(ExecutionContext.currentProjectName).find(w, false)
     val contents = new JList(list)
     contents.setCellRenderer(new CodeSuggestionRenderer)
+    contents.setSelectedIndex(0)
     val scrollpane = new JScrollPane(contents)
     scrollpane.setBackground(java.awt.Color.decode("0xffffff"))
     scrollpane.setViewportBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5))
 
-    if (popup != null) popup.hide
+    hide
+
+    def insert(index: Int) = {
+      val pane = currentScript.text
+      list(index) match {
+        case x: String =>
+          var text = x.substring(0, x.indexOf("-")).trim
+          pane.doc.remove(word._1, pane.caret.position - word._1)
+          if (CodeTemplates.map.contains(text)) {
+            text = CodeTemplates.map(text)
+          }
+
+          text = if (annotation) "@" + text else text
+          pane.doc.insertString(word._1, text, null)
+          pane.peer.setCaretPosition(word._1 + text.length)
+      }
+      restoreFocus
+    }
 
     popup = factory.getPopup(owner.peer, scrollpane, 210 + x, 110 + y)
     contents.addMouseListener(new java.awt.event.MouseAdapter {
       override def mouseClicked(e: java.awt.event.MouseEvent) {
         if (e.getButton == java.awt.event.MouseEvent.BUTTON1 && e.getClickCount() == 2) {
           val index = contents.locationToIndex(e.getPoint());
-          val pane = currentScript.text
-          list(index) match {
-            case x: String =>
-              var text = x.substring(0, x.indexOf("-")).trim
-              pane.doc.remove(word._1, pane.caret.position - word._1)
-              if (CodeTemplates.map.contains(text)) {
-                text = CodeTemplates.map(text)
-              }
-              
-              text = if (annotation) "@" + text else text
-              pane.doc.insertString(pane.caret.position, text, null)
-          }
-          restoreFocus
+          insert(index)
         }
       }
-
     })
+
+    processor = actor {
+      react {
+        case _ =>
+          insert(contents.getSelectedIndex)
+      }
+    }
 
     contents.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeCodeAssist");
     contents.getActionMap().put("closeCodeAssist", new javax.swing.AbstractAction {
@@ -77,15 +88,6 @@ object CodeSuggestionPopupMenu {
       }
     });
     popup.show()
-  }
-
-  def restoreFocus = {
-    javax.swing.SwingUtilities.invokeLater(new Runnable {
-      def run = {
-        popup.hide
-        currentScript.text.peer.requestFocus
-      }
-    })
   }
 
   /**

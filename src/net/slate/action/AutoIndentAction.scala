@@ -21,20 +21,33 @@ import java.awt.event.ActionEvent
 import net.slate.Launch._
 
 class AutoIndentAction extends AbstractAction with IndentText with LineParser {
+  import net.slate.gui._
 
   def actionPerformed(e: ActionEvent) = {
-    val textPane = currentScript.text.peer
+    val indent = !checkPopups
+    if (indent) {
+      val textPane = currentScript.text.peer
 
-    val doc = textPane.getDocument;
-    val caret = textPane.getCaretPosition;
-    val l = line(textPane, caret)
+      val doc = textPane.getDocument;
+      val caret = textPane.getCaretPosition;
+      val l = line(textPane, caret)
 
-    val indentation = indentLine(l, true)
-    doc.insertString(caret, indentation._1, null)
+      val indentation = indentLine(l, true)
+      doc.insertString(caret, indentation._1, null)
 
-    if (l.trim.endsWith("{")) {
-      val newCaret = textPane.getCaretPosition
-      textPane.setCaretPosition(textPane.getCaretPosition - indentation._2)
+      if (l.trim.endsWith("{")) {
+        val newCaret = textPane.getCaretPosition
+        textPane.setCaretPosition(textPane.getCaretPosition - indentation._2)
+      }
     }
+  }
+
+  private def checkPopups = {
+    val open = CodeCompletionPopupMenu.isOpen || CodeSuggestionPopupMenu.isOpen || WordCompletionPopupMenu.isOpen
+    if (CodeCompletionPopupMenu.isOpen) CodeCompletionPopupMenu.processor ! "execute"
+    if (CodeSuggestionPopupMenu.isOpen) CodeSuggestionPopupMenu.processor ! "execute"
+    if (WordCompletionPopupMenu.isOpen) WordCompletionPopupMenu.processor ! "execute"
+
+    open
   }
 }

@@ -72,6 +72,14 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       if (!top.splitPane.maximized) top.splitPane.maximize else top.splitPane.restore
     }
   })
+  addActionforKeyStroke(KeyEvent.VK_ESCAPE, new javax.swing.AbstractAction {
+    import net.slate.Launch._
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      CodeCompletionPopupMenu.hide
+      CodeSuggestionPopupMenu.hide
+      WordCompletionPopupMenu.hide
+    }
+  })
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction)
   addActionforKeyStroke(KeyStroke.getKeyStroke("control shift F"), new FormatFileAction)
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
