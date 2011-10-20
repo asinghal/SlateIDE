@@ -49,7 +49,7 @@ h2. Building Slate from code
 1. Clone the repository
 2. Go to the local directory where the code was cloned.
 3. Run ant: 
-	ant -Dscala.home=${SCALA_HOME} -Dalacs.jar=alacs/alacs-${version}.jar
+	ant \-Dscala.home=${SCALA_HOME} \-Dalacs.jar=alacs/alacs-${version}.jar
 	
 	where ${SCALA_HOME} is the scala home directory and ${version} is the scala version you are working with.
 	
