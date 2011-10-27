@@ -25,11 +25,16 @@ import scala.swing.event._
 import net.slate.{ ExecutionContext, Launch }
 import net.slate.builder.ProjectConfigurator
 import net.slate.gui.popupmenu.ProjectTreeMenu
+import net.slate.util.{ FileUtils, ObjectSerializer }
 
+/**
+ * Provides the Project explorer on the left hand side of the IDE.
+ *
+ * @author Aishwarya Singhal
+ */
 class FileExplorer(dir: File) extends ScrollPane {
   import Launch._
   import net.slate.editor.tools.TypeIndexer
-  import net.slate.util.FileUtils
 
   private val customLeafIcon = new ImageIcon("images/file.png")
   private val projectRootIcon = new ImageIcon("images/project.png")
@@ -37,8 +42,8 @@ class FileExplorer(dir: File) extends ScrollPane {
   private val destDirIcon = new ImageIcon("images/destDir.png")
   private val hiddenDirIcon = new ImageIcon("images/hidden.png")
   private val viewsDirIcon = new ImageIcon("images/views.png")
-  
-  private var allProjectSettings = Map[String, (List[String], String)]() 
+
+  private var allProjectSettings = Map[String, (List[String], String)]()
 
   private val top = new DefaultMutableTreeNode(new File("."))
 
@@ -148,9 +153,9 @@ class FileExplorer(dir: File) extends ScrollPane {
       new TypeIndexer(project.getAbsolutePath).index
 
       if (persist)
-        ProjectDetailsSerializer.write(ProjectDetailsSerializer.read ::: List(new ProjectDetails(project.getPath, true)))
+        ProjectDetailsSerializer.add(new ProjectDetails(project.getPath, true))
     } else {
-      ProjectDetailsSerializer.write(ProjectDetailsSerializer.read.remove(p => p.path == project.getPath))
+      ProjectDetailsSerializer.remove(p => p.path == project.getPath)
     }
   }
 
@@ -194,26 +199,28 @@ class FileExplorer(dir: File) extends ScrollPane {
       var srcDir = false
       var destDir = false
       var hidden = false
-      
+
       def identifyDirType(dir: String) {
-          hidden = dir.startsWith(".") || dir.contains(File.separator + ".")
-          val project = ExecutionContext.currentProjectName(dir)
-          isRoot = (dir == project)
-          val settings = allProjectSettings(project)
-          srcDir = settings._1.contains(dir)
-          destDir = (dir == settings._2)
+        hidden = dir.startsWith(".") || dir.contains(File.separator + ".")
+        val project = ExecutionContext.currentProjectName(dir)
+        isRoot = (dir == project)
+        val settings = allProjectSettings(project)
+        srcDir = settings._1.contains(dir)
+        destDir = (dir == settings._2)
       }
 
       value match {
         case v: DefaultMutableTreeNode =>
           v.getUserObject match {
             case file: FileNode =>
-              if (new File(file.path).isDirectory) { isLeaf = false; 
-              identifyDirType(file.path)
+              if (new File(file.path).isDirectory) {
+                isLeaf = false;
+                identifyDirType(file.path)
               }
             case file: File =>
-              if (file.isDirectory) { isLeaf = false; 
-              identifyDirType(file.getAbsolutePath)
+              if (file.isDirectory) {
+                isLeaf = false;
+                identifyDirType(file.getAbsolutePath)
               }
             case _ =>
           }
@@ -223,7 +230,7 @@ class FileExplorer(dir: File) extends ScrollPane {
       if (isRoot) { setIcon(projectRootIcon) }
       if (srcDir) { setIcon(srcDirIcon) }
       if (destDir) { setIcon(destDirIcon) }
-      
+
       c
     }
 
@@ -235,28 +242,6 @@ class ProjectDetails(val path: String, val open: Boolean) {
   val serialVersionUID = 1L
 }
 
-object ProjectDetailsSerializer {
-  import java.io._
-
-  val storeName = "projectDetails.ser"
-
-  def write(data: List[ProjectDetails]) {
-    val file = new File(storeName)
-    if (file.exists) { file.delete }
-    val store = new ObjectOutputStream(new FileOutputStream(storeName))
-    store.writeObject(data)
-    store.close
-  }
-
-  def read = {
-    if (new File(storeName).exists) {
-      val in = new ObjectInputStream(new FileInputStream(storeName))
-      val details = in.readObject().asInstanceOf[List[ProjectDetails]]
-      in.close()
-      details
-    } else {
-      List[ProjectDetails]()
-    }
-  }
+object ProjectDetailsSerializer extends ObjectSerializer[ProjectDetails] {
+  override lazy val storeName = "projectDetails.ser"
 }
-
