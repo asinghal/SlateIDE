@@ -1,0 +1,8 @@
+.classpath
+.project
+.scala_dependencies
+.settings/
+classes/
+index/
+projectDetails.ser
+target/
