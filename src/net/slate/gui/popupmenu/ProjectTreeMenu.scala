@@ -129,8 +129,8 @@ object ProjectTreeMenu extends PopupMenu with MenuPainter {
           JOptionPane.PLAIN_MESSAGE,
           null,
           null,
-          null)
-        if (null != remote) new GitRunner(path).init(remote.toString)
+          null) match { case x: String => x  case _ => null}
+        if (null != remote) new GitRunner(path).init(remote)
       }
     }) with CreateNewItemMenuItem
 
@@ -153,9 +153,9 @@ object ProjectTreeMenu extends PopupMenu with MenuPainter {
           JOptionPane.PLAIN_MESSAGE,
           null,
           null,
-          null)
+          null) match { case x: String => x  case _ => null}
         val git = new GitRunner(path)
-        if (git ?) git.commit(comment.toString)
+        if (git ?) git.commit(comment)
       }
     }) with CreateNewItemMenuItem
 
@@ -200,9 +200,9 @@ object ProjectTreeMenu extends PopupMenu with MenuPainter {
           JOptionPane.PLAIN_MESSAGE,
           null,
           null,
-          null)
+          null) match { case x: String => x  case _ => null}
         val project = currentProjectName(path)
-        if (null != name) new HerokuRunner(project).create(name.toString)
+        if (null != name) new HerokuRunner(project).create(name)
       }
     }) with CreateNewItemMenuItem
 
@@ -226,9 +226,9 @@ object ProjectTreeMenu extends PopupMenu with MenuPainter {
           JOptionPane.PLAIN_MESSAGE,
           null,
           null,
-          null)
+          null) match { case x: String => x  case _ => null}
         val project = currentProjectName(path)
-        new HerokuRunner(project).console(if (comment != null) comment.toString else "")
+        new HerokuRunner(project).console(if (comment != null) comment else "")
       }
     }) with CreateNewItemMenuItem
 

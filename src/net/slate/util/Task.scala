@@ -23,8 +23,10 @@ object Task {
 
   import TaskDetailsSerializer._
 
-  def create(title: String, description: String, status: TaskStatus) {
-    add(new Task(nextId, title, description, status))
+  def create(title: String, description: String, project: String, status: Int) = {
+    val id = nextId
+    add(new Task(id, title, description, project, status))
+    id
   }
 
   def list = read
@@ -44,7 +46,7 @@ object Task {
  * @author Aishwarya Singhal
  */
 @scala.serializable
-class Task(var id: Long, var title: String, var description: String, var status: TaskStatus) {
+class Task(var id: Long, var title: String, var description: String, var project: String, var status: Int) {
   val serialVersionUID = 1L
   def isOpen = status == TaskStatus.OPEN
 }
@@ -66,13 +68,7 @@ object TaskDetailsSerializer extends ObjectSerializer[Task] {
  *
  * @author Aishwarya Singhal
  */
-trait TaskStatus {}
-
-/**
- *
- * @author Aishwarya Singhal
- */
-object TaskStatus extends Enumeration with TaskStatus {
-  type TaskStatus = Value
-  val OPEN, CLOSED = Value
+object TaskStatus {
+  val OPEN = 1
+  val CLOSED = 2
 }

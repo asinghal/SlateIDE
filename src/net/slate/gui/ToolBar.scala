@@ -16,7 +16,7 @@
 package net.slate.gui
 
 import java.io.File
-import javax.swing.{ JFileChooser, JToolBar, KeyStroke }
+import javax.swing.{ JFileChooser, JOptionPane, JToolBar, KeyStroke }
 import scala.swing._
 import net.slate.Launch
 
@@ -88,6 +88,29 @@ class NavigationToolBar extends ToolBar("Navigation") {
       if (runningProcess != null) {
         stop
         outputPane.pane.text += "Stopped running process"
+      }
+    }
+  })
+
+  add(new Action("Add Task") {
+    import net.slate.ExecutionContext._
+
+    icon = new javax.swing.ImageIcon("images/Add.png")
+    tooltip = title
+
+    def apply() {
+      val summary = JOptionPane.showInputDialog(
+        top.peer,
+        "Please enter a summary of the task.",
+        "New Task",
+        JOptionPane.PLAIN_MESSAGE,
+        null,
+        null,
+        null) match { case x: String => x case _ => null}
+
+      if (summary != null && summary.trim != "") {
+        bottomTabPane.tasks.add(summary, summary, currentProjectName, 0)
+        bottomTabPane.selection.index = 3
       }
     }
   })
