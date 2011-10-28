@@ -41,6 +41,11 @@ object Launch extends SimpleSwingApplication {
 
   var tabs = Map[String, Int]()
 
+  val dir = new java.io.File(".metadata")
+  if (!dir.exists) {
+    dir.mkdir
+  }
+
   try {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
   } catch {
@@ -230,8 +235,8 @@ object Launch extends SimpleSwingApplication {
   def closeTab(name: String = currentScript.text.path): Unit = {
     if (tabs.contains(name)) {
       tabs -= (name)
-      
-      (0 until tabPane.peer.getTabCount).find { i => (tabPane.peer.getToolTipTextAt(i) == name)} foreach(tabPane.pages.remove)
+
+      (0 until tabPane.peer.getTabCount).find { i => (tabPane.peer.getToolTipTextAt(i) == name) } foreach (tabPane.pages.remove)
     }
   }
 

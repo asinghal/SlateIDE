@@ -106,12 +106,23 @@ class NavigationToolBar extends ToolBar("Navigation") {
         JOptionPane.PLAIN_MESSAGE,
         null,
         null,
-        null) match { case x: String => x case _ => null}
+        null) match { case x: String => x case _ => null }
 
       if (summary != null && summary.trim != "") {
-        bottomTabPane.tasks.add(summary, summary, currentProjectName, 0)
+        bottomTabPane.tasks.add(summary, summary, currentProjectName)
         bottomTabPane.selection.index = 3
       }
+    }
+  })
+
+  add(new Action("Delete Task") {
+    import net.slate.ExecutionContext._
+
+    icon = new javax.swing.ImageIcon("images/completed.png")
+    tooltip = title
+
+    def apply() {
+      bottomTabPane.tasks.delete
     }
   })
 

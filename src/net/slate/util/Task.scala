@@ -55,7 +55,7 @@ class Task(var id: Long, var title: String, var description: String, var project
  *
  */
 object TaskDetailsSerializer extends ObjectSerializer[Task] {
-  override lazy val storeName = "taskDetails.ser"
+  override lazy val storeName = ".metadata" + java.io.File.separator + "taskDetails.ser"
   private var taskId = System.currentTimeMillis
 
   def nextId = {
@@ -68,7 +68,24 @@ object TaskDetailsSerializer extends ObjectSerializer[Task] {
  *
  * @author Aishwarya Singhal
  */
+// I wish I could get enums to work!!
 object TaskStatus {
   val OPEN = 1
   val CLOSED = 2
+
+  def getName(t: Int) = {
+    t match {
+      case OPEN => "Open"
+      case CLOSED => "Closed"
+      case _ => "Unknown"
+    }
+  }
+
+  def getByName(t: String) = {
+    t match {
+      case "Open" => OPEN
+      case "Closed" => CLOSED
+      case _ => 0
+    }
+  }
 }

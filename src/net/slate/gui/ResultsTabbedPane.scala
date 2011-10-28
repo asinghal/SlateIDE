@@ -29,6 +29,7 @@ class ResultsTabbedPane extends TabbedPane {
   val problems = new ProblemsTab
   val testResults = new TestResultsTree
   val tasks = new TasksTab
+  tasks load
 
   focusable = false
   pages += new TabbedPane.Page("Console", outputPane)
@@ -58,20 +59,26 @@ abstract class TabularTabPane extends ScrollPane {
   import javax.swing.table.{ DefaultTableModel, DefaultTableCellRenderer }
 
   lazy val columnNames: Array[AnyRef] = Array("")
+  lazy val hiddenColumns = Array("")
 
   lazy val tableModel = new DefaultTableModel(Array[Array[AnyRef]](), columnNames)
   lazy val cellRenderer: Option[DefaultTableCellRenderer] = None
   protected def mouseListener(table: JTable): MouseAdapter
 
-  viewportView = new Table {
+  val table = new Table {
     font = displayFont
     model = tableModel
     // this should have worked but doesn't --> cellRenderer foreach peer.getColumnModel().getColumn(0).setCellRenderer
+
+    var hidden = 0
+    (0 until peer.getColumnModel.getColumnCount) foreach { c => peer.getColumnModel().getColumn(c - hidden).getHeaderValue match { case x: String => if (hiddenColumns.contains(x)) { peer.getColumnModel().removeColumn(peer.getColumnModel().getColumn(c - hidden)); hidden = hidden + 1 } case _ => } }
 
     peer.addMouseListener(mouseListener(peer))
 
     cellRenderer foreach { c => peer.setDefaultRenderer(classOf[String], c) }
   }
+
+  viewportView = table
 
   /**
    * clears the table
@@ -158,6 +165,7 @@ class TasksTab extends TabularTabPane {
   import net.slate.util.TaskStatus._
 
   override lazy val columnNames: Array[AnyRef] = Array("Id", "Title", "Description", "Project", "Status")
+  override lazy val hiddenColumns = Array("Id")
   protected def mouseListener(peer: JTable): MouseAdapter = new MouseAdapter() {
     override def mouseClicked(e: MouseEvent) = {
       //        if (e.getButton == java.awt.event.MouseEvent.BUTTON3/* && e.getClickCount() == 2*/) {
@@ -174,6 +182,36 @@ class TasksTab extends TabularTabPane {
    */
   def add(title: String, description: String, project: String, status: Int = OPEN) = {
     val id = Task.create(title, description, project, status)
-    tableModel.insertRow(tableModel.getRowCount, Array[AnyRef](String.valueOf(id), title, description, project, String.valueOf(status)))
+    insertRow(String.valueOf(id), title, description, project, getName(status))
+  }
+
+  /**
+   * Inserts a row into the table.
+   *
+   * @param id
+   * @param title
+   * @param description
+   * @param project
+   * @param status
+   */
+  private def insertRow(id: String, title: String, description: String, project: String, status: String) {
+    tableModel.insertRow(tableModel.getRowCount, Array[AnyRef](id, title, description, project, status))
+  }
+
+  /**
+   * Load all existing tasks into the table.
+   */
+  def load {
+    Task.list foreach { t => insertRow(String.valueOf(t.id), t.title, t.description, t.project, getName(t.status)) }
+  }
+
+  /**
+   * Delete the currently selected task.
+   */
+  def delete {
+    if (table.peer.getSelectedRow > -1) {
+      Task.delete(tableModel.getValueAt(table.peer.getSelectedRow, 0).toString.toLong)
+      tableModel.removeRow(table.peer.getSelectedRow)
+    }
   }
 }

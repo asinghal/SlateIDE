@@ -243,5 +243,5 @@ class ProjectDetails(val path: String, val open: Boolean) {
 }
 
 object ProjectDetailsSerializer extends ObjectSerializer[ProjectDetails] {
-  override lazy val storeName = "projectDetails.ser"
+  override lazy val storeName = ".metadata" + File.separator + "projectDetails.ser"
 }
