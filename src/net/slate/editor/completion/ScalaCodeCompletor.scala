@@ -46,7 +46,6 @@ object ScalaCodeCompletor {
 
     val completed = new Response[List[global.Member]]
     val typed = new Response[global.Tree]
-    val reload = new Response[Unit]
     val sourceFile = new BatchSourceFile(path, contents)
 
     // HACK!!! can't get one solution that works with both 2.8.1 and 2.9.1
@@ -57,10 +56,14 @@ object ScalaCodeCompletor {
     val cpos = global.rangePos(sourceFile, start, start, start)
     global.askTypeCompletion(cpos, completed)
 
+    var error = false
+
     val visibleMembers = completed.get.left.toOption match {
       case Some(members) =>
-        members.filter { _.accessible } map {
+        members.filter { _.accessible } filterNot { _.sym.nameString == "this" } map {
           case m@global.TypeMember(sym, tpe, true, _, _) => {
+            // there must be a better way to do this!!
+            if (tpe.toString == "<error>") error = true
 
             def memberName = {
               (tpe.paramss.map { sect =>
@@ -77,6 +80,6 @@ object ScalaCodeCompletor {
       case None => List[String]()
     }
 
-    visibleMembers
+    if (!error) visibleMembers else List[String]()
   }
 }

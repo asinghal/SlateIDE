@@ -52,7 +52,8 @@ object CodeCompletionPopupMenu extends InlinePopup {
             pane.peer.setCaretPosition(word._1 + text.length)
           } else {
               val s = text.substring(0, text.indexOf("{{}}")).trim
-              pane.doc.insertString(pane.caret.position, s, null)
+              val name = if (s.endsWith("()")) s.substring(0, s.length - 2) else s
+              pane.doc.insertString(pane.caret.position, name, null)
           }
         }
         restoreFocus
