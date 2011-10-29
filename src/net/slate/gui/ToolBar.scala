@@ -16,7 +16,7 @@
 package net.slate.gui
 
 import java.io.File
-import javax.swing.{ JFileChooser, JOptionPane, JToolBar, KeyStroke }
+import javax.swing.{ ImageIcon, JFileChooser, JOptionPane, JToolBar, KeyStroke }
 import scala.swing._
 import net.slate.Launch
 
@@ -34,21 +34,22 @@ class NavigationToolBar extends ToolBar("Navigation") {
 
   val component = this
 
-  add(new Action("New Project") {
-    lazy val newPrjDialog = new NewProjectDialog(top)
-    icon = new javax.swing.ImageIcon("images/newjprj_wiz.gif")
+  abstract class ToolAction(title: String, iconPath: String, keys: String = null) extends Action(title) {
+    icon = new ImageIcon(iconPath)
     tooltip = title
-    accelerator = getAccelerator("control shift N")
+    peer.putValue(javax.swing.Action.SHORT_DESCRIPTION, title)
+    if (keys != null) accelerator = getAccelerator(keys)
+  }
+
+  add(new ToolAction("New Project", "images/newjprj_wiz.gif", "control shift N") {
+    lazy val newPrjDialog = new NewProjectDialog(top)
 
     def apply() {
       newPrjDialog.display
     }
   })
 
-  add(new Action("Open Project") {
-    icon = new javax.swing.ImageIcon("images/open.gif")
-    tooltip = title
-    accelerator = getAccelerator("control shift P")
+  add(new ToolAction("Open Project", "images/open.gif", "control shift P") {
 
     def apply() {
       val chooser = ProjectOpener.chooser
@@ -57,10 +58,7 @@ class NavigationToolBar extends ToolBar("Navigation") {
     }
   })
 
-  add(new Action("Clear Console") {
-    icon = new javax.swing.ImageIcon("images/clear.gif")
-    tooltip = title
-    accelerator = getAccelerator("control E")
+  add(new ToolAction("Clear Console", "images/clear.gif", "control E") {
 
     def apply() {
       outputPane.pane.text = ""
@@ -68,21 +66,15 @@ class NavigationToolBar extends ToolBar("Navigation") {
     }
   })
 
-  add(new Action("Run") {
-    icon = new javax.swing.ImageIcon("images/run.gif")
-    tooltip = title
-    accelerator = getAccelerator("control F11")
+  add(new ToolAction("Run", "images/run.gif", "control F11") {
 
     def apply() {
       runDialog.display
     }
   })
 
-  add(new Action("Stop") {
+  add(new ToolAction("Stop", "images/stop.gif") {
     import net.slate.ExecutionContext._
-
-    icon = new javax.swing.ImageIcon("images/stop.gif")
-    tooltip = title
 
     def apply() {
       if (runningProcess != null) {
@@ -92,11 +84,8 @@ class NavigationToolBar extends ToolBar("Navigation") {
     }
   })
 
-  add(new Action("Add Task") {
+  add(new ToolAction("Add Task", "images/Add.png") {
     import net.slate.ExecutionContext._
-
-    icon = new javax.swing.ImageIcon("images/Add.png")
-    tooltip = title
 
     def apply() {
       val summary = JOptionPane.showInputDialog(
@@ -115,12 +104,7 @@ class NavigationToolBar extends ToolBar("Navigation") {
     }
   })
 
-  add(new Action("Delete Task") {
-    import net.slate.ExecutionContext._
-
-    icon = new javax.swing.ImageIcon("images/completed.png")
-    tooltip = title
-
+  add(new ToolAction("Delete Task", "images/completed.png") {
     def apply() {
       bottomTabPane.tasks.delete
     }
