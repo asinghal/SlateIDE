@@ -69,6 +69,6 @@ trait ObjectSerializer[T] {
    * @param fn
    */
   def remove(fn: (T) => Boolean) {
-    write(read.remove(fn))
+    write(read.filterNot(fn))
   }
 }

@@ -48,7 +48,7 @@ trait Builder {
   def getClassPathURLs(project: String) = {
     val path = System.getProperty("sun.boot.class.path") + pathSeparator + settings(project)._3
     var urls = List[java.net.URL]()
-    path.split(pathSeparator).foreach { p => urls :::= List(new File(p).toURL) }
+    path.split(pathSeparator).foreach { p => urls :::= List(new File(p).toURI.toURL) }
 
     (urls.toArray, settings(project)._2)
   }
@@ -70,9 +70,9 @@ trait Builder {
 
     var command = List[String]()
 
-    command :::= List.fromArray(programArgs)
+    command :::= programArgs.toList
     command :::= List(className)
-    command :::= List.fromArray(vmArgs)
+    command :::= vmArgs.toList
     command :::= List(executable, "-classpath", classpath)
 
     executeCommand(command, dir, program, test)

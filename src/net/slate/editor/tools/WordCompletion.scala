@@ -36,7 +36,7 @@ object WordCompletion {
 
     val words = getWords(prefix, 0, caret).reverse ++ getWords(prefix, caret, doc.getLength())
     // remove duplicate words
-    words.reverse.removeDuplicates.reverse.toArray.asInstanceOf[Array[AnyRef]]
+    words.reverse.distinct.reverse.toArray.asInstanceOf[Array[AnyRef]]
   }
 
   /**
@@ -53,6 +53,6 @@ object WordCompletion {
    *
    */
   private def getWordsFromString(s: String, prefix: String): List[String] = {
-    List.fromArray(s.split("[^\\w_]+")).filter { word => word.startsWith(prefix) } - prefix
+    s.split("[^\\w_]+").toList.filter { word => word.startsWith(prefix) } filterNot { _ == prefix }
   }
 }

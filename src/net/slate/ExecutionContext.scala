@@ -45,7 +45,7 @@ object ExecutionContext {
    */
   def currentProjectName(selectedDir: String) = {
     val file = selectedDir
-    val p = loadedProjects.sort { _ > _ }.filter { project =>
+    val p = loadedProjects.sortWith { _ > _ }.filter { project =>
       file.contains(project)
     }
 

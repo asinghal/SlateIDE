@@ -16,6 +16,7 @@
 package net.slate.gui
 
 import java.io.File
+import java.io.Serializable
 import javax.swing.{ BorderFactory, ImageIcon, JTree }
 import javax.swing.event.{ TreeSelectionEvent, TreeSelectionListener }
 import javax.swing.tree.{ DefaultMutableTreeNode, DefaultTreeCellRenderer, DefaultTreeModel, TreeCellRenderer }
@@ -107,7 +108,7 @@ class FileExplorer(dir: File) extends ScrollPane {
         curTop.add(curDir);
       }
 
-      val ol = List(dir.list(): _*).sort(_.toUpperCase < _.toUpperCase)
+      val ol = List(dir.list(): _*).sortWith(_.toUpperCase < _.toUpperCase)
 
       var files = List[FileNode]()
       // Make two passes, one for Dirs and one for Files. This is #1.
@@ -237,8 +238,7 @@ class FileExplorer(dir: File) extends ScrollPane {
   }
 }
 
-@scala.serializable
-class ProjectDetails(val path: String, val open: Boolean) {
+class ProjectDetails(val path: String, val open: Boolean) extends Serializable {
   val serialVersionUID = 1L
 }
 

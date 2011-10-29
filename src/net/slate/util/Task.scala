@@ -15,6 +15,8 @@
  */
 package net.slate.util
 
+import java.io.Serializable
+
 /**
  *
  * @author Aishwarya Singhal
@@ -45,8 +47,7 @@ object Task {
  *
  * @author Aishwarya Singhal
  */
-@scala.serializable
-class Task(var id: Long, var title: String, var description: String, var project: String, var status: Int) {
+class Task(var id: Long, var title: String, var description: String, var project: String, var status: Int) extends Serializable {
   val serialVersionUID = 1L
   def isOpen = status == TaskStatus.OPEN
 }

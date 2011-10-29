@@ -146,7 +146,7 @@ class NewItemDetailsDialog(frame: MainFrame) extends Dialog(frame.owner) {
     def display
   }
 
-  case class ScalaFile extends CreationCategory {
+  case class ScalaFile() extends CreationCategory {
     def extension = ".scala"
     def display {
       classNameLabel.text = "Class Name"
@@ -161,7 +161,7 @@ class NewItemDetailsDialog(frame: MainFrame) extends Dialog(frame.owner) {
     }
   }
 
-  case class JavaFile extends CreationCategory {
+  case class JavaFile() extends CreationCategory {
     def extension = ".java"
     def display {
       classNameLabel.text = "Class Name"
@@ -176,7 +176,7 @@ class NewItemDetailsDialog(frame: MainFrame) extends Dialog(frame.owner) {
     }
   }
 
-  case class GeneralFile extends CreationCategory {
+  case class GeneralFile() extends CreationCategory {
     def extension = ""
     def display {
       classNameLabel.text = "Name"

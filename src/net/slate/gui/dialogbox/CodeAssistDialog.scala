@@ -142,7 +142,7 @@ class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
   private def getMethodSignature(method: Method) = {
     val m = access(Modifier.toString(method.getModifiers()))
     def getParameters = {
-      List.fromArray(method.getParameterTypes).map { t => t.getSimpleName }.mkString(", ")
+      method.getParameterTypes.toList.map { t => t.getSimpleName }.mkString(", ")
     }
     m + method.getName + "(" + getParameters + ")" + " : " + method.getReturnType.getSimpleName
   }

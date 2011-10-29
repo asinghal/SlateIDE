@@ -96,7 +96,7 @@ class OrganiseImportsAction extends AbstractAction {
       if (i.contains("{") && i.contains("}") && i.contains("_")) { i.substring(0, i.lastIndexOf(".")) + "._\n" } else { i }
     }
 
-    val replacement = finalImports.sort { _.toLowerCase < _.toLowerCase }.distinct.mkString
+    val replacement = finalImports.sortWith { _.toLowerCase < _.toLowerCase }.distinct.mkString
 
     val replacedText = text.replace(MARKER, replacement)
 
@@ -144,7 +144,7 @@ class OrganiseImportsAction extends AbstractAction {
       modifiedText += (all(index) + "\n")
     }
 
-    (imports.sort { _ < _ }.distinct, modifiedText)
+    (imports.sortWith { _ < _ }.distinct, modifiedText)
   }
 
   private def loadErrorsAndFixImports = {

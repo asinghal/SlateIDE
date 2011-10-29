@@ -69,7 +69,7 @@ class HerokuRunner(project: String) extends Runner {
    * @param command
    */
   private def run(command: String*) {
-    executeCommand(List.flatten(List(List("heroku"), List(command: _*))), project, "heroku", false)
+    executeCommand((List(List("heroku"), List(command: _*))).flatten, project, "heroku", false)
   }
 
   /**

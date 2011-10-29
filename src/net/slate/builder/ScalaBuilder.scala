@@ -72,7 +72,7 @@ object ScalaBuilder extends Builder {
         case ex: Throwable =>
           ex.printStackTrace()
           val msg = if (ex.getMessage == null) "no error message provided" else ex.getMessage
-          error("Compile failed because of an internal compiler error (" + msg + "); see the error output for details.")
+          println("Compile failed because of an internal compiler error (" + msg + "); see the error output for details.")
       }
 
       reporter.printSummary()

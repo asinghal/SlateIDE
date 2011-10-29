@@ -18,6 +18,13 @@ package net.slate.action
 import javax.swing.{ JTextPane, AbstractAction }
 import java.awt.event.ActionEvent
 
+import scala.tools.nsc.Settings
+import scala.tools.nsc.interactive.{ Global, Response }
+import scala.tools.nsc.util.BatchSourceFile
+import scala.tools.nsc.reporters.StoreReporter
+
+import net.slate.builder.ScalaBuilder
+import net.slate.ExecutionContext
 import net.slate.Launch._
 import net.slate.gui.{ CodeCompletionPopupMenu, CodeSuggestionPopupMenu }
 
@@ -55,6 +62,55 @@ class CodeSuggestAction extends AbstractAction with LineParser {
     } else if (l.trim.startsWith("@")) {
       setPosition
       CodeSuggestionPopupMenu.show(pane, x, y)
+    } else {
+//      complete
     }
+  }
+
+  def complete = {
+    val settings = new Settings
+    settings.classpath.value = ScalaBuilder.getClassPath(ExecutionContext.currentProjectName(currentScript.text.path))
+
+    val reporter = new StoreReporter
+
+    val global = new Global(settings, reporter)
+
+    val completed = new Response[List[global.Member]]
+    val typed = new Response[global.Tree]
+    val textPane = currentScript.text.peer
+    val sourceFile = new BatchSourceFile(currentScript.text.path, currentScript.text.text)
+    val start = textPane.getCaretPosition
+    global.askType(sourceFile, true, typed)
+//
+//    global.getTypedTree(sourceFile, true, typed)
+//
+//    val t1 = typed.get.left.toOption
+
+    val cpos = global.rangePos(sourceFile, start, start, start)
+    global.askTypeCompletion(cpos, completed)
+
+    // completion depends on the typed tree
+    //    t1 match {
+    //      // completion on select
+    //      case Some(s@global.Select(qualifier, name)) if qualifier.pos.isDefined && qualifier.pos.isRange =>
+    //        val cpos0 = qualifier.pos.end
+    //        val cpos = global.rangePos(sourceFile, cpos0, cpos0, cpos0)
+    //        global.askTypeCompletion(cpos, completed)
+    //      case Some(global.Import(expr, _)) =>
+    //        // completion on `imports`
+    //        val cpos0 = expr.pos.endOrPoint
+    //        val cpos = global.rangePos(sourceFile, cpos0, cpos0, cpos0)
+    //        global.askTypeCompletion(cpos, completed)
+    //      case _ =>
+    //        // this covers completion on `types`
+    //        val cpos = global.rangePos(sourceFile, start, start, start)
+    //        global.askScopeCompletion(cpos, completed)
+    //    }
+
+    println(completed.get.left.toOption match {
+      case Some(members) =>
+        members filter { _.accessible } mkString "\n"
+      case None => "<None>"
+    })
   }
 }
