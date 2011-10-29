@@ -18,11 +18,6 @@ package net.slate.action
 import javax.swing.{ JTextPane, AbstractAction }
 import java.awt.event.ActionEvent
 
-import scala.tools.nsc.Settings
-import scala.tools.nsc.interactive.{ Global, Response }
-import scala.tools.nsc.util.BatchSourceFile
-import scala.tools.nsc.reporters.StoreReporter
-
 import net.slate.builder.ScalaBuilder
 import net.slate.ExecutionContext
 import net.slate.Launch._
@@ -33,6 +28,8 @@ import net.slate.gui.{ CodeCompletionPopupMenu, CodeSuggestionPopupMenu }
  * @author Aishwarya Singhal
  */
 class CodeSuggestAction extends AbstractAction with LineParser {
+
+  import actors.Actor._
 
   /**
    * @param ActionEvent
@@ -62,12 +59,18 @@ class CodeSuggestAction extends AbstractAction with LineParser {
     } else if (l.trim.startsWith("@")) {
       setPosition
       CodeSuggestionPopupMenu.show(pane, x, y)
-    } else {
-//      complete
+    } else if (currentScript.text.path.trim.toLowerCase.endsWith(".scala")) {
+      val a = actor { CodeCompletionPopupMenu.show(pane, x, y, suggestMethodsAndVars.toArray, false) }
     }
   }
 
-  def complete = {
+  private def suggestMethodsAndVars = {
+
+    import scala.tools.nsc.Settings
+    import scala.tools.nsc.interactive.{ Global, Response }
+    import scala.tools.nsc.util.BatchSourceFile
+    import scala.tools.nsc.reporters.StoreReporter
+
     val settings = new Settings
     settings.classpath.value = ScalaBuilder.getClassPath(ExecutionContext.currentProjectName(currentScript.text.path))
 
@@ -77,40 +80,39 @@ class CodeSuggestAction extends AbstractAction with LineParser {
 
     val completed = new Response[List[global.Member]]
     val typed = new Response[global.Tree]
+    val reload = new Response[Unit]
     val textPane = currentScript.text.peer
     val sourceFile = new BatchSourceFile(currentScript.text.path, currentScript.text.text)
     val start = textPane.getCaretPosition
-    global.askType(sourceFile, true, typed)
-//
-//    global.getTypedTree(sourceFile, true, typed)
-//
-//    val t1 = typed.get.left.toOption
+
+    // HACK!!! can't get one solution that works with both 2.8.1 and 2.9.1
+    global.unitOfFile.getOrElse(sourceFile.file,
+      global.unitOfFile.put(sourceFile.file, new global.RichCompilationUnit(sourceFile)))
+    global.askType(sourceFile, false, typed)
 
     val cpos = global.rangePos(sourceFile, start, start, start)
     global.askTypeCompletion(cpos, completed)
 
-    // completion depends on the typed tree
-    //    t1 match {
-    //      // completion on select
-    //      case Some(s@global.Select(qualifier, name)) if qualifier.pos.isDefined && qualifier.pos.isRange =>
-    //        val cpos0 = qualifier.pos.end
-    //        val cpos = global.rangePos(sourceFile, cpos0, cpos0, cpos0)
-    //        global.askTypeCompletion(cpos, completed)
-    //      case Some(global.Import(expr, _)) =>
-    //        // completion on `imports`
-    //        val cpos0 = expr.pos.endOrPoint
-    //        val cpos = global.rangePos(sourceFile, cpos0, cpos0, cpos0)
-    //        global.askTypeCompletion(cpos, completed)
-    //      case _ =>
-    //        // this covers completion on `types`
-    //        val cpos = global.rangePos(sourceFile, start, start, start)
-    //        global.askScopeCompletion(cpos, completed)
-    //    }
-
-    println(completed.get.left.toOption match {
+    val visibleMembers = completed.get.left.toOption match {
       case Some(members) =>
-        members filter { _.accessible } mkString "\n"
-      case None => "<None>"
-    })
+        members.filter { _.accessible } map {
+          case m@global.TypeMember(sym, tpe, true, _, _) => {
+
+            def memberName = {
+              (tpe.paramss.map { sect =>
+                "(" +
+                  sect.map { _.tpe.toString }.mkString(", ") +
+                  ")"
+              }.mkString(" : ")
+                + " {{}} " +
+                tpe.finalResultType.toString)
+            }
+            sym.nameString + memberName
+          }
+        }
+      case None => List[String]()
+    }
+
+    visibleMembers
   }
 }

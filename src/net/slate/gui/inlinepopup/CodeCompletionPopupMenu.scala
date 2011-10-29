@@ -19,20 +19,23 @@ import scala.swing.{ Action, Component }
 import net.slate.Launch._
 
 /**
- *
+ * Used to provide completions for import names and make suggestions for method/ attribute names.
+ * 
  * @author Aishwarya Singhal
  */
 object CodeCompletionPopupMenu extends InlinePopup {
   import java.awt.event.KeyEvent
-  import javax.swing.{ BorderFactory, JList, JScrollPane, KeyStroke, PopupFactory }
+  import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, PopupFactory }
   import net.slate.editor.tools.CodeAssist
   import scala.actors.Actor._
 
-  def show(owner: Component, x: Int, y: Int, list: Array[AnyRef]) {
+  def show(owner: Component, x: Int, y: Int, list: Array[AnyRef], typeNameCompletion: Boolean = true) {
     if (!list.isEmpty) {
       val factory = PopupFactory.getSharedInstance()
       val word = CodeAssist.getWord
       val contents = new JList(list)
+      contents.setCellRenderer(new CodeAssistRenderer)
+      
       val scrollpane = new JScrollPane(contents)
       scrollpane.setBackground(java.awt.Color.decode("0xffffff"))
       scrollpane.setViewportBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5))
@@ -43,9 +46,14 @@ object CodeCompletionPopupMenu extends InlinePopup {
         val pane = currentScript.text
         list(index) match {
           case text: String =>
+          if (typeNameCompletion) {
             pane.doc.remove(word._1, pane.caret.position - word._1)
             pane.doc.insertString(word._1, text, null)
             pane.peer.setCaretPosition(word._1 + text.length)
+          } else {
+              val s = text.substring(0, text.indexOf("{{}}")).trim
+              pane.doc.insertString(pane.caret.position, s, null)
+          }
         }
         restoreFocus
       }
@@ -77,6 +85,21 @@ object CodeCompletionPopupMenu extends InlinePopup {
       popup.show()
     } else {
       hide
+    }
+  }
+  
+  /**
+   * cell renderer for showing code options.
+   */
+  class CodeAssistRenderer extends DefaultListCellRenderer {
+    val icon = new ImageIcon("images/img_bullet_green.png");
+
+    override def getListCellRendererComponent(list: JList, value: AnyRef, index: Int, iss: Boolean, chf: Boolean) = {
+      val text = value.asInstanceOf[String].replace("{{}}", ":")
+
+      super.getListCellRendererComponent(list, text, index, iss, chf);
+      setIcon(icon)
+      this
     }
   }
 }

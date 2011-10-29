@@ -23,7 +23,7 @@
 	
 	<target name="build" depends="-init">
       <scalac srcdir="${sources.dir}"
-            destdir="${build.dir}" includes="**/*.scala">
+            destdir="${build.dir}" includes="**/*.scala" deprecation="yes">
 			<classpath>
                 <fileset dir="${basedir}/lib">
                     <include name="**/*.jar"/>
