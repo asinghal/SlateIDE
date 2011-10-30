@@ -27,7 +27,7 @@ import net.slate.gui.{ CodeCompletionPopupMenu, CodeSuggestionPopupMenu }
  *
  * @author Aishwarya Singhal
  */
-class CodeSuggestAction extends AbstractAction with LineParser {
+class CodeSuggestAction(includeLocal: Boolean = true) extends AbstractAction with LineParser {
 
   import actors.Actor._
 
@@ -51,12 +51,12 @@ class CodeSuggestAction extends AbstractAction with LineParser {
       y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 20) else 20
     }
 
-    if (l.trim.startsWith("import ")) {
+    if (includeLocal && l.trim.startsWith("import ")) {
       val name = l.trim.substring("import ".length).trim
       val packages = Package.getPackages.filter { p => p.getName.startsWith(name) && (p.getName) != name }.sortWith { _.getName < _.getName }.map { _.getName }
       setPosition
       CodeCompletionPopupMenu.show(pane, x, y, packages.asInstanceOf[Array[AnyRef]])
-    } else if (l.trim.startsWith("@")) {
+    } else if (includeLocal && l.trim.startsWith("@")) {
       setPosition
       CodeSuggestionPopupMenu.show(pane, x, y)
     } else if (currentScript.text.path.trim.toLowerCase.endsWith(".scala")) {
@@ -71,6 +71,11 @@ class CodeSuggestAction extends AbstractAction with LineParser {
     val cp = ScalaBuilder.getClassPath(ExecutionContext.currentProjectName(currentScript.text.path))
 
     val textPane = currentScript.text.peer
-    ScalaCodeCompletor.suggestMethodsAndVars(cp, currentScript.text.path, currentScript.text.text, textPane.getCaretPosition - 1)
+    var lastCharPosition = textPane.getCaretPosition - 1
+    while (Character.isWhitespace(textPane.getText.charAt(lastCharPosition))) {
+      lastCharPosition = lastCharPosition - 1
+    }
+
+    ScalaCodeCompletor.suggestMethodsAndVars(cp, currentScript.text.path, currentScript.text.text, lastCharPosition)
   }
 }

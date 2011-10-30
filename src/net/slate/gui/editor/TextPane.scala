@@ -64,6 +64,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
 
   addActionforKeyStroke(KeyEvent.VK_ENTER, new AutoIndentAction)
   addActionforKeyStroke(KeyEvent.VK_PERIOD, new CodeSuggestAction)
+  addActionforKeyStroke(KeyEvent.VK_SPACE, new CodeSuggestAction(false))
   addActionforKeyStroke(KeyStroke.getKeyStroke("control shift O"), new OrganiseImportsAction)
   addActionforKeyStroke(KeyEvent.VK_F11, new javax.swing.AbstractAction {
     import net.slate.Launch._
