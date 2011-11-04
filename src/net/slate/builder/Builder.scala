@@ -182,7 +182,8 @@ trait Builder {
     var cp = ""
     classpath.split(pathSeparator).foreach { p =>
       if (p.endsWith("*.jar") || p.endsWith("*.zip")) {
-        val dir = p.replace("*.jar", "").replace("*.zip", "")
+        val path = if (p.startsWith(".\\")) (project + File.separator + p.substring(2)) else p
+        val dir = path.replace("*.jar", "").replace("*.zip", "")
         new File(dir).list.filter { lib => lib.endsWith(".jar") || lib.endsWith(".zip") }.foreach { lib =>
           cp += (dir + lib + pathSeparator)
         }

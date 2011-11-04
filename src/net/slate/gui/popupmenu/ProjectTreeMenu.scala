@@ -28,7 +28,7 @@ object ProjectTreeMenu extends PopupMenu with MenuPainter {
   var path = ""
   lazy val form = new NewItemDetailsDialog(Launch.top)
   var nodeRow = -1
-
+  
   contents += new Menu("New") with CreateNewItemMenuItem {
 
     // template names need to start with Scala/ Java/ General as the dialog box logic depends on it

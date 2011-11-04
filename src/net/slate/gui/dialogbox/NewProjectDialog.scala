@@ -92,8 +92,12 @@ class NewProjectDialog(frame: MainFrame) extends Dialog(frame.owner) {
       create(project + File.separator + test)
       create(project + File.separator + lib)
       create(project + File.separator + output)
+      
+      val sep = "." + File.separator
+      val pathSeparator = System.getProperty("path.separator")
+      val cp = sep + output + pathSeparator + sep + lib + sep + "*.jar"
 
-      ProjectConfigurator.init(new File(project), src, test, lib, output)
+      ProjectConfigurator.init(new File(project), src, test, output, cp)
 
       top.fileExplorer.openProject(new File(project))
 
