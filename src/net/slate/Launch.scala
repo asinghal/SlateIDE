@@ -208,6 +208,7 @@ object Launch extends SimpleSwingApplication {
   def currentScript = tabPane.selection.page.content.asInstanceOf[ScriptScrollPane]
 
   def addTab(name: String, path: String): Boolean = {
+
     if (!tabs.contains(path)) {
       tabPane.pages += new TabbedPane.Page(name, new ScriptScrollPane(name, path)) { tip = path }
 
@@ -222,6 +223,8 @@ object Launch extends SimpleSwingApplication {
         add(new Label(tabPane.peer.getTitleAt(index)), Position.West)
         add(new TabButton(path), Position.East)
       }
+
+      pnl.opaque = false
 
       tabPane.peer.setTabComponentAt(index, pnl.peer)
 
