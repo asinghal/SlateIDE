@@ -67,8 +67,10 @@ class CodeSuggestAction(includeLocal: Boolean = true) extends AbstractAction wit
   private def suggestMethodsAndVars = {
 
     import net.slate.editor.completion._
+    
+    val projectName = ExecutionContext.currentProjectName(currentScript.text.path)
 
-    val cp = ScalaBuilder.getClassPath(ExecutionContext.currentProjectName(currentScript.text.path))
+    val cp = ScalaBuilder.getClassPath(projectName)
 
     val textPane = currentScript.text.peer
     var lastCharPosition = textPane.getCaretPosition - 1
@@ -76,6 +78,6 @@ class CodeSuggestAction(includeLocal: Boolean = true) extends AbstractAction wit
       lastCharPosition = lastCharPosition - 1
     }
 
-    ScalaCodeCompletor.suggestMethodsAndVars(cp, currentScript.text.path, currentScript.text.text, lastCharPosition)
+    ScalaCodeCompletor.suggestMethodsAndVars(projectName, cp, currentScript.text.path, currentScript.text.text, lastCharPosition)
   }
 }

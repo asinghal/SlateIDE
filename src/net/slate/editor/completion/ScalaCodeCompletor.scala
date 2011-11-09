@@ -35,14 +35,9 @@ object ScalaCodeCompletor {
    * @param contents
    * @param start
    */
-  def suggestMethodsAndVars(classpath: String, path: String, contents: String, start: Int) = {
+  def suggestMethodsAndVars(projectName: String, classpath: String, path: String, contents: String, start: Int) = {
 
-    val settings = new Settings
-    settings.classpath.value = classpath
-
-    val reporter = new StoreReporter
-
-    val global = new Global(settings, reporter)
+    val global = cache(projectName, classpath)
 
     val completed = new Response[List[global.Member]]
     val typed = new Response[global.Tree]
@@ -81,5 +76,32 @@ object ScalaCodeCompletor {
     }
 
     if (!error) visibleMembers else List[String]()
+  }
+
+  /**
+   * cache of presentation compilers for each project.
+   */
+  private var cachedCompilers = Map[String, Global]()
+
+  /**
+   * Fetches a cached instance of the presentation compiler, or adds one to cache if none is present.
+   */
+  private def cache(projectName: String, classpath: String) = {
+    cachedCompilers.getOrElse(projectName, newCompiler(projectName, classpath))
+  }
+
+  /**
+   * Creates a new instance of the presentation compiler for this project.
+   */
+  private def newCompiler(projectName: String, classpath: String) = {
+    val settings = new Settings
+    settings.classpath.value = classpath
+
+    val reporter = new StoreReporter
+
+    val compiler = new Global(settings, reporter)
+    cachedCompilers += (projectName -> compiler)
+
+    cachedCompilers(projectName)
   }
 }
