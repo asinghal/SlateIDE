@@ -32,15 +32,11 @@ object ScalaBuilder extends Builder {
    */
   def build: List[Message] = {
 
-    val projectSettings = settings(currentProjectName)
+    val (src, destDir, classpath, enableAlacs) = settings(currentProjectName)
     var sourceFiles = List[String]()
 
-    val destDir = projectSettings._2
-    val classpath = projectSettings._3
-    val enableAlacs = projectSettings._4
-
-    projectSettings._1.foreach { dir =>
-      findAllFiles(dir).filter { isModified(_, dir, destDir) }.foreach { x => sourceFiles :::= List(x) }
+    src.foreach { dir =>
+      findAllFiles(dir).filter { isModified(_, dir, destDir) }.foreach { sourceFiles ::= _ }
     }
 
     var errors = List[Message]()
@@ -62,7 +58,7 @@ object ScalaBuilder extends Builder {
 
       val reporter = new ConsoleReporter(settings) {
         override def printMessage(msg: String) {
-          if (msg.indexOf(": error:") != -1 || msg.indexOf(": warning:") != -1) { errors :::= List(Message.parse(msg)) } else { println(msg) }
+          if (msg.indexOf(": error:") != -1 || msg.indexOf(": warning:") != -1) { errors ::= Message.parse(msg) } else { println(msg) }
         }
       }
       val compiler = new Global(settings, reporter) // compiles the actual code
