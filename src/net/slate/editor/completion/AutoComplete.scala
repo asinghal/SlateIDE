@@ -23,11 +23,14 @@ object AutoComplete {
   import net.slate.editor.tools.CodeAssist._
 
   private val templates = Map(
-    "def" -> " name(x: Any) : Any = { \n}",
-    "try" -> " { \n} catch { \n case (e: Exception) { \n} \n}",
-    "class" -> " name(x: Any) { \n}",
-    "object" -> " name(x: Any) { \n}",
-    "trait" -> " name { \n}")
+    "def" -> " __POSITION__( : ) : Any = { \n\n}",
+    "try" -> " { __POSITION__\n} catch { \n case (e: Exception) { \n\n} \n}",
+    "match" -> " { \n case __POSITION__ :  =>  \n}",
+    "for" -> " (__POSITION__ <- ) {\n\n}",
+    "if" -> " (__POSITION__) { } else { }",
+    "class" -> " __POSITION__( : ) { \n}",
+    "object" -> " __POSITION__( : ) { \n}",
+    "trait" -> " __POSITION__{ \n}")
 
   def inject = {
     val lookup = getWord._2
@@ -35,8 +38,8 @@ object AutoComplete {
     val text = templates.getOrElse(lookup, null)
     val found = text != null
     if (found) { 
-      val expectedPosition = pane.caret.position + text.indexOf("}")
-      pane.doc.insertString(pane.caret.position, text, null)
+      val expectedPosition = pane.caret.position + text.indexOf("__POSITION__")
+      pane.doc.insertString(pane.caret.position, text.replace("__POSITION__", ""), null)
       pane.caret.position = expectedPosition
     }
     found
