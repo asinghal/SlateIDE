@@ -28,6 +28,9 @@ object AutoComplete {
     "match" -> " { \n case __POSITION__ :  =>  \n}",
     "for" -> " (__POSITION__ <- ) {\n\n}",
     "if" -> " (__POSITION__) { } else { }",
+    "private" -> "[this] __POSITION__",
+    "List" -> "[__POSITION__]",
+    "Map" -> "[__POSITION__, ]",
     "class" -> " __POSITION__( : ) { \n}",
     "object" -> " __POSITION__( : ) { \n}",
     "trait" -> " __POSITION__{ \n}")
