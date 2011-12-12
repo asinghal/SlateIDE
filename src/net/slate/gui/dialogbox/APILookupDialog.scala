@@ -60,11 +60,9 @@ class APILookupDialog(frame: MainFrame) extends Dialog(frame.owner) {
   val label = new Label
   pane.add(label.peer)
 
-  def display(list: List[String]) {
+  def display(query: String, list: List[String]) {
     pack()
-    txtFind.text = ""
-    txtFind.requestFocus()
-    txtFind.selectAll()
+    txtFind.text = "Showing Results for : " + query
     peer.setLocation(new Point(850, 100))
     
     build(list)
@@ -110,7 +108,8 @@ class APILookupDialog(frame: MainFrame) extends Dialog(frame.owner) {
       var text = value.asInstanceOf[String]
       val part = text.split("@@@@@@")
       
-      text = "<html><font color=green>"+ part(0) + "</font> : <font color=black>"+ part(1) + "</font> - <p><font color=gray>"+ part(2) + "</font></p><hr></html>"
+      text = "<html><body style='width:300px' ><font color=green>"+ part(0) + "</font> : <font color=black>"+ 
+      part(1) + "</font> - <p><font color=gray>"+ part(2) + "</font></p><hr></body></html>"
 
       super.getListCellRendererComponent(list, text, index, iss, chf);
 

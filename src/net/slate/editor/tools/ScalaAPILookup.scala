@@ -31,7 +31,7 @@ object ScalaAPILookup {
     var list = List[String]()
     docs.results.foreach { x => list ::= getText(x) }
 
-    if (!list.isEmpty) apiLookupDialog.display(list) else apiLookupDialog.hide
+    if (!list.isEmpty) apiLookupDialog.display(docs.query, list) else apiLookupDialog.hide
   }
   
   private[this] def getText(x: APIDoc) = {
@@ -44,6 +44,7 @@ object ScalaAPILookup {
   }
 
   class APIDocContainer {
+    var query: String = ""
     var results: Array[APIDoc] = Array()
   }
 
