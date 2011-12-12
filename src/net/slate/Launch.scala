@@ -96,10 +96,18 @@ object Launch extends SimpleSwingApplication {
     outputFrame.toBack
 
     TrayIcon.init
+    
+    val editorSplitPane = new SplitPane(Orientation.Vertical) {
+      topComponent = tabPane
+      bottomComponent = apiLookupDialog
+      dividerLocation = 700
+      resizeWeight = 1.0
+      dividerSize = 1
+    }
 
     // editor panel that houses editor + console
     val splitPane = new SplitPane(Orientation.Horizontal) {
-      topComponent = tabPane
+      topComponent = editorSplitPane
 
       bottomComponent = bottomTabPane
 
@@ -193,7 +201,7 @@ object Launch extends SimpleSwingApplication {
   lazy val findDialog = new FindDialog(top)
   lazy val lookUpDialog = new LookupResourceDialog(top)
   lazy val codeAssistDialog = new CodeAssistDialog(top)
-  lazy val apiLookupDialog = new APILookupDialog(top)
+  lazy val apiLookupDialog = new APILookupDialog
   lazy val runDialog = new RunDialog(top)
 
   def textPane(name: String, path: String) = new EditorTabbedPane(name, path)

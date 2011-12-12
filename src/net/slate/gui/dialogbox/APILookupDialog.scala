@@ -30,12 +30,11 @@ import net.slate.editor.tools.{ TypeCacheBuilder, TypeIndexer }
 /**
  * 
  */
-class APILookupDialog(frame: MainFrame) extends Dialog(frame.owner) {
-  title = "API Docs"
+class APILookupDialog extends Panel {
+//  title = "API Docs"
   val SPACING = 5
-  val pane = new JPanel
+  val pane = peer
   pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS))
-  peer.getContentPane.add(pane)
   val txtFind = new TextField(30)
   txtFind.editable = false
   pane.add(txtFind.peer)
@@ -61,12 +60,10 @@ class APILookupDialog(frame: MainFrame) extends Dialog(frame.owner) {
   pane.add(label.peer)
 
   def display(query: String, list: List[String]) {
-    pack()
+    import net.slate.Launch._
     txtFind.text = "Showing Results for : " + query
-    peer.setLocation(new Point(850, 100))
-    
     build(list)
-
+    top.editorSplitPane.dividerLocation = 700
     peer.setVisible(true)
   }
   
