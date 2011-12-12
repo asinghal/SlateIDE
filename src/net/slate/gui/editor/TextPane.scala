@@ -230,6 +230,8 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
           val editor = pane.peer.getViewport.getViewPosition
           val x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
           val y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 10) else 10
+          
+          net.slate.editor.tools.ScalaAPILookup.lookup
 
           WordCompletionPopupMenu.show(pane, x, y)
         }
