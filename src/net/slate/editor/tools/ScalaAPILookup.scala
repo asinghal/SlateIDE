@@ -1,29 +1,48 @@
 package net.slate.editor.tools
 
 import scala.io.Source
+import net.slate.action.LineParser
 import net.slate.editor.tools.CodeAssist._
 
-object ScalaAPILookup {
+object ScalaAPILookup extends LineParser {
   import net.slate.Launch._
 
   private[this] val url = "http://api.scalex.org/?q="
 
   def lookup = {
     import actors.Actor._
-    var a = actor {
+    if (isApplicable) {
+      var a = actor {
 
-      val urlConnection = new java.net.URL(url + getWord._2).openConnection()
-      urlConnection.setUseCaches(true)
-      val stream = urlConnection.getInputStream
+        val urlConnection = new java.net.URL(url + getWord._2).openConnection()
+        urlConnection.setUseCaches(true)
+        val stream = urlConnection.getInputStream
 
-      val source = Source.fromInputStream(stream)
-      val lines = source.mkString
-      source.close()
-      parse(lines);
+        val source = Source.fromInputStream(stream)
+        val lines = source.mkString
+        source.close()
+        parse(lines);
+      }
     }
   }
 
-  def parse(json: String) = {
+  private[this] def isApplicable = {
+    
+    var applicable = false
+    if (currentScript.text.path.endsWith(".scala")) {
+      val textPane = currentScript.text.peer
+      val caret = textPane.getCaretPosition
+      val l = line(textPane, caret)
+      
+      // TODO need to ignore comments too
+      
+      applicable = (!l.trim.startsWith("import"))
+    }
+
+    applicable
+  }
+
+  private[this] def parse(json: String) = {
     import com.google.gson._
 
     val gson = new Gson()
@@ -33,13 +52,13 @@ object ScalaAPILookup {
 
     if (!list.isEmpty) apiLookupDialog.display(docs.query, list) else apiLookupDialog.hide
   }
-  
+
   private[this] def getText(x: APIDoc) = {
-    var text = (x.name + " @@@@@@ " + x.signature + " @@@@@@ ") 
+    var text = (x.name + " @@@@@@ " + x.signature + " @@@@@@ ")
     if (x.comment != null && x.comment.body != null) {
       text += (x.comment.body.txt)
     }
-    
+
     text
   }
 
