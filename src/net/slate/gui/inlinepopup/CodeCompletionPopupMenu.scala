@@ -32,7 +32,7 @@ object CodeCompletionPopupMenu extends InlinePopup {
   def show(owner: Component, x: Int, y: Int, list: Array[AnyRef], typeNameCompletion: Boolean = true) {
     if (!list.isEmpty) {
       val factory = PopupFactory.getSharedInstance()
-      val word = CodeAssist.getWord
+      val word = CodeAssist.getWord(false)
       val contents = new JList(list)
       contents.setCellRenderer(new CodeAssistRenderer)
       

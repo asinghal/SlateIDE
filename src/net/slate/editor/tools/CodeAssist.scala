@@ -27,7 +27,9 @@ object CodeAssist {
   /**
    * Extract the word at the caret position.
    */
-  def getWord = {
+  def getWord : (Int, String) = getWord(true)
+  
+  def getWord(ignorePeriods: Boolean = true) : (Int, String) = {
     val caret = currentScript.text.peer.getCaretPosition
     val doc = currentScript.text.peer.getDocument().asInstanceOf[javax.swing.text.DefaultStyledDocument]
 
@@ -36,7 +38,7 @@ object CodeAssist {
 
     val line = doc.getText(start, caret - start).trim
     val word = if (line.contains(" ")) line.substring(line.lastIndexOf(" ", caret - start) + 1) else line
-    val w = removeBrackets(word).trim
+    val w = if(ignorePeriods) removeBrackets(word.substring(word.lastIndexOf(".") + 1)).trim else removeBrackets(word).trim
     val pos = caret - w.length
 
     (pos, w)
