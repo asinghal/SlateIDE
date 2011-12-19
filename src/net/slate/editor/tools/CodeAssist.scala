@@ -25,29 +25,45 @@ import net.slate.Launch._
 object CodeAssist {
 
   /**
+   * add extra capabilities to java string.
+   */
+  implicit def StringWrapper(str: String) = {
+    new {
+      /**
+       * Gets a string until it find the character, or the whole string anyways.
+       */
+      def substr(c: Character) = {
+        if (str.contains(c)) str.substring(0, str.indexOf(c)) else str
+      }
+    }
+  }
+
+  /**
    * Extract the word at the caret position.
    */
-  def getWord : (Int, String) = getWord(true)
-  
-  def getWord(ignorePeriods: Boolean = true) : (Int, String) = {
+  def getWord: (Int, String) = getWord(true)
+
+  def getWord(ignorePeriods: Boolean = true): (Int, String) = {
     val caret = currentScript.text.peer.getCaretPosition
     val doc = currentScript.text.peer.getDocument().asInstanceOf[javax.swing.text.DefaultStyledDocument]
 
     val start = doc.getParagraphElement(caret).getStartOffset
     val end = doc.getParagraphElement(caret).getEndOffset
 
-    val line = doc.getText(start, caret - start).trim
+    val line = doc.getText(start, end - start).trim
     val word = if (line.contains(" ")) line.substring(line.lastIndexOf(" ", caret - start) + 1) else line
-    val w = if(ignorePeriods) removeBrackets(word.substring(word.lastIndexOf(".") + 1)).trim else removeBrackets(word).trim
+    val w = if (ignorePeriods) removeBrackets(word.substring(word.lastIndexOf(".") + 1)).trim else removeBrackets(word).trim
     val pos = caret - w.length
 
-    (pos, w)
+    val fullWord = w.substr(' ').substr('.')
+
+    (pos, fullWord)
   }
 
   /**
    * Removes brackets from the words.
    */
-  private def removeBrackets(input: String) = {
+  private[this] def removeBrackets(input: String) = {
     input.replaceAll("[\\{\\(\\[\\]\\}\\)]*", "")
   }
 }

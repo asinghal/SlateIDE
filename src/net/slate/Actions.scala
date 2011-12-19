@@ -175,6 +175,7 @@ object Actions {
     writer.write(currentScript.text.text)
     writer.close()
     currentScript.text.undoManager.save
+    net.slate.editor.tools.ScalaTags.tag(currentScript.text.path)
   }
 
   /**

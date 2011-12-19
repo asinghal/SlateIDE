@@ -72,7 +72,7 @@ object FileUtils {
       updateStatusBar("Ready")
       true
     } else false
-
+    
     opened
   }
 

@@ -155,6 +155,7 @@ class FileExplorer(dir: File) extends ScrollPane {
 
       if (persist)
         ProjectDetailsSerializer.add(new ProjectDetails(project.getPath, true))
+      net.slate.editor.tools.ScalaTags.tagAll(project.getPath)
     } else {
       ProjectDetailsSerializer.remove(p => p.path == project.getPath)
     }
