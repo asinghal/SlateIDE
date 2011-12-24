@@ -33,7 +33,7 @@ object ScalaTags {
         while (matcher.find()) {
           val cType = matcher.group(1).trim
           val tag = matcher.group(2).trim
-          if (!indexer.exists(cType, tag, path)) {
+          if (tag != "" && !indexer.exists(cType, tag, path)) {
             indexer.addTag(cType, tag, path)
           }
         }
