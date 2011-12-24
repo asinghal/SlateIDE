@@ -49,10 +49,19 @@ object CodeAssist {
 
     val start = doc.getParagraphElement(caret).getStartOffset
     val end = doc.getParagraphElement(caret).getEndOffset
+    
+    val caretPos = caret - start 
+    
+    val line = doc.getText(start, end - start)
+    
+    def maxIndex(x: Int, y: Character) = {
+      if (line.contains(y) && (line.indexOf(y, caretPos) <= x || x == -1)) line.indexOf(y, caretPos) else x
+    }
+    val index = Array(' ', '.').foldLeft(-1){ (x, y) => maxIndex(x, y) }
+    val endPos = if (index > -1) index else caretPos
 
-    val line = doc.getText(start, end - start).trim
     val word = if (line.contains(" ")) line.substring(line.lastIndexOf(" ", caret - start) + 1) else line
-    val w = if (ignorePeriods) removeBrackets(word.substring(word.lastIndexOf(".") + 1)).trim else removeBrackets(word).trim
+    val w = if (ignorePeriods) removeBrackets(word.substring(word.lastIndexOf(".", caret - start) + 1)) else removeBrackets(word)
     val pos = caret - w.length
 
     val fullWord = w.substr(' ').substr('.')
@@ -64,6 +73,6 @@ object CodeAssist {
    * Removes brackets from the words.
    */
   private[this] def removeBrackets(input: String) = {
-    input.replaceAll("[\\{\\(\\[\\]\\}\\)]*", "")
+    input.substr('[').substr('(').substr('{').substr('}').substr(')').substr(']').trim
   }
 }
