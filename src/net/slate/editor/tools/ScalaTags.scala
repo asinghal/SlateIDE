@@ -9,7 +9,7 @@ object ScalaTags {
   import net.slate.util.FileUtils
 
   private lazy val regex = Array("def", "class", "object", "trait").map { "\\b" + _ + "\\b[\\s]*" }.foldLeft("") { (x, y) => x + "|" + y }.substring(1)
-  private lazy val overall: Regex = ("(" + regex + ")([^\\s\\(\\=]*)").r
+  private lazy val overall: Regex = ("(" + regex + ")([^\\s\\:\\;\\(\\[\\{\\=]*)").r
 
   private var running = false
   
@@ -33,8 +33,9 @@ object ScalaTags {
         while (matcher.find()) {
           val cType = matcher.group(1).trim
           val tag = matcher.group(2).trim
+          val position = matcher.start
           if (tag != "" && !indexer.exists(cType, tag, path)) {
-            indexer.addTag(cType, tag, path)
+            indexer.addTag(cType, tag, path, position)
           }
         }
         running = false
@@ -64,7 +65,7 @@ class TagsIndexer(project: String) {
   val analyzer = new StandardAnalyzer(Version.LUCENE_33)
   val index_ = FSDirectory.open(INDEX_DIR)
 
-  def addTag(cType: String, tag: String, path: String) = {
+  def addTag(cType: String, tag: String, path: String, position: Int) = {
     val config = new IndexWriterConfig(Version.LUCENE_33,
       analyzer)
 
@@ -72,7 +73,7 @@ class TagsIndexer(project: String) {
 
     val w = new IndexWriter(index_, config)
 
-    addDoc(w, cType, tag, path)
+    addDoc(w, cType, tag, path, position)
 
     ready = true
     w.close()
@@ -114,7 +115,7 @@ class TagsIndexer(project: String) {
         val d = searcher.doc(docId)
 
         if (d.get("tag") == tag) {
-          results(i - skipped) = d.get("tag")
+          results(i - skipped) = d.get("path") + ":" + d.get("position")
         } else {
           skipped += 1
         }
@@ -130,11 +131,12 @@ class TagsIndexer(project: String) {
     }
   }
 
-  private def addDoc(w: IndexWriter, cType: String, tag: String, path: String) = {
+  private def addDoc(w: IndexWriter, cType: String, tag: String, path: String, position: Int) = {
     val doc = new Document()
     doc.add(new Field("cType", cType, Field.Store.YES, Field.Index.ANALYZED))
     doc.add(new Field("tag", tag, Field.Store.YES, Field.Index.ANALYZED))
     doc.add(new Field("path", path, Field.Store.YES, Field.Index.ANALYZED))
+    doc.add(new Field("position", String.valueOf(position), Field.Store.YES, Field.Index.NOT_ANALYZED))
     w.addDocument(doc)
   }
 }

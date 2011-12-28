@@ -32,7 +32,7 @@ object CodeAssist {
       /**
        * Gets a string until it find the character, or the whole string anyways.
        */
-      def substr(c: Character) = {
+      def substr(c: java.lang.Character) = {
         if (str.contains(c)) str.substring(0, str.indexOf(c)) else str
       }
     }
@@ -54,7 +54,7 @@ object CodeAssist {
     
     val line = doc.getText(start, end - start)
     
-    def maxIndex(x: Int, y: Character) = {
+    def maxIndex(x: Int, y: java.lang.Character) = {
       if (line.contains(y) && (line.indexOf(y, caretPos) <= x || x == -1)) line.indexOf(y, caretPos) else x
     }
     val index = Array(' ', '.').foldLeft(-1){ (x, y) => maxIndex(x, y) }

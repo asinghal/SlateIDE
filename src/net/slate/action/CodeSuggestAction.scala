@@ -54,13 +54,12 @@ class CodeSuggestAction(includeLocal: Boolean = true) extends AbstractAction wit
     if (includeLocal && l.trim.startsWith("import ")) {
       val name = l.trim.substring("import ".length).trim
       val packages = Package.getPackages.filter { p => p.getName.startsWith(name) && (p.getName) != name }.sortWith { _.getName < _.getName }.map { _.getName }
-      setPosition
-      CodeCompletionPopupMenu.show(pane, x, y, packages.asInstanceOf[Array[AnyRef]])
+      CodeCompletionPopupMenu.show(packages.asInstanceOf[Array[AnyRef]])
     } else if (includeLocal && l.trim.startsWith("@")) {
       setPosition
       CodeSuggestionPopupMenu.show(pane, x, y)
     } else if (currentScript.text.path.trim.toLowerCase.endsWith(".scala")) {
-      val a = actor { CodeCompletionPopupMenu.show(pane, x, y, suggestMethodsAndVars.toArray, false) }
+      val a = actor { CodeCompletionPopupMenu.show(suggestMethodsAndVars.toArray, false) }
     }
   }
 

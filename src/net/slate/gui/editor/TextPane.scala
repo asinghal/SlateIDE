@@ -15,7 +15,6 @@
  */
 package net.slate.gui
 import java.awt.event.{ InputEvent, KeyEvent }
-
 import swing.{ Button, Component, TextComponent }
 import javax.swing.{ Action, KeyStroke, JTextPane }
 import java.awt.{ FlowLayout, Font, LayoutManager, Point }
@@ -108,6 +107,15 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   addActionforKeyStroke(KeyStroke.getKeyStroke("control F11"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       runDialog.display
+    }
+  })
+  
+  addActionforKeyStroke(KeyEvent.VK_F3, new javax.swing.AbstractAction {
+    import net.slate.ExecutionContext._
+    import net.slate.editor.tools._
+    def actionPerformed(e: java.awt.event.ActionEvent) {
+      val list = ScalaTags.lookup(CodeAssist.getWord(false)._2, currentProjectName)
+      SimplePopup.show(list)
     }
   })
 
