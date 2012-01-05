@@ -20,13 +20,15 @@ package net.slate.gui
  *
  * @author Aishwarya Singhal
  */
-object WordCompletionPopupMenu extends InlinePopup {
+object WordCompletionPopupMenu extends CommonPopup {
   import java.awt.event.KeyEvent
   import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, PopupFactory }
   import scala.swing.Component
   import net.slate.Launch._
   import net.slate.editor.tools.{ CodeAssist, WordCompletion }
   import scala.actors.Actor._
+
+  override lazy val popupName = "wordCompletionPopup"
 
   /**
    * Display the list of words that can be substituted at the current cursor position.
@@ -35,23 +37,15 @@ object WordCompletionPopupMenu extends InlinePopup {
    * @param x
    * @param y
    */
-  def show(owner: Component, x: Int, y: Int) {
+  def show {
     val factory = PopupFactory.getSharedInstance()
     val textpane = currentScript.text.peer
     val caret = textpane.getCaretPosition
     val currentChar = if (caret == 0) ' ' else (textpane.getDocument.getText(caret - 1, 1)).charAt(0)
     val word = CodeAssist.getWord
     val list = if (currentChar != '.' && Character.isLetterOrDigit(currentChar)) WordCompletion.suggest(word._2) else Array[AnyRef]()
-
-    if (!list.isEmpty) {
-      val contents = new JList(list)
-      val scrollpane = new JScrollPane(contents)
-      scrollpane.setBackground(java.awt.Color.decode("0xffffff"))
-      scrollpane.setViewportBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5))
-
-      hide
-
-      def insert(index: Int) = {
+    
+    def insert(index: Int) = {
         val pane = currentScript.text
         list(index) match {
           case text: String =>
@@ -61,34 +55,7 @@ object WordCompletionPopupMenu extends InlinePopup {
         }
         restoreFocus
       }
-
-      popup = factory.getPopup(owner.peer, scrollpane, 210 + x, 110 + y)
-      contents.setSelectedIndex(0)
-      contents.addMouseListener(new java.awt.event.MouseAdapter {
-        override def mouseClicked(e: java.awt.event.MouseEvent) {
-          if (e.getButton == java.awt.event.MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-            val index = contents.locationToIndex(e.getPoint());
-            insert(index)
-          }
-        }
-      })
-
-      processor = actor {
-        react {
-          case _ =>
-            insert(contents.getSelectedIndex)
-        }
-      }
-
-      contents.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeWordCompletion");
-      contents.getActionMap().put("closeWordCompletion", new javax.swing.AbstractAction {
-        def actionPerformed(e: java.awt.event.ActionEvent) {
-          restoreFocus
-        }
-      });
-      popup.show()
-    } else {
-      if (popup != null && currentChar != '.') hide
-    }
+    
+    showPopup(list) { (i,l) => insert(i)}
   }
 }

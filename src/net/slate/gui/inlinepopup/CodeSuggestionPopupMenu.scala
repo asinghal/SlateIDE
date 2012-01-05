@@ -24,7 +24,7 @@ import net.slate.Launch._
  * @author Aishwarya Singhal
  *
  */
-object CodeSuggestionPopupMenu extends InlinePopup {
+object CodeSuggestionPopupMenu extends CommonPopup {
   import java.awt.event.KeyEvent
   import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, JList, JScrollPane, KeyStroke, PopupFactory }
   import net.slate.ExecutionContext
@@ -32,21 +32,11 @@ object CodeSuggestionPopupMenu extends InlinePopup {
   import scala.actors.Actor._
 
   def show(owner: Component, x: Int, y: Int) {
-    val factory = PopupFactory.getSharedInstance()
     val word = CodeAssist.getWord
 
     val annotation = word._2.startsWith("@")
     val w = if (annotation) word._2.substring(1) else word._2
     val list = new TypeIndexer(ExecutionContext.currentProjectName).find(w, false)
-    val contents = new JList(list)
-    contents.setCellRenderer(new CodeSuggestionRenderer)
-    contents.setSelectedIndex(0)
-    val scrollpane = new JScrollPane(contents)
-    scrollpane.setBackground(java.awt.Color.decode("0xffffff"))
-    scrollpane.setViewportBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5))
-
-    hide
-
     def insert(index: Int) = {
       val pane = currentScript.text
       list(index) match {
@@ -63,54 +53,7 @@ object CodeSuggestionPopupMenu extends InlinePopup {
       }
       restoreFocus
     }
-
-    popup = factory.getPopup(owner.peer, scrollpane, 210 + x, 110 + y)
-    contents.addMouseListener(new java.awt.event.MouseAdapter {
-      override def mouseClicked(e: java.awt.event.MouseEvent) {
-        if (e.getButton == java.awt.event.MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-          val index = contents.locationToIndex(e.getPoint());
-          insert(index)
-        }
-      }
-    })
-
-    processor = actor {
-      react {
-        case _ =>
-          insert(contents.getSelectedIndex)
-      }
-    }
-
-    contents.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeCodeAssist");
-    contents.getActionMap().put("closeCodeAssist", new javax.swing.AbstractAction {
-      def actionPerformed(e: java.awt.event.ActionEvent) {
-        restoreFocus
-      }
-    });
-    popup.show()
-  }
-
-  /**
-   * cell renderer for showing code options.
-   */
-  class CodeSuggestionRenderer extends DefaultListCellRenderer {
-    val icon = new ImageIcon("images/img_bullet_blue.png");
-
-    /* This is the only method defined by ListCellRenderer.  We just
-     * reconfigure the Jlabel each time we're called.
-     */
-    override def getListCellRendererComponent(list: JList, value: AnyRef, index: Int, iss: Boolean, chf: Boolean) = {
-      /* The DefaultListCellRenderer class will take care of
-         * the JLabels text property, it's foreground and background
-         * colors, and so on.
-         */
-      super.getListCellRendererComponent(list, value, index, iss, chf);
-
-      /* We additionally set the JLabels icon property here.
-         */
-      setIcon(icon);
-
-      this
-    }
+    
+    showPopup(list) { (i, l) => insert(i) }
   }
 }

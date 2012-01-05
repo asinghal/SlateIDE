@@ -241,7 +241,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
           
           net.slate.editor.tools.ScalaAPILookup.lookup
 
-          WordCompletionPopupMenu.show(pane, x, y)
+          WordCompletionPopupMenu.show
         }
       }
     })

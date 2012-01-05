@@ -21,6 +21,8 @@ trait CommonPopup extends InlinePopup {
   import javax.swing.{ BorderFactory, DefaultListCellRenderer, ImageIcon, PopupFactory, JList, JScrollPane, KeyStroke }
   import scala.actors.Actor._
 
+  lazy val popupName = "simplePopup"
+    
   protected def showPopup(list: Array[AnyRef])(f: (Int, Array[AnyRef]) => Unit) {
     if (!list.isEmpty) {
       val factory = PopupFactory.getSharedInstance()
@@ -51,8 +53,8 @@ trait CommonPopup extends InlinePopup {
         }
       }
 
-      contents.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "simplePopup");
-      contents.getActionMap().put("simplePopup", new javax.swing.AbstractAction {
+      contents.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), popupName);
+      contents.getActionMap().put(popupName, new javax.swing.AbstractAction {
         def actionPerformed(e: java.awt.event.ActionEvent) {
           restoreFocus
         }
