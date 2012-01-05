@@ -12,7 +12,7 @@ object ScalaTags {
   private lazy val overall: Regex = ("(" + regex + ")([^\\s\\:\\;\\(\\[\\{\\=]*)").r
 
   private var running = false
-  
+
   def tagAll(project: String) = {
     FileUtils.findAllFiles(project, ".scala").foreach(tag)
   }
@@ -27,22 +27,22 @@ object ScalaTags {
     var pos = 0
 
     val a = actor {
-      if (!running) {
-        running = true
         val matcher = overall.pattern.matcher(lines)
         while (matcher.find()) {
           val cType = matcher.group(1).trim
           val tag = matcher.group(2).trim
           val position = matcher.start
-          if (tag != "" && !indexer.exists(cType, tag, path)) {
-            indexer.addTag(cType, tag, path, position)
+          try {
+            if (tag != "" && !indexer.exists(cType, tag, path)) {
+              indexer.addTag(cType, tag, path, position)
+            }
+          } catch {
+            case e: Exception => //println("could not tag " + tag + " of type " + cType + " in file" + path) 
           }
         }
-        running = false
-      }
     }
   }
-  
+
   def lookup(tag: String, path: String) = {
     val indexer = new TagsIndexer(net.slate.ExecutionContext.currentProjectName(path))
     indexer.find(tag)
@@ -115,7 +115,7 @@ class TagsIndexer(project: String) {
         val d = searcher.doc(docId)
 
         if (d.get("tag") == tag) {
-          results(i - skipped) = d.get("path") + ":" + d.get("position")
+          results(i - skipped) = d.get("path") + ": " + d.get("cType")
         } else {
           skipped += 1
         }

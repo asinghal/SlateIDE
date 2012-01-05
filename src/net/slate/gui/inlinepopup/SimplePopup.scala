@@ -17,6 +17,7 @@ package net.slate.gui
 
 import scala.swing.{ Action, Component }
 import net.slate.Launch._
+import net.slate.util.FileUtils._
 
 /**
  *
@@ -30,6 +31,9 @@ object SimplePopup extends CommonPopup {
   def insert(index: Int, list: Array[AnyRef]) {
     list(index) match {
       case text: String =>
+        val path = text.substring(0, text.lastIndexOf(":")).trim
+        val name = path.substring(path.lastIndexOf(java.io.File.separator) + 1)
+        open(name, path)
     }
     restoreFocus
   }
