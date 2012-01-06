@@ -115,7 +115,6 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     import net.slate.editor.tools._
     def actionPerformed(e: java.awt.event.ActionEvent) {
       val list = ScalaTags.lookup(CodeAssist.getWord(false)._2, currentProjectName)
-      list foreach println
       SimplePopup.show(list)
     }
   })
