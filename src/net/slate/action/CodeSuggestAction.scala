@@ -41,23 +41,12 @@ class CodeSuggestAction(includeLocal: Boolean = true) extends AbstractAction wit
     val caret = textPane.getCaretPosition;
     val l = line(textPane, caret)
 
-    val pane = currentScript
-    var x = 0
-    var y = 0
-    def setPosition {
-      val point = pane.text.peer.getCaret.getMagicCaretPosition
-      val editor = pane.peer.getViewport.getViewPosition
-      x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
-      y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 20) else 20
-    }
-
     if (includeLocal && l.trim.startsWith("import ")) {
       val name = l.trim.substring("import ".length).trim
       val packages = Package.getPackages.filter { p => p.getName.startsWith(name) && (p.getName) != name }.sortWith { _.getName < _.getName }.map { _.getName }
       CodeCompletionPopupMenu.show(packages.asInstanceOf[Array[AnyRef]])
     } else if (includeLocal && l.trim.startsWith("@")) {
-      setPosition
-      CodeSuggestionPopupMenu.show(pane, x, y)
+      CodeSuggestionPopupMenu.show
     } else if (currentScript.text.path.trim.toLowerCase.endsWith(".scala")) {
       val a = actor { CodeCompletionPopupMenu.show(suggestMethodsAndVars.toArray, false) }
     }

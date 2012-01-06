@@ -31,7 +31,7 @@ object CodeSuggestionPopupMenu extends CommonPopup {
   import net.slate.editor.tools.{ CodeAssist, CodeTemplates, TypeIndexer }
   import scala.actors.Actor._
 
-  def show(owner: Component, x: Int, y: Int) {
+  def show {
     val word = CodeAssist.getWord
 
     val annotation = word._2.startsWith("@")

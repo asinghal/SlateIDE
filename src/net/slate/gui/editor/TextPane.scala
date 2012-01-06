@@ -115,6 +115,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
     import net.slate.editor.tools._
     def actionPerformed(e: java.awt.event.ActionEvent) {
       val list = ScalaTags.lookup(CodeAssist.getWord(false)._2, currentProjectName)
+      list foreach println
       SimplePopup.show(list)
     }
   })
@@ -125,12 +126,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
 
   addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
-      val pane = currentScript
-      val point = pane.text.peer.getCaret.getMagicCaretPosition
-      val editor = pane.peer.getViewport.getViewPosition
-      val x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
-      val y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 10) else 10
-      CodeSuggestionPopupMenu.show(pane, x, y)
+      CodeSuggestionPopupMenu.show
     }
   })
 
@@ -234,10 +230,6 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
         // suggest word completions only for scala/java/css/js files. 
         if (pane.text.path.endsWith(".scala") || pane.text.path.endsWith(".java")
           || pane.text.path.endsWith(".css") || pane.text.path.endsWith(".js")) {
-          val point = pane.text.peer.getCaret.getMagicCaretPosition
-          val editor = pane.peer.getViewport.getViewPosition
-          val x = if (point != null) (point.getX.asInstanceOf[Int] - editor.getX.asInstanceOf[Int] + 50) else 50
-          val y = if (point != null) (point.getY.asInstanceOf[Int] - editor.getY.asInstanceOf[Int] + 10) else 10
           
           net.slate.editor.tools.ScalaAPILookup.lookup
 
