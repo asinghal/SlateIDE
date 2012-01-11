@@ -15,17 +15,10 @@
  */
 package net.slate.gui
 
-import java.awt.FlowLayout
-import java.lang.reflect._
-import java.io.File
-import javax.swing.{ BoxLayout, DefaultListModel, DefaultListCellRenderer, ImageIcon, JList, JPanel, JScrollPane, JTextField }
+import javax.swing.{ BoxLayout, DefaultListModel, DefaultListCellRenderer, ImageIcon, JList, JScrollPane }
 import javax.swing.event.{ ListSelectionEvent, ListSelectionListener }
 
 import scala.swing._
-import scala.swing.event.{ ButtonClicked, KeyReleased }
-
-import net.slate.ExecutionContext
-import net.slate.editor.tools.{ TypeCacheBuilder, TypeIndexer }
 
 /**
  * 

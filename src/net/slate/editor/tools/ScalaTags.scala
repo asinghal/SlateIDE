@@ -1,6 +1,22 @@
+/*
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *  Created on: 11th January 2012
+ */
 package net.slate.editor.tools
 
 import scala.actors.Actor._
+import net.slate.ExecutionContext._
 
 object ScalaTags {
 
@@ -27,25 +43,34 @@ object ScalaTags {
     var pos = 0
 
     val a = actor {
-        val matcher = overall.pattern.matcher(lines)
-        while (matcher.find()) {
-          val cType = matcher.group(1).trim
-          val tag = matcher.group(2).trim
-          val position = matcher.start
-          try {
-            if (tag != "" && !indexer.exists(cType, tag, path)) {
-              indexer.addTag(cType, tag, path, position)
-            }
-          } catch {
-            case e: Exception => //println("could not tag " + tag + " of type " + cType + " in file" + path) 
+      val matcher = overall.pattern.matcher(lines)
+      while (matcher.find()) {
+        val cType = matcher.group(1).trim
+        val tag = matcher.group(2).trim
+        val position = matcher.start
+        try {
+          if (tag != "" && !indexer.exists(cType, tag, path)) {
+            indexer.addTag(cType, tag, path, position)
           }
+        } catch {
+          case e: Exception => //println("could not tag " + tag + " of type " + cType + " in file" + path) 
         }
+      }
     }
   }
 
+  var cache = Map[String, TagsIndexer]()
+
   def lookup(tag: String, path: String) = {
-    val indexer = new TagsIndexer(net.slate.ExecutionContext.currentProjectName(path))
-    indexer.find(tag)
+    indexer(currentProjectName(path)).find(tag)
+  }
+
+  private def indexer(project: String) = {
+    cache.getOrElse(project, {
+      val _indexer = new TagsIndexer(project)
+      cache += (project -> _indexer)
+      _indexer
+    })
   }
 }
 
@@ -79,27 +104,29 @@ class TagsIndexer(project: String) {
     w.close()
   }
 
-  def find(tag: String) = {
-    val keyword = tag
-
-    val q = new QueryParser(Version.LUCENE_33, "tag", analyzer)
-      .parse(keyword)
-    search(q, tag)
-  }
+  def find(tag: String) = findByTag(tag, tag)
 
   def exists(cType: String, tag: String, path: String) = {
     val keyword = tag
     val query = "cType:\"" + cType + "\" AND path:\"" + path + "\" AND \"" + keyword + "\""
 
-    val q = new QueryParser(Version.LUCENE_33, "tag", analyzer)
-      .parse(keyword)
-    search(q, tag).length != 0
+    findByTag(tag, query).length != 0
+  }
+
+  private def findByTag(tag: String, query: String) = {
+    if (!tag.isEmpty()) {
+      val q = new QueryParser(Version.LUCENE_33, "tag", analyzer)
+        .parse(query)
+      search(q, tag)
+    } else {
+      returnOnFault
+    }
   }
 
   private def search(q: Query, tag: String) = {
+    val searcher = new IndexSearcher(index_, true)
     try {
       val hitsPerPage = 100
-      val searcher = new IndexSearcher(index_, true)
       val collector = TopScoreDocCollector.create(
         hitsPerPage, true)
       searcher.search(q, collector)
@@ -115,21 +142,24 @@ class TagsIndexer(project: String) {
         val d = searcher.doc(docId)
 
         if (d.get("tag") == tag) {
-          results(i - skipped) = d.get("path") + ": " + d.get("cType")
+          results(i - skipped) = d.get("path") + ": " + d.get("cType") + "- " + d.get("position")
         } else {
           skipped += 1
         }
       }
 
+      results
+    } catch {
+      case e: Throwable => returnOnFault
+    } finally {
       // searcher can only be closed when there
       // is no need to access the documents any more.
       searcher.close()
 
-      results
-    } catch {
-      case e: Throwable => Array[AnyRef]()
     }
   }
+
+  private def returnOnFault = Array[AnyRef]()
 
   private def addDoc(w: IndexWriter, cType: String, tag: String, path: String, position: Int) = {
     val doc = new Document()

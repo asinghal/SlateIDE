@@ -18,6 +18,7 @@ package net.slate.gui
 import scala.swing.{ Action, Component }
 import net.slate.Launch._
 import net.slate.util.FileUtils._
+import net.slate.Launch._
 
 /**
  *
@@ -32,8 +33,10 @@ object SimplePopup extends CommonPopup {
     list(index) match {
       case text: String =>
         val path = text.substring(0, text.lastIndexOf(":")).trim
+        val position = text.substring(text.lastIndexOf(":") + 1).split("-")(1).trim
         val name = path.substring(path.lastIndexOf(java.io.File.separator) + 1)
         open(name, path)
+        currentScript.text.peer.setCaretPosition(position.toInt);
     }
     restoreFocus
   }
