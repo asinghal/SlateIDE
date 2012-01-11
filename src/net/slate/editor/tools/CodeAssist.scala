@@ -40,21 +40,20 @@ object CodeAssist {
     
     val line = doc.getText(start, end - start)
     
-    def maxIndex(x: Int, y: java.lang.Character) = {
-      if (line.contains(y) && (line.indexOf(y, caretPos)<= x || x == -1)) line.indexOf(y, caretPos) else x
-    }
+    def min(a: Int, b: Int) = (a <= b || b == -1)
+    def max(a: Int, b: Int) = (a >= b || b == -1)
     
-    def minIndex(x: Int, y: java.lang.Character) = {
-      if (line.contains(y) && (line.lastIndexOf(y, caretPos)>= x || x == -1)) line.lastIndexOf(y, caretPos) else x
-    }
+    def index(x: Int, y: java.lang.Character, z: Int)(f: (Int, Int) => Boolean) = {
+      if (line.contains(y) && f(z, x)) z else x
+    } 
     
     val chars = Array(' ', '.', '(', '{', '[', ']', ')', '}')
-    val endIndex = chars.foldLeft(-1){ (x, y) => maxIndex(x, y) }
+    val endIndex = chars.foldLeft(-1){ (x, y) => index(x, y, line.indexOf(y, caretPos))(min) }
     val endPos = if (endIndex > -1) endIndex else line.length
-    val startIndex = chars.foldLeft(-1){ (x, y) => minIndex(x, y) }
+    val startIndex = chars.foldLeft(-1){ (x, y) => index(x, y, line.lastIndexOf(y, caretPos))(max) }
     val startPos = if (startIndex > -1) startIndex + 1 else 0
     
-    val word = line.substring(startPos, endPos)
+    val word = if (startIndex == endIndex) "" else line.substring(startPos, endPos)
     val pos = caret - word.length
 
     (pos, word)
