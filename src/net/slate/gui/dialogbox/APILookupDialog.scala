@@ -19,6 +19,7 @@ import javax.swing.{ BoxLayout, DefaultListModel, DefaultListCellRenderer, Image
 import javax.swing.event.{ ListSelectionEvent, ListSelectionListener }
 
 import scala.swing._
+import net.slate.Size
 
 /**
  * 
@@ -37,7 +38,7 @@ class APILookupDialog extends Panel {
   results.setCellRenderer(new APILookupRenderer)
 
   val resultsPane = new JScrollPane(results)
-  resultsPane.setPreferredSize(new Dimension(400, 600))
+  resultsPane.setPreferredSize(Size(400, 600))
   pane.add(resultsPane)
 
   results.addMouseListener(new java.awt.event.MouseAdapter {

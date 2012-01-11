@@ -25,6 +25,7 @@ import scala.swing.event.{ ButtonClicked, KeyReleased }
 
 import net.slate.{ ExecutionContext, Launch }
 import net.slate.util.FileUtils
+import net.slate.Size
 
 /**
  *
@@ -46,7 +47,7 @@ class LookupResourceDialog(frame: MainFrame) extends Dialog(frame.owner) {
   results.setCellRenderer(new LookUpResourceRenderer)
 
   val resultsPane = new JScrollPane(results)
-  resultsPane.setPreferredSize(new Dimension(400, 400))
+  resultsPane.setPreferredSize(Size(400, 400))
   pane.add(resultsPane)
 
   results.addMouseListener(new java.awt.event.MouseAdapter {

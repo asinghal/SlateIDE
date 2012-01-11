@@ -15,8 +15,9 @@
  */
 package net.slate.gui
 
-import java.awt.{ Color, Dimension }
+import java.awt.Color
 import scala.swing.{ Dialog, MainFrame, ScrollPane }
+import net.slate.Size
 
 abstract class BaseHelpDialog(frame: MainFrame) extends Dialog(frame.owner) {
   val pane = new TextPane
@@ -26,7 +27,7 @@ abstract class BaseHelpDialog(frame: MainFrame) extends Dialog(frame.owner) {
   peer.getContentPane.add(new ScrollPane {
 		 viewportView =  pane
   }.peer)
-  preferredSize = new Dimension(400, 300)
+  preferredSize = Size(400, 300)
   pane.peer.setContentType("text/html")
   pane.peer.setEditable(false)
   peer.setModal(true)

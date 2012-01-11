@@ -22,6 +22,7 @@ import javax.swing.text.Document
 import scala.swing._
 import scala.swing.event._
 import net.slate.Launch._
+import net.slate.Size
 
 class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   title = "Find"
@@ -89,7 +90,7 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
       peer.setVisible(false)
   }
 
-  preferredSize = new Dimension(330, 150)
+  preferredSize = Size(330, 150)
   resizable = false
 
   def display() {

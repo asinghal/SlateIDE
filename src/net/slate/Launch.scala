@@ -69,7 +69,7 @@ object Launch extends SimpleSwingApplication {
   private val splash = new MainFrame {
     iconImage = TrayIcon.icon
     title = "Slate"
-    preferredSize = new Dimension(400, 150)
+    preferredSize = Size(400, 150)
     peer.setUndecorated(true)
     contents = new BorderPanel {
       import javax.swing.BorderFactory

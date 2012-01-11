@@ -17,18 +17,19 @@ package net.slate.gui
 
 import swing.Button
 import net.slate.Launch._
+import net.slate.Size
 
 /**
  * This is the 'close' button that appears on each tab of the editor.
  */
 class TabButton(name: String) extends Button {
-  import java.awt.{ BasicStroke, Color, Dimension, Graphics2D }
+  import java.awt.{ BasicStroke, Color, Graphics2D }
   import javax.swing.BorderFactory
   import javax.swing.plaf.basic.BasicButtonUI
   import swing.event.MouseClicked
 
   val buttonSize = 18
-  preferredSize = new Dimension(buttonSize, buttonSize)
+  preferredSize = Size(buttonSize, buttonSize)
 
   tooltip = "Close"
   peer.setUI(new BasicButtonUI)

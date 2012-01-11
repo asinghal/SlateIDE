@@ -25,6 +25,7 @@ import scala.swing._
 import scala.swing.event.{ ButtonClicked, KeyReleased }
 
 import net.slate.ExecutionContext
+import net.slate.Size
 import net.slate.editor.tools.{ TypeCacheBuilder, TypeIndexer }
 
 class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
@@ -41,7 +42,7 @@ class CodeAssistDialog(frame: MainFrame) extends Dialog(frame.owner) {
   results.setCellRenderer(new CodeAssistRenderer)
 
   val resultsPane = new JScrollPane(results)
-  resultsPane.setPreferredSize(new Dimension(400, 400))
+  resultsPane.setPreferredSize(Size(400, 400))
   pane.add(resultsPane)
 
   results.addMouseListener(new java.awt.event.MouseAdapter {

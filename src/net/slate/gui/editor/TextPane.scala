@@ -21,6 +21,7 @@ import java.awt.{ FlowLayout, Font, LayoutManager, Point }
 import net.slate.Launch._
 import net.slate.Actions
 import net.slate.gui.popupmenu.EditorPopupMenu
+import net.slate.Size
 
 /**
  *
@@ -45,7 +46,7 @@ class TextPane extends TextComponent {
 class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   peerText =>
 
-  import java.awt.{ Cursor, Dimension, Graphics2D }
+  import java.awt.{ Cursor, Graphics2D }
   import javax.swing.event.{ DocumentEvent, DocumentListener }
   import javax.swing.text.DefaultStyledDocument
   import scala.swing.Panel
@@ -190,8 +191,8 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
   val numbersPane = new Panel {
     val fontSizeChanged = { () =>
       val initialSize = 3 * displayFont.getSize
-      minimumSize = new Dimension(initialSize, initialSize)
-      preferredSize = new Dimension(initialSize, initialSize)
+      minimumSize = Size(initialSize, initialSize)
+      preferredSize = Size(initialSize, initialSize)
     }
 
     fontSizeChanged()

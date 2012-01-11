@@ -1,6 +1,7 @@
 package net.slate.gui
 
 import com.sun.awt.AWTUtilities._
+import net.slate.Size
 
 class OutputFrame extends javax.swing.JFrame {
   setIconImage(net.slate.TrayIcon.icon)
@@ -15,9 +16,7 @@ class OutputFrame extends javax.swing.JFrame {
 
   val outputPane = new Console
 
-  //  setBackground(java.awt.Color.decode("0x363636"))
-  //  setUndecorated(true)
-  setMinimumSize(new java.awt.Dimension(321, 250))
+  setMinimumSize(Size(321, 250))
   setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE)
 
   val tk = java.awt.Toolkit.getDefaultToolkit();

@@ -15,13 +15,14 @@
  */
 package net.slate.gui.popupmenu
 
-import java.awt.{ Color, Dimension, Font }
+import java.awt.{ Color, Font }
 import javax.swing.{ BorderFactory, JPopupMenu }
 import javax.swing.border._
 import scala.swing.{ Action, Menu, Component, MenuItem }
 import scala.swing.SequentialContainer.Wrapper
 
 import net.slate.Launch
+import net.slate.Size
 
 object PopupMenu {
   private[PopupMenu] trait JPopupMenuMixin { def popupMenuWrapper: PopupMenu }
@@ -58,7 +59,7 @@ trait MenuFont {
 
 trait CreateNewItemMenuItem {
   self: Component =>
-  val itemSize = new Dimension(150, 20)
+  val itemSize = Size(150, 20)
   minimumSize = itemSize
   maximumSize = itemSize
 }
