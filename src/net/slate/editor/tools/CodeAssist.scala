@@ -25,20 +25,6 @@ import net.slate.Launch._
 object CodeAssist {
 
   /**
-   * add extra capabilities to java string.
-   */
-  implicit def StringWrapper(str: String) = {
-    new {
-      /**
-       * Gets a string until it find the character, or the whole string anyways.
-       */
-      def substr(c: java.lang.Character) = {
-        if (str.contains(c)) str.substring(0, str.indexOf(c)) else str
-      }
-    }
-  }
-
-  /**
    * Extract the word at the caret position.
    */
   def getWord: (Int, String) = getWord(true)
@@ -55,24 +41,22 @@ object CodeAssist {
     val line = doc.getText(start, end - start)
     
     def maxIndex(x: Int, y: java.lang.Character) = {
-      if (line.contains(y) && (line.indexOf(y, caretPos) <= x || x == -1)) line.indexOf(y, caretPos) else x
+      if (line.contains(y) && (line.indexOf(y, caretPos)<= x || x == -1)) line.indexOf(y, caretPos) else x
     }
-    val index = Array(' ', '.').foldLeft(-1){ (x, y) => maxIndex(x, y) }
-    val endPos = if (index > -1) index else caretPos
+    
+    def minIndex(x: Int, y: java.lang.Character) = {
+      if (line.contains(y) && (line.lastIndexOf(y, caretPos)>= x || x == -1)) line.lastIndexOf(y, caretPos) else x
+    }
+    
+    val chars = Array(' ', '.', '(', '{', '[', ']', ')', '}')
+    val endIndex = chars.foldLeft(-1){ (x, y) => maxIndex(x, y) }
+    val endPos = if (endIndex > -1) endIndex else line.length
+    val startIndex = chars.foldLeft(-1){ (x, y) => minIndex(x, y) }
+    val startPos = if (startIndex > -1) startIndex + 1 else 0
+    
+    val word = line.substring(startPos, endPos)
+    val pos = caret - word.length
 
-    val word = if (line.contains(" ")) line.substring(line.lastIndexOf(" ", caret - start) + 1) else line
-    val w = if (ignorePeriods) removeBrackets(word.substring(word.lastIndexOf(".", caret - start) + 1)) else removeBrackets(word)
-    val pos = caret - w.length
-
-    val fullWord = w.substr(' ').substr('.')
-
-    (pos, fullWord)
-  }
-
-  /**
-   * Removes brackets from the words.
-   */
-  private[this] def removeBrackets(input: String) = {
-    input.substr('[').substr('(').substr('{').substr('}').substr(')').substr(']').trim
+    (pos, word)
   }
 }
