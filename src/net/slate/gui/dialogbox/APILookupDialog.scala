@@ -57,7 +57,7 @@ class APILookupDialog extends Panel {
     import net.slate.Launch._
     txtFind.text = "Showing Results for : " + query
     build(list)
-    top.editorSplitPane.dividerLocation = 700
+    top.editorSplitPane.dividerLocation = Size.adjustHeight(700)
     peer.setVisible(true)
   }
   
