@@ -100,7 +100,7 @@ object Launch extends SimpleSwingApplication {
     val editorSplitPane = new SplitPane(Orientation.Vertical) {
       topComponent = tabPane
       bottomComponent = apiLookupDialog
-      dividerLocation = Size.adjustHeight(700)
+      dividerLocation = Size.adjustWidth(1200)
       resizeWeight = 1.0
       dividerSize = 1
     }
@@ -111,7 +111,7 @@ object Launch extends SimpleSwingApplication {
 
       bottomComponent = bottomTabPane
 
-      dividerLocation = Size.adjustWidth(900)
+      dividerLocation = Size.adjustHeight(550)
       resizeWeight = 1.0
       dividerSize = 1
       var maximized = false
@@ -121,7 +121,7 @@ object Launch extends SimpleSwingApplication {
        */
       def maximize = {
         // resizeWeight = 1d
-        dividerLocation = Size.adjustWidth(1200)
+        dividerLocation = Size.adjustHeight(800)
         maximized = true
       }
 
@@ -130,7 +130,7 @@ object Launch extends SimpleSwingApplication {
        */
       def restore = {
         // resizeWeight = 0.8d
-        dividerLocation = Size.adjustWidth(600)
+        dividerLocation = Size.adjustHeight(550)
         maximized = false
       }
     }
@@ -150,7 +150,7 @@ object Launch extends SimpleSwingApplication {
 
       bottomComponent = splitPane
 
-      dividerLocation = Size.adjustHeight(200)
+      dividerLocation = Size.adjustWidth(200)
       resizeWeight = 0.0
       dividerSize = 1
 
@@ -168,7 +168,7 @@ object Launch extends SimpleSwingApplication {
        */
       def restore = {
         resizeWeight = 0.0
-        dividerLocation = Size.adjustHeight(200)
+        dividerLocation = Size.adjustWidth(200)
         maximized = false
       }
     }
