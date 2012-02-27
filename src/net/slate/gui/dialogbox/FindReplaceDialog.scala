@@ -28,8 +28,6 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   title = "Find"
   val SPACING = 5
 
-  var findForward = true
-
   var curFinder: Finder = null
 
   //  com.sun.awt.AWTUtilities.setWindowOpacity(peer, 0.8f)
@@ -78,14 +76,12 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   pnlRight.add(butReplace.peer)
   pnlRight.add(butCancel.peer)
 
-  listenTo(butFind, butCancel)
+  listenTo(butFind, butReplace, butCancel)
   reactions += {
     case ButtonClicked(`butFind`) =>
-      findForward = radDown.selected
-      TextSearch.findNext(txtFind.getText, chkCase.isSelected, findForward)
+      TextSearch.findNext(txtFind.getText, chkCase.isSelected, radDown.selected)
     case ButtonClicked(`butReplace`) =>
-      findForward = radDown.selected
-      TextSearch.replace(txtFind.getText, txtReplace.getText(), chkCase.isSelected, findForward)
+      TextSearch.replace(txtFind.getText, txtReplace.getText(), chkCase.isSelected, radDown.selected)
     case ButtonClicked(`butCancel`) =>
       peer.setVisible(false)
   }

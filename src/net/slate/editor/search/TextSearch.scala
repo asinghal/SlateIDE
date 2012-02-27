@@ -30,7 +30,6 @@ object TextSearch {
 
     if (lastOcc == null) {
       selectNone()
-      //      alertInfo ("Finished searching the document")
       println("Text not found. Perhaps start at the beginning of this file? ")
     } else {
       selectText(lastOcc.pos, lastOcc.length)
