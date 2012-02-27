@@ -17,7 +17,7 @@ object SearchField {
       foreground = Color.decode("0xBBBBBB")
 
       reactions += {
-        case ValueChanged(_) => if(text != prompt) {
+        case ValueChanged(_) => if(text != prompt && text.trim.length > 0) {
           net.slate.Launch.currentScript.text.peer.setCaretPosition(1)
           TextSearch.findNext(text, false, true)
         }

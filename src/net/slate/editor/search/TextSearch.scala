@@ -16,16 +16,18 @@
 package net.slate.editor.search
 
 object TextSearch {
-  
+
   import net.slate.gui._
   import net.slate.Launch._
+
+  private val myHighlightPainter = new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(java.awt.Color.decode("0x666666"))
 
   def findNext(text: String, caseSensitive: Boolean, forward: Boolean): Occurrence = {
     val curFinder = makeFinder(text, caseSensitive)
     val caret = currentScript.text.peer.getCaretPosition
 
     val lastOcc = curFinder.findNext(currentScript.text.peer.getDocument(), caret, forward)
-    
+
     if (lastOcc == null) {
       selectNone()
       //      alertInfo ("Finished searching the document")
@@ -33,7 +35,7 @@ object TextSearch {
     } else {
       selectText(lastOcc.pos, lastOcc.length)
     }
-    
+
     lastOcc
   }
 
@@ -42,10 +44,14 @@ object TextSearch {
   }
 
   def selectText(index: Int, length: Int) {
-    currentScript.text.peer.setSelectionStart(index)
-    currentScript.text.peer.setSelectionEnd(index + length)
+    val hilite = currentScript.text.peer.getHighlighter()
+    hilite.removeAllHighlights
+    hilite.addHighlight(index, index + length, myHighlightPainter)
   }
+
   def selectNone() {
+    val hilite = currentScript.text.peer.getHighlighter()
+    hilite.removeAllHighlights
     selectText(0, 0)
   }
 
