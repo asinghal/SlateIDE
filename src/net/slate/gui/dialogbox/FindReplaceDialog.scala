@@ -18,11 +18,11 @@ package net.slate.gui
 import java.awt.{ BorderLayout, Color, FlowLayout }
 import java.awt.event.KeyEvent
 import javax.swing.{ BorderFactory, BoxLayout, JRadioButton, JButton, JTextField, JCheckBox, JDialog, JPanel }
-import javax.swing.text.Document
 import scala.swing._
 import scala.swing.event._
 import net.slate.Launch._
 import net.slate.Size
+import net.slate.editor.search._
 
 class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   title = "Find"
@@ -82,10 +82,10 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
   reactions += {
     case ButtonClicked(`butFind`) =>
       findForward = radDown.selected
-      findNext(findForward)
+      TextSearch.findNext(txtFind.getText, chkCase.isSelected, findForward)
     case ButtonClicked(`butReplace`) =>
       findForward = radDown.selected
-      findNext(findForward)
+      TextSearch.replace(txtFind.getText, txtReplace.getText(), chkCase.isSelected, findForward)
     case ButtonClicked(`butCancel`) =>
       peer.setVisible(false)
   }
@@ -101,83 +101,5 @@ class FindDialog(frame: MainFrame) extends Dialog(frame.owner) {
     peer.setLocation(950, 100);
 
     peer.setVisible(true)
-  }
-
-  private var lastOcc: Occurrence = null
-
-  def findNext(forward: Boolean): Boolean = {
-    curFinder = makeFinder
-
-    val caret = currentScript.text.peer.getCaretPosition
-
-    lastOcc = curFinder.findNext(currentScript.text.peer.getDocument(), caret, forward)
-
-    if (lastOcc == null) {
-      selectNone()
-      //      alertInfo ("Finished searching the document")
-      println("Text not found. Perhaps start at the beginning of this file? ")
-      false
-    } else {
-      selectText(lastOcc.pos, lastOcc.length)
-      true
-    }
-  }
-
-  def replace = {
-    makeFinder.replaceAll(currentScript.text.peer.getDocument(), txtReplace.getText)
-  }
-
-  def selectText(index: Int, length: Int) {
-    currentScript.text.peer.setSelectionStart(index)
-    currentScript.text.peer.setSelectionEnd(index + length)
-  }
-  def selectNone() {
-    selectText(0, 0)
-  }
-
-  def makeFinder: Finder = {
-    new PlainTextFinder(txtFind.getText, chkCase.isSelected)
-  }
-}
-
-case class Occurrence(pos: Int, length: Int)
-
-abstract class Finder {
-  def findNext(doc: Document, startPos: Int, findForward: Boolean): Occurrence
-
-  def replaceAll(doc: Document, replacement: String)
-}
-
-class PlainTextFinder(casedTarget: String, caseSensitive: Boolean) extends Finder {
-  def findNext(doc: Document, startPos: Int, findForward: Boolean): Occurrence = {
-    val docText = doc.getText(0, doc.getLength)
-    val text = if (caseSensitive) docText else docText.toLowerCase
-    val target = if (caseSensitive) casedTarget else casedTarget.toLowerCase
-    val pos =
-      if (findForward) {
-        if (startPos == text.length)
-          -1
-        else
-          text.indexOf(target, startPos)
-      } else {
-        //        if (startPos == 0)
-        //          -1
-        //        else
-        text.lastIndexOf(target, /*startPos - */ target.length)
-      }
-    if (pos >= 0)
-      return new Occurrence(pos, target.length)
-    else
-      return null
-  }
-
-  def replaceAll(doc: Document, replacement: String) = {
-    var next: Occurrence = findNext(doc, 0, true)
-
-    while (next != null) {
-      doc.remove(next.pos, next.length)
-      doc.insertString(next.pos, replacement, null)
-      next = findNext(doc, 0, true)
-    }
   }
 }

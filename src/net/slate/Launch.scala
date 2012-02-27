@@ -104,6 +104,12 @@ object Launch extends SimpleSwingApplication {
       resizeWeight = 1.0
       dividerSize = 1
     }
+    
+    val searchField = SearchField("search...")
+    
+    val glasspane = new FlowPanel(FlowPanel.Alignment.Right)(searchField) {
+      opaque = false
+    }
 
     // editor panel that houses editor + console
     val splitPane = new SplitPane(Orientation.Horizontal) {
@@ -179,6 +185,8 @@ object Launch extends SimpleSwingApplication {
     }
 
     peer.setExtendedState(peer.getExtendedState() | Frame.MAXIMIZED_BOTH)
+    peer.setGlassPane(glasspane.peer)
+    peer.getGlassPane.setVisible(true)
 
     Actions.newTabAction.apply()
 
