@@ -22,6 +22,7 @@ import net.slate.Launch._
 import net.slate.Actions
 import net.slate.gui.popupmenu.EditorPopupMenu
 import net.slate.Size
+import net.slate.util.KeyStrokeHelper
 
 /**
  *
@@ -69,7 +70,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       net.slate.editor.completion.AutoComplete.inject
     }
   })
-  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift O"), new OrganiseImportsAction)
+  addActionforKeyStroke(KeyStrokeHelper("control shift O"), new OrganiseImportsAction)
   addActionforKeyStroke(KeyEvent.VK_F11, new javax.swing.AbstractAction {
     import net.slate.Launch._
     def actionPerformed(e: java.awt.event.ActionEvent) {
@@ -85,27 +86,27 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
       WordCompletionPopupMenu.hide
     }
   })
-  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction)
-  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift F"), new FormatFileAction)
-  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
+  addActionforKeyStroke(KeyStrokeHelper(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), new CommentCodeAction)
+  addActionforKeyStroke(KeyStrokeHelper("control shift F"), new FormatFileAction)
+  addActionforKeyStroke(KeyStrokeHelper(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       findDialog.display
     }
   })
 
-  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift R"), new javax.swing.AbstractAction {
+  addActionforKeyStroke(KeyStrokeHelper("control shift R"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       lookUpDialog.display
     }
   })
 
-  addActionforKeyStroke(KeyStroke.getKeyStroke("control shift T"), new javax.swing.AbstractAction {
+  addActionforKeyStroke(KeyStrokeHelper("control shift T"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       codeAssistDialog.display
     }
   })
 
-  addActionforKeyStroke(KeyStroke.getKeyStroke("control F11"), new javax.swing.AbstractAction {
+  addActionforKeyStroke(KeyStrokeHelper("control F11"), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       runDialog.display
     }
@@ -124,7 +125,7 @@ class EditorTabbedPane(tabName: String, val path: String) extends TextPane {
 
   val popupMenu = new EditorPopupMenu
 
-  addActionforKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
+  addActionforKeyStroke(KeyStrokeHelper(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), new javax.swing.AbstractAction {
     def actionPerformed(e: java.awt.event.ActionEvent) {
       CodeSuggestionPopupMenu.show
     }

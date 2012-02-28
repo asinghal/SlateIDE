@@ -26,6 +26,7 @@ import scala.util.Properties._
 import scala.tools.nsc.{ Interpreter, Settings, InterpreterResults }
 import swing._
 import net.slate.builder.{ JavaBuilder, ScalaBuilder }
+import net.slate.util.KeyStrokeHelper
 
 /**
  * Defines the main menu actions and Scala interpreter usage.
@@ -280,7 +281,7 @@ object Actions {
    * Enables "undo" on the text pane.
    */
   object UndoAction extends UpdateCaretListener("Undo") with PropertyChangeListener {
-    accelerator = Some(KeyStroke.getKeyStroke("control Z"))
+    accelerator = Some(KeyStrokeHelper("control Z"))
     enabled = false
 
     override def apply() {
@@ -302,7 +303,7 @@ object Actions {
    */
   object RedoAction extends UpdateCaretListener("Redo") with PropertyChangeListener {
     title = "Redo"
-    accelerator = Some(KeyStroke.getKeyStroke("control Y"))
+    accelerator = Some(KeyStrokeHelper("control Y"))
     enabled = false
 
     override def apply() {
