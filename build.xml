@@ -1,7 +1,7 @@
 <project name="Slate" default="dist" basedir=".">
 
 <!--<property name="scala.home" value="" />-->
-<property name="sources.dir" value="${basedir}/src" />
+<property name="sources.dir" value="${basedir}/src/main/scala" />
 <property name="build.dir" value="${basedir}/classes" />
 <property name="dist.dir" value="${basedir}/dist" />
 
