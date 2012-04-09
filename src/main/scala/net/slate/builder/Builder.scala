@@ -184,8 +184,12 @@ trait Builder {
       if (p.endsWith("*.jar") || p.endsWith("*.zip")) {
         val path = if (p.startsWith(".\\")) (project + File.separator + p.substring(2)) else p
         val dir = path.replace("*.jar", "").replace("*.zip", "")
-        new File(dir).list.filter { lib => lib.endsWith(".jar") || lib.endsWith(".zip") }.foreach { lib =>
-          cp += (dir + lib + pathSeparator)
+        val files = new File(dir).list
+
+        if (files != null) {
+          files.filter { lib => lib.endsWith(".jar") || lib.endsWith(".zip") }.foreach { lib =>
+            cp += (dir + lib + pathSeparator)
+          }
         }
       } else if (p.startsWith(".\\")) {
         cp += (project + File.separator + p.substring(2))

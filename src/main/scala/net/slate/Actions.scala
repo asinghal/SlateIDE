@@ -346,9 +346,6 @@ object Actions {
  * Defines the Main menu bar that appear on the top.
  */
 object MainMenuBar extends MenuBar {
-  peer.setLayout(new BorderLayout)
-  peer.add(new MenuBar {
-
     import Actions._
 
     // "File" menu
@@ -377,5 +374,4 @@ object MainMenuBar extends MenuBar {
       contents += new MenuItem(helpAction)
       contents += new MenuItem(aboutAction)
     }
-  }.peer, BorderLayout.CENTER)
 }

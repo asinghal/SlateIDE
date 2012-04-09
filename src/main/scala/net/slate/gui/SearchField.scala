@@ -18,7 +18,7 @@ object SearchField {
 
       reactions += {
         case ValueChanged(_) => if(text != prompt && text.trim.length > 0) {
-          net.slate.Launch.currentScript.text.peer.setCaretPosition(1)
+          //net.slate.Launch.currentScript.text.peer.setCaretPosition(text.trim.length -1)
           TextSearch.findNext(text, false, true)
         }
       }

@@ -14,4 +14,4 @@ CLASSPATH=$SLATE_HOME/conf:$SLATE_HOME/templates:$SLATE_HOME/lib/lucene-core-3.3
 
 export JAVA_OPTS="-Xms512M -Xmx512M -XX:MaxPermSize=256M"
 
-$SCALA_HOME/bin/scala -cp $CLASSPATH net.slate.Launch 
+$SCALA_HOME/bin/scala -cp $CLASSPATH net.slate.Launch -Dcom.apple.mrj.application.apple.menu.about.name=Slate -Dapple.laf.useScreenMenuBar=true
