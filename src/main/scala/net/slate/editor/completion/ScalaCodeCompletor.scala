@@ -17,7 +17,7 @@ package net.slate.editor.completion
 
 import scala.tools.nsc.Settings
 import scala.tools.nsc.interactive.{ Global, Response }
-import scala.tools.nsc.util.BatchSourceFile
+import scala.reflect.internal.util.BatchSourceFile
 import scala.tools.nsc.reporters.StoreReporter
 
 /**
@@ -46,7 +46,7 @@ object ScalaCodeCompletor {
     // HACK!!! can't get one solution that works with both 2.8.1 and 2.9.1
     global.unitOfFile.getOrElse(sourceFile.file,
       global.unitOfFile.put(sourceFile.file, new global.RichCompilationUnit(sourceFile)))
-    global.askType(sourceFile, false, typed)
+    global.askLoadedTyped(sourceFile, typed)
 
     val cpos = global.rangePos(sourceFile, start, start, start)
     global.askTypeCompletion(cpos, completed)

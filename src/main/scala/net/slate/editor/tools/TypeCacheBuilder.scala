@@ -58,7 +58,7 @@ object TypeCacheBuilder {
 
     val directory = new File(settings._2)
     
-    def loadClass(name: String) = try { findClass(classLoader, name) } catch { case _ => Class.forName(name, true, classLoader) }
+    def loadClass(name: String) = try { findClass(classLoader, name) } catch { case _ : Throwable => Class.forName(name, true, classLoader) }
 
     val scalaSuite = Class.forName("org.scalatest.Suite", true, classLoader)
     var classes = findClasses(directory, null) map { loadClass } filter { scalaSuite.isAssignableFrom } map { _.getName }

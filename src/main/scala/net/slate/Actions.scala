@@ -23,7 +23,7 @@ import java.beans.{ PropertyChangeEvent, PropertyChangeListener }
 import java.io._
 import scala.actors.Actor._
 import scala.util.Properties._
-import scala.tools.nsc.{ Interpreter, Settings, InterpreterResults }
+import scala.tools.nsc.{ Interpreter, Settings }
 import swing._
 import net.slate.builder.{ JavaBuilder, ScalaBuilder }
 import net.slate.util.KeyStrokeHelper
